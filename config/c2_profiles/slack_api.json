@@ -1,0 +1,65 @@
+{
+  "name": "slack_api",
+  "description": "伪装为 Slack 客户端 API 调用流量",
+  "author": "Cerberus",
+
+  "global": {
+    "sleep_ms": 12000,
+    "jitter_pct": 35,
+    "max_retry": 3,
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Slack/4.39.95 Chrome/128.0.6613.178 Electron/32.1.2 Safari/537.36"
+  },
+
+  "crypto": {
+    "aes_key": "",
+    "aes_iv": ""
+  },
+
+  "http_get": {
+    "uri_paths": ["/api/conversations.history?channel={}", "/api/rtm.connect?batch_presence_aware=1&token={}", "/api/team.info?token={}"],
+    "cookie_name": "d",
+    "headers": {
+      "Accept": "application/json",
+      "Accept-Language": "en-US,en;q=0.5",
+      "Connection": "keep-alive",
+      "X-Slack-Version-Ts": "1710000000",
+      "Origin": "https://app.slack.com",
+      "Referer": "https://app.slack.com/client/"
+    },
+    "metadata": {
+      "transform": "base64_aes",
+      "location": "cookie"
+    }
+  },
+
+  "http_post": {
+    "uri_paths": ["/api/chat.postMessage", "/api/conversations.mark", "/api/chat.update"],
+    "cookie_name": "d",
+    "content_type": "application/json; charset=utf-8",
+    "headers": {
+      "Accept": "application/json",
+      "Connection": "keep-alive",
+      "X-Slack-Version-Ts": "1710000000",
+      "Origin": "https://app.slack.com",
+      "Referer": "https://app.slack.com/client/"
+    },
+    "body": {
+      "transform": "aes"
+    }
+  },
+
+  "http_response": {
+    "content_type": "application/json; charset=utf-8",
+    "headers": {
+      "X-Content-Type-Options": "nosniff",
+      "X-Slack-Backend": "r",
+      "X-Via": "haproxy-www-j3p3",
+      "Strict-Transport-Security": "max-age=31536000"
+    },
+    "body_template": "{\"ok\":true,\"messages\":[{\"type\":\"message\",\"text\":\"{{DATA}}\",\"ts\":\"1710000000.000000\"}],\"has_more\":false}",
+    "data_marker": "\"text\":\"",
+    "data_delimiter_start": "\"text\":\"",
+    "data_delimiter_end": "\",\"ts\"",
+    "no_task_value": "UYz2QVy4ydqbZejA9lTAzQ=="
+  }
+}

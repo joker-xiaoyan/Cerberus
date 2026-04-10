@@ -1,0 +1,64 @@
+{
+  "name": "google_api",
+  "description": "伪装为 Google Workspace / Drive API 流量",
+  "author": "Cerberus",
+
+  "global": {
+    "sleep_ms": 14000,
+    "jitter_pct": 40,
+    "max_retry": 3,
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+  },
+
+  "crypto": {
+    "aes_key": "",
+    "aes_iv": ""
+  },
+
+  "http_get": {
+    "uri_paths": ["/drive/v3/files?pageToken={}&fields=*", "/oauth2/v4/token?code={}", "/calendar/v3/calendars/{}/events"],
+    "cookie_name": "NID",
+    "headers": {
+      "Accept": "application/json",
+      "Accept-Language": "en-US,en;q=0.9",
+      "Connection": "keep-alive",
+      "X-Goog-Api-Client": "gdcl/7.0.0 gl-python/3.12.0",
+      "X-Goog-Request-Reason": "endpoint_check",
+      "Origin": "https://drive.google.com"
+    },
+    "metadata": {
+      "transform": "base64_aes",
+      "location": "cookie"
+    }
+  },
+
+  "http_post": {
+    "uri_paths": ["/upload/drive/v3/files?uploadType=multipart", "/batch/drive/v3", "/drive/v3/files/{}/copy"],
+    "cookie_name": "NID",
+    "content_type": "multipart/related; boundary=boundary_cerberus",
+    "headers": {
+      "Accept": "application/json",
+      "Connection": "keep-alive",
+      "X-Goog-Api-Client": "gdcl/7.0.0 gl-python/3.12.0",
+      "Origin": "https://drive.google.com"
+    },
+    "body": {
+      "transform": "aes"
+    }
+  },
+
+  "http_response": {
+    "content_type": "application/json; charset=UTF-8",
+    "headers": {
+      "X-Content-Type-Options": "nosniff",
+      "X-Goog-Safety-Content-Type": "application/json",
+      "X-Frame-Options": "SAMEORIGIN",
+      "Alt-Svc": "h3=\":443\"; ma=2592000"
+    },
+    "body_template": "{\"kind\":\"drive#fileList\",\"incompleteSearch\":false,\"files\":[{\"id\":\"{{DATA}}\",\"name\":\"document.pdf\",\"mimeType\":\"application/pdf\"}]}",
+    "data_marker": "\"id\":\"",
+    "data_delimiter_start": "\"id\":\"",
+    "data_delimiter_end": "\",\"name\"",
+    "no_task_value": "UYz2QVy4ydqbZejA9lTAzQ=="
+  }
+}

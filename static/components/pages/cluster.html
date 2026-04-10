@@ -1,0 +1,1109 @@
+<!-- cluster 页面 - 分布式集群管理 -->
+<div id="clusterPage" class="page-content">
+    <div class="max-w-full mx-auto px-6 py-6">
+        <!-- 页面头部 -->
+        <div class="mb-6">
+            <h2 class="text-2xl font-bold flex items-center">
+                <i class="fas fa-network-wired mr-2 text-purple-400"></i>
+                集群管理
+            </h2>
+            <p class="text-sm text-gray-400 mt-1">
+                管理分布式 TeamServer 节点、监控集群状态、进行故障转移。
+            </p>
+        </div>
+
+        <!-- 集群状态概览 -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <!-- 集群模式 -->
+            <div class="chart-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-400">集群模式</p>
+                        <p id="clusterMode" class="text-2xl font-bold text-purple-400">-</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center">
+                        <i class="fas fa-sitemap text-purple-400 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 节点数量 -->
+            <div class="chart-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-400">节点数量</p>
+                        <p id="nodeCount" class="text-2xl font-bold text-blue-400">-</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
+                        <i class="fas fa-server text-blue-400 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 在线节点 -->
+            <div class="chart-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-400">在线节点</p>
+                        <p id="onlineCount" class="text-2xl font-bold text-green-400">-</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
+                        <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 当前角色 -->
+            <div class="chart-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-400">当前角色</p>
+                        <p id="currentRole" class="text-2xl font-bold text-yellow-400">-</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                        <i class="fas fa-user-cog text-yellow-400 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 节点列表 -->
+        <div class="chart-card mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold flex items-center">
+                    <i class="fas fa-network-wired mr-2 text-purple-400"></i>
+                    节点列表
+                </h3>
+                <div class="flex items-center space-x-2">
+                    <button id="refreshClusterBtn" class="btn-secondary text-sm">
+                        <i class="fas fa-sync-alt mr-1"></i>刷新
+                    </button>
+                    <button id="manualFailoverBtn" class="btn-warning text-sm">
+                        <i class="fas fa-exchange-alt mr-1"></i>手动故障转移
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b border-gray-700">
+                            <th class="py-3 px-4 text-sm font-semibold text-gray-300">节点名称</th>
+                            <th class="py-3 px-4 text-sm font-semibold text-gray-300">地址</th>
+                            <th class="py-3 px-4 text-sm font-semibold text-gray-300">角色</th>
+                            <th class="py-3 px-4 text-sm font-semibold text-gray-300">状态</th>
+                            <th class="py-3 px-4 text-sm font-semibold text-gray-300">主节点</th>
+                            <th class="py-3 px-4 text-sm font-semibold text-gray-300">内存</th>
+                            <th class="py-3 px-4 text-sm font-semibold text-gray-300">Goroutines</th>
+                            <th class="py-3 px-4 text-sm font-semibold text-gray-300">最后心跳</th>
+                        </tr>
+                    </thead>
+                    <tbody id="nodeTableBody">
+                        <tr>
+                            <td colspan="8" class="py-8 text-center text-gray-400">
+                                <i class="fas fa-circle-notch fa-spin mr-2"></i>加载中...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Beacon 分布 & Redirector 状态 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <!-- Beacon 节点分布 -->
+            <div class="chart-card">
+                <h3 class="text-lg font-semibold flex items-center mb-4">
+                    <i class="fas fa-chart-pie mr-2 text-cyan-400"></i>
+                    Beacon 节点分布
+                </h3>
+                <div id="beaconDistribution" class="space-y-2">
+                    <p class="text-sm text-gray-400 text-center py-4">加载中...</p>
+                </div>
+            </div>
+
+            <!-- Redirector 状态 -->
+            <div class="chart-card">
+                <h3 class="text-lg font-semibold flex items-center mb-4">
+                    <i class="fas fa-random mr-2 text-orange-400"></i>
+                    Redirector 状态
+                </h3>
+                <div id="redirectorStatus" class="space-y-3">
+                    <p class="text-sm text-gray-400 text-center py-4">加载中...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 集群事件日志 -->
+        <div class="chart-card mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold flex items-center">
+                    <i class="fas fa-history mr-2 text-green-400"></i>
+                    集群事件日志
+                </h3>
+                <button id="refreshEventsBtn" class="btn-secondary text-sm">
+                    <i class="fas fa-sync-alt mr-1"></i>刷新
+                </button>
+            </div>
+            <div class="overflow-x-auto max-h-80 overflow-y-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="sticky top-0 bg-gray-800">
+                        <tr class="border-b border-gray-700">
+                            <th class="py-2 px-3 text-gray-300">时间</th>
+                            <th class="py-2 px-3 text-gray-300">类型</th>
+                            <th class="py-2 px-3 text-gray-300">节点</th>
+                            <th class="py-2 px-3 text-gray-300">目标</th>
+                            <th class="py-2 px-3 text-gray-300">消息</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eventLogBody">
+                        <tr>
+                            <td colspan="5" class="py-6 text-center text-gray-400">
+                                <i class="fas fa-circle-notch fa-spin mr-2"></i>加载中...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 集群配置 -->
+        <div class="chart-card">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold flex items-center">
+                    <i class="fas fa-cog mr-2 text-gray-400"></i>
+                    集群配置
+                    <span class="ml-2 text-xs text-yellow-400 font-normal" id="configDirtyHint" style="display:none;">
+                        <i class="fas fa-exclamation-triangle mr-1"></i>有未保存的更改
+                    </span>
+                </h3>
+                <div class="flex items-center space-x-2">
+                    <button id="resetConfigBtn" class="btn-secondary text-sm">
+                        <i class="fas fa-undo mr-1"></i>重置
+                    </button>
+                    <button id="saveConfigBtn" class="btn-primary text-sm">
+                        <i class="fas fa-save mr-1"></i>保存配置
+                    </button>
+                </div>
+            </div>
+
+            <!-- 运行模式切换 -->
+            <div class="mb-6 p-4 bg-gray-700/30 rounded-lg">
+                <h4 class="text-sm font-semibold text-gray-300 mb-3">
+                    <i class="fas fa-toggle-on mr-1 text-purple-400"></i>运行模式
+                </h4>
+                <div class="flex items-center space-x-4">
+                    <label class="flex items-center cursor-pointer">
+                        <input type="radio" name="configMode" value="standalone" class="mr-2 config-input">
+                        <span class="text-sm">单机模式 (Standalone)</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer">
+                        <input type="radio" name="configMode" value="distributed" class="mr-2 config-input">
+                        <span class="text-sm">分布式模式 (Distributed)</span>
+                    </label>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    单机模式使用 SQLite + 内存缓存；分布式模式需要 PostgreSQL + Redis。
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 节点配置 -->
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-300 mb-3">
+                        <i class="fas fa-server mr-1 text-blue-400"></i>节点配置
+                    </h4>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="form-label">节点 ID</label>
+                            <input type="text" id="configNodeId" class="input-field config-input" placeholder="auto-generated if empty">
+                        </div>
+                        <div>
+                            <label class="form-label">节点名称</label>
+                            <input type="text" id="configNodeName" class="input-field config-input" placeholder="e.g. Primary Node">
+                        </div>
+                        <div>
+                            <label class="form-label">对外地址</label>
+                            <input type="text" id="configAdvertiseAddr" class="input-field config-input" placeholder="e.g. 192.168.1.100">
+                        </div>
+                        <div>
+                            <label class="form-label">API 端口</label>
+                            <input type="number" id="configApiPort" class="input-field config-input" placeholder="8000" min="1" max="65535">
+                        </div>
+                        <div>
+                            <label class="form-label">节点角色</label>
+                            <select id="configNodeRole" class="input-field config-input">
+                                <option value="primary">Primary (主节点)</option>
+                                <option value="worker">Worker (工作节点)</option>
+                                <option value="redirector">Redirector (重定向器)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 数据库配置 -->
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-300 mb-3">
+                        <i class="fas fa-database mr-1 text-green-400"></i>数据库配置
+                    </h4>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="form-label">数据库驱动</label>
+                            <select id="configDbDriver" class="input-field config-input">
+                                <option value="sqlite">SQLite</option>
+                                <option value="postgres">PostgreSQL</option>
+                            </select>
+                        </div>
+
+                        <!-- SQLite 配置 -->
+                        <div id="sqliteConfigSection">
+                            <div>
+                                <label class="form-label">SQLite 文件路径</label>
+                                <input type="text" id="configSqlitePath" class="input-field config-input" placeholder="./c2platform.db">
+                            </div>
+                        </div>
+
+                        <!-- PostgreSQL 配置 -->
+                        <div id="postgresConfigSection" style="display:none;">
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="form-label">主机</label>
+                                        <input type="text" id="configPgHost" class="input-field config-input" placeholder="127.0.0.1">
+                                    </div>
+                                    <div>
+                                        <label class="form-label">端口</label>
+                                        <input type="number" id="configPgPort" class="input-field config-input" placeholder="5432">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="form-label">用户名</label>
+                                        <input type="text" id="configPgUser" class="input-field config-input" placeholder="cerberus">
+                                    </div>
+                                    <div>
+                                        <label class="form-label">密码</label>
+                                        <input type="password" id="configPgPassword" class="input-field config-input" placeholder="••••••">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="form-label">数据库名</label>
+                                        <input type="text" id="configPgDbname" class="input-field config-input" placeholder="cerberus">
+                                    </div>
+                                    <div>
+                                        <label class="form-label">SSL 模式</label>
+                                        <select id="configPgSslmode" class="input-field config-input">
+                                            <option value="disable">disable</option>
+                                            <option value="require">require</option>
+                                            <option value="verify-ca">verify-ca</option>
+                                            <option value="verify-full">verify-full</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <!-- Redis 配置 -->
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-300 mb-3">
+                        <i class="fas fa-bolt mr-1 text-red-400"></i>Redis 配置
+                    </h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <label class="form-label mb-0">启用 Redis</label>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="configRedisEnabled" class="sr-only peer config-input">
+                                <div class="w-9 h-5 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-500"></div>
+                            </label>
+                            <div id="redisStatus" class="flex items-center">
+                                <span class="px-2 py-1 bg-gray-600 rounded text-sm">-</span>
+                            </div>
+                        </div>
+                        <div id="redisConfigFields">
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="form-label">Redis 地址</label>
+                                    <input type="text" id="configRedisAddr" class="input-field config-input" placeholder="127.0.0.1:6379">
+                                </div>
+                                <div>
+                                    <label class="form-label">Redis 密码</label>
+                                    <input type="password" id="configRedisPassword" class="input-field config-input" placeholder="留空表示无密码">
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="form-label">数据库编号</label>
+                                        <input type="number" id="configRedisDb" class="input-field config-input" placeholder="0" min="0">
+                                    </div>
+                                    <div>
+                                        <label class="form-label">连接池大小</label>
+                                        <input type="number" id="configRedisPoolSize" class="input-field config-input" placeholder="20" min="1">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="form-label">Key 前缀</label>
+                                    <input type="text" id="configRedisPrefix" class="input-field config-input" placeholder="cerberus:">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 集群 & 存储配置 -->
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-300 mb-3">
+                        <i class="fas fa-heartbeat mr-1 text-pink-400"></i>集群参数
+                    </h4>
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="form-label">心跳间隔 (秒)</label>
+                                <input type="number" id="configHeartbeatInterval" class="input-field config-input" placeholder="10" min="1">
+                            </div>
+                            <div>
+                                <label class="form-label">节点超时 (秒)</label>
+                                <input type="number" id="configNodeTimeout" class="input-field config-input" placeholder="30" min="5">
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 class="text-sm font-semibold text-gray-300 mb-3 mt-6">
+                        <i class="fas fa-hdd mr-1 text-yellow-400"></i>存储配置
+                    </h4>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="form-label">存储驱动</label>
+                            <select id="configStorageDriver" class="input-field config-input">
+                                <option value="local">本地存储 (Local)</option>
+                                <option value="s3">S3/MinIO</option>
+                            </select>
+                        </div>
+                        <div id="localStorageSection">
+                            <div>
+                                <label class="form-label">本地存储路径</label>
+                                <input type="text" id="configLocalBasePath" class="input-field config-input" placeholder="./">
+                            </div>
+                        </div>
+                        <div id="s3StorageSection" style="display:none;">
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="form-label">Endpoint</label>
+                                        <input type="text" id="configS3Endpoint" class="input-field config-input" placeholder="s3.amazonaws.com">
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Bucket</label>
+                                        <input type="text" id="configS3Bucket" class="input-field config-input" placeholder="cerberus">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="form-label">Access Key</label>
+                                        <input type="text" id="configS3AccessKey" class="input-field config-input">
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Secret Key</label>
+                                        <input type="password" id="configS3SecretKey" class="input-field config-input">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="form-label">Region</label>
+                                        <input type="text" id="configS3Region" class="input-field config-input" placeholder="us-east-1">
+                                    </div>
+                                    <div class="flex items-center pt-6">
+                                        <label class="flex items-center cursor-pointer">
+                                            <input type="checkbox" id="configS3UseSSL" class="mr-2 config-input">
+                                            <span class="text-sm">使用 SSL</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分布式模式说明 -->
+        <div class="chart-card mt-6">
+            <h3 class="text-lg font-semibold flex items-center mb-3">
+                <i class="fas fa-info-circle mr-2 text-blue-400"></i>
+                分布式模式说明
+            </h3>
+            <div class="text-sm text-gray-400 space-y-2">
+                <p>Cerberus TeamServer 支持两种运行模式：</p>
+                <ul class="list-disc list-inside space-y-1 ml-4">
+                    <li><strong>单机模式</strong>：使用 SQLite 数据库和内存 Redis，适合个人使用和小规模测试</li>
+                    <li><strong>分布式模式</strong>：使用 PostgreSQL 和 Redis，支持多节点协同工作</li>
+                </ul>
+                <p class="mt-2">节点角色说明：</p>
+                <ul class="list-disc list-inside space-y-1 ml-4">
+                    <li><strong>Primary（主节点）</strong>：负责故障转移协调、集群管理</li>
+                    <li><strong>Worker（工作节点）</strong>：处理 Beacon 通信、执行任务</li>
+                    <li><strong>Redirector（重定向器）</strong>：流量转发和负载均衡</li>
+                </ul>
+                <p class="mt-2 text-gray-500">
+                    详细部署文档请查看 <code>DISTRIBUTED_GUIDE.md</code>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Cluster management page JavaScript
+(function() {
+    'use strict';
+
+    const clusterPage = document.getElementById('clusterPage');
+    if (!clusterPage) return;
+
+    let refreshInterval = null;
+    let originalConfig = null; // Track original config for dirty detection
+
+    // ──────────── Event Listeners ────────────
+
+    clusterPage.addEventListener('page-show', function() {
+        loadClusterStatus();
+        loadClusterConfig();
+        loadClusterEvents();
+        startAutoRefresh();
+    });
+
+    clusterPage.addEventListener('page-hide', function() {
+        stopAutoRefresh();
+    });
+
+    document.getElementById('refreshClusterBtn').addEventListener('click', function() {
+        loadClusterStatus();
+    });
+
+    document.getElementById('refreshEventsBtn').addEventListener('click', function() {
+        loadClusterEvents();
+    });
+
+    document.getElementById('manualFailoverBtn').addEventListener('click', function() {
+        showFailoverDialog();
+    });
+
+    // Save config button
+    document.getElementById('saveConfigBtn').addEventListener('click', function() {
+        saveClusterConfig();
+    });
+
+    // Reset config button
+    document.getElementById('resetConfigBtn').addEventListener('click', function() {
+        if (originalConfig) {
+            populateConfigForm(originalConfig);
+            document.getElementById('configDirtyHint').style.display = 'none';
+            showNotification('配置已重置为当前运行值', 'info');
+        }
+    });
+
+    // DB driver toggle
+    document.getElementById('configDbDriver').addEventListener('change', function() {
+        toggleDbSections(this.value);
+        markDirty();
+    });
+
+    // Storage driver toggle
+    document.getElementById('configStorageDriver').addEventListener('change', function() {
+        toggleStorageSections(this.value);
+        markDirty();
+    });
+
+    // Redis enabled toggle
+    document.getElementById('configRedisEnabled').addEventListener('change', function() {
+        toggleRedisFields(this.checked);
+        markDirty();
+    });
+
+    // Track dirty state on all config inputs
+    clusterPage.addEventListener('input', function(e) {
+        if (e.target.classList.contains('config-input')) {
+            markDirty();
+        }
+    });
+    clusterPage.addEventListener('change', function(e) {
+        if (e.target.classList.contains('config-input')) {
+            markDirty();
+        }
+    });
+
+    // ──────────── Toggle Helpers ────────────
+
+    function toggleDbSections(driver) {
+        document.getElementById('sqliteConfigSection').style.display = driver === 'sqlite' ? 'block' : 'none';
+        document.getElementById('postgresConfigSection').style.display = driver === 'postgres' ? 'block' : 'none';
+    }
+
+    function toggleStorageSections(driver) {
+        document.getElementById('localStorageSection').style.display = driver === 'local' ? 'block' : 'none';
+        document.getElementById('s3StorageSection').style.display = driver === 's3' ? 'block' : 'none';
+    }
+
+    function toggleRedisFields(enabled) {
+        const fields = document.getElementById('redisConfigFields');
+        fields.style.opacity = enabled ? '1' : '0.5';
+        const inputs = fields.querySelectorAll('input');
+        inputs.forEach(input => input.disabled = !enabled);
+    }
+
+    function markDirty() {
+        document.getElementById('configDirtyHint').style.display = 'inline';
+    }
+
+    // ──────────── Load Cluster Status ────────────
+
+    async function loadClusterStatus() {
+        try {
+            const response = await fetch('/api/cluster/status');
+            const data = await response.json();
+
+            document.getElementById('clusterMode').textContent = data.mode || 'standalone';
+            document.getElementById('nodeCount').textContent = data.nodes ? data.nodes.length : 0;
+            
+            const onlineNodes = data.nodes ? data.nodes.filter(n => n.status === 'online') : [];
+            document.getElementById('onlineCount').textContent = onlineNodes.length;
+            document.getElementById('currentRole').textContent = data.role || '-';
+
+            updateNodeTable(data.nodes, data.mode);
+            updateBeaconDistribution(data.beacon_distribution, data.nodes);
+            updateRedirectorStatus(data.redirector);
+
+        } catch (error) {
+            console.error('Failed to load cluster status:', error);
+            showNotification('加载集群状态失败: ' + error.message, 'error');
+        }
+    }
+
+    // ──────────── Node Table ────────────
+
+    function updateNodeTable(nodes, mode) {
+        const tbody = document.getElementById('nodeTableBody');
+        if (nodes && nodes.length > 0) {
+            tbody.innerHTML = nodes.map(node => `
+                <tr class="border-b border-gray-700 hover:bg-gray-700/30">
+                    <td class="py-3 px-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-server mr-2 text-gray-400"></i>
+                            ${node.name || '-'}
+                            ${node.is_self ? '<span class="ml-2 px-2 py-0.5 bg-blue-500/30 text-blue-400 text-xs rounded">本节点</span>' : ''}
+                        </div>
+                    </td>
+                    <td class="py-3 px-4 font-mono text-sm">${node.addr || '-'}</td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-1 rounded text-xs ${
+                            node.role === 'primary' ? 'bg-purple-500/30 text-purple-400' :
+                            node.role === 'worker' ? 'bg-blue-500/30 text-blue-400' :
+                            'bg-orange-500/30 text-orange-400'
+                        }">
+                            ${getRoleName(node.role)}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-1 rounded text-xs ${
+                            node.status === 'online' ? 'bg-green-500/30 text-green-400' :
+                            node.status === 'degraded' ? 'bg-yellow-500/30 text-yellow-400' :
+                            'bg-red-500/30 text-red-400'
+                        }">
+                            ${node.status || 'unknown'}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        ${node.is_primary ? '<i class="fas fa-crown text-yellow-400"></i>' : '-'}
+                    </td>
+                    <td class="py-3 px-4">${node.memory_mb ? node.memory_mb + ' MB' : '-'}</td>
+                    <td class="py-3 px-4">${node.goroutines || '-'}</td>
+                    <td class="py-3 px-4 text-sm text-gray-400">${formatTime(node.last_heartbeat)}</td>
+                </tr>
+            `).join('');
+        } else {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="py-8 text-center text-gray-400">
+                        <i class="fas fa-network-wired mr-2"></i>
+                        ${mode === 'distributed' ? '暂无其他节点' : '单机模式，无分布式节点'}
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    // ──────────── Beacon Distribution ────────────
+
+    function updateBeaconDistribution(distribution, nodes) {
+        const container = document.getElementById('beaconDistribution');
+        if (!distribution || Object.keys(distribution).length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-4">
+                    <i class="fas fa-chart-pie text-gray-600 text-3xl mb-2"></i>
+                    <p class="text-sm text-gray-400">暂无 Beacon 分布数据</p>
+                </div>
+            `;
+            return;
+        }
+
+        const nodeMap = {};
+        if (nodes) {
+            nodes.forEach(n => { nodeMap[n.id] = n.name || n.id; });
+        }
+
+        const total = Object.values(distribution).reduce((a, b) => a + b, 0);
+        const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-cyan-500', 'bg-pink-500'];
+
+        let html = `<div class="text-sm text-gray-300 mb-3">总计 <span class="text-white font-bold">${total}</span> 个 Beacon</div>`;
+        html += '<div class="space-y-2">';
+
+        let colorIdx = 0;
+        for (const [nodeId, count] of Object.entries(distribution)) {
+            const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+            const nodeName = nodeMap[nodeId] || nodeId;
+            const color = colors[colorIdx % colors.length];
+            html += `
+                <div>
+                    <div class="flex justify-between text-xs text-gray-400 mb-1">
+                        <span><i class="fas fa-server mr-1"></i>${nodeName}</span>
+                        <span>${count} (${pct}%)</span>
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-2">
+                        <div class="${color} h-2 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                    </div>
+                </div>
+            `;
+            colorIdx++;
+        }
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    // ──────────── Redirector Status ────────────
+
+    function updateRedirectorStatus(redirector) {
+        const container = document.getElementById('redirectorStatus');
+        if (!redirector) {
+            container.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">无 Redirector 数据</p>';
+            return;
+        }
+
+        let html = `
+            <div class="flex items-center justify-between text-sm mb-3">
+                <span class="text-gray-400">负载均衡策略</span>
+                <span class="px-2 py-1 bg-orange-500/20 text-orange-400 rounded text-xs">${redirector.strategy || 'round_robin'}</span>
+            </div>
+            <div class="flex items-center justify-between text-sm mb-3">
+                <span class="text-gray-400">节点角色</span>
+                <span class="text-gray-300">${redirector.role || '-'}</span>
+            </div>
+        `;
+
+        const backends = redirector.backends || [];
+        if (backends.length > 0) {
+            html += '<div class="text-xs text-gray-400 mb-2">后端节点:</div>';
+            html += '<div class="space-y-1">';
+            backends.forEach(b => {
+                const statusColor = b.status === 'online' ? 'text-green-400' : 'text-red-400';
+                const statusIcon = b.status === 'online' ? 'fa-check-circle' : 'fa-times-circle';
+                html += `
+                    <div class="flex items-center justify-between text-sm bg-gray-700/50 rounded px-3 py-2">
+                        <span class="text-gray-300"><i class="fas fa-server mr-1 text-gray-500"></i>${b.name || b.id}</span>
+                        <div class="flex items-center space-x-3">
+                            <span class="font-mono text-xs text-gray-400">${b.addr}</span>
+                            <span class="text-xs">W:${b.weight || 1}</span>
+                            <i class="fas ${statusIcon} ${statusColor}"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+        } else {
+            html += '<p class="text-sm text-gray-500 text-center py-2">无后端节点</p>';
+        }
+
+        container.innerHTML = html;
+    }
+
+    // ──────────── Cluster Events ────────────
+
+    async function loadClusterEvents() {
+        try {
+            const response = await fetch('/api/cluster/events?limit=50');
+            const events = await response.json();
+
+            const tbody = document.getElementById('eventLogBody');
+            if (events && events.length > 0) {
+                tbody.innerHTML = events.map(evt => {
+                    const typeColors = {
+                        'node_join': 'bg-green-500/20 text-green-400',
+                        'node_leave': 'bg-red-500/20 text-red-400',
+                        'node_discover': 'bg-blue-500/20 text-blue-400',
+                        'node_start': 'bg-cyan-500/20 text-cyan-400',
+                        'node_stop': 'bg-gray-500/20 text-gray-400',
+                        'listener_recover': 'bg-purple-500/20 text-purple-400',
+                        'proxy_recover': 'bg-orange-500/20 text-orange-400',
+                        'command_forward': 'bg-yellow-500/20 text-yellow-400',
+                    };
+                    const typeColor = typeColors[evt.event_type] || 'bg-gray-500/20 text-gray-400';
+
+                    return `
+                        <tr class="border-b border-gray-700/50 hover:bg-gray-700/20">
+                            <td class="py-2 px-3 text-gray-400 whitespace-nowrap">${formatTime(evt.created_at)}</td>
+                            <td class="py-2 px-3">
+                                <span class="px-2 py-0.5 rounded text-xs ${typeColor}">${evt.event_type}</span>
+                            </td>
+                            <td class="py-2 px-3 font-mono text-xs text-gray-400">${evt.node_id || '-'}</td>
+                            <td class="py-2 px-3 font-mono text-xs text-gray-400">${evt.target_id || '-'}</td>
+                            <td class="py-2 px-3 text-gray-300">${evt.message || '-'}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } else {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-6 text-center text-gray-400">
+                            <i class="fas fa-history mr-2"></i>暂无集群事件
+                        </td>
+                    </tr>
+                `;
+            }
+        } catch (error) {
+            console.error('Failed to load cluster events:', error);
+        }
+    }
+
+    // ──────────── Load & Populate Config ────────────
+
+    async function loadClusterConfig() {
+        try {
+            const response = await fetch('/api/cluster/config');
+            const data = await response.json();
+
+            originalConfig = JSON.parse(JSON.stringify(data)); // Deep clone
+            populateConfigForm(data);
+            document.getElementById('configDirtyHint').style.display = 'none';
+
+        } catch (error) {
+            console.error('Failed to load cluster config:', error);
+            showNotification('加载集群配置失败: ' + error.message, 'error');
+        }
+    }
+
+    function populateConfigForm(data) {
+        // Mode
+        const modeRadios = document.querySelectorAll('input[name="configMode"]');
+        modeRadios.forEach(r => { r.checked = r.value === (data.mode || 'standalone'); });
+
+        // Node config
+        document.getElementById('configNodeId').value = data.node?.id || '';
+        document.getElementById('configNodeName').value = data.node?.name || '';
+        document.getElementById('configAdvertiseAddr').value = data.node?.advertise_addr || '';
+        document.getElementById('configApiPort').value = data.node?.api_port || 8000;
+        document.getElementById('configNodeRole').value = data.node?.role || 'primary';
+
+        // Database config
+        const dbDriver = data.database?.driver || 'sqlite';
+        document.getElementById('configDbDriver').value = dbDriver;
+        toggleDbSections(dbDriver);
+
+        document.getElementById('configSqlitePath').value = data.database?.sqlite?.path || './c2platform.db';
+        document.getElementById('configPgHost').value = data.database?.postgres?.host || '127.0.0.1';
+        document.getElementById('configPgPort').value = data.database?.postgres?.port || 5432;
+        document.getElementById('configPgUser').value = data.database?.postgres?.user || '';
+        document.getElementById('configPgPassword').value = data.database?.postgres?.password || '';
+        document.getElementById('configPgDbname').value = data.database?.postgres?.dbname || '';
+        document.getElementById('configPgSslmode').value = data.database?.postgres?.sslmode || 'disable';
+
+        // Redis config
+        const redisEnabled = data.redis?.enabled || false;
+        document.getElementById('configRedisEnabled').checked = redisEnabled;
+        toggleRedisFields(redisEnabled);
+
+        const redisStatus = document.getElementById('redisStatus');
+        if (redisEnabled) {
+            redisStatus.innerHTML = '<span class="px-2 py-1 bg-green-500/30 text-green-400 rounded text-sm">已启用</span>';
+        } else {
+            redisStatus.innerHTML = '<span class="px-2 py-1 bg-gray-600 text-gray-400 rounded text-sm">未启用</span>';
+        }
+
+        document.getElementById('configRedisAddr').value = data.redis?.addr || '127.0.0.1:6379';
+        document.getElementById('configRedisPassword').value = data.redis?.password || '';
+        document.getElementById('configRedisDb').value = data.redis?.db ?? 0;
+        document.getElementById('configRedisPoolSize').value = data.redis?.pool_size || 20;
+        document.getElementById('configRedisPrefix').value = data.redis?.prefix || 'cerberus:';
+
+        // Cluster config
+        document.getElementById('configHeartbeatInterval').value = data.cluster?.heartbeat_interval_sec || 10;
+        document.getElementById('configNodeTimeout').value = data.cluster?.node_timeout_sec || 30;
+
+        // Storage config
+        const storageDriver = data.storage?.driver || 'local';
+        document.getElementById('configStorageDriver').value = storageDriver;
+        toggleStorageSections(storageDriver);
+
+        document.getElementById('configLocalBasePath').value = data.storage?.local?.base_path || './';
+        document.getElementById('configS3Endpoint').value = data.storage?.s3?.endpoint || '';
+        document.getElementById('configS3Bucket').value = data.storage?.s3?.bucket || '';
+        document.getElementById('configS3AccessKey').value = data.storage?.s3?.access_key || '';
+        document.getElementById('configS3SecretKey').value = data.storage?.s3?.secret_key || '';
+        document.getElementById('configS3Region').value = data.storage?.s3?.region || '';
+        document.getElementById('configS3UseSSL').checked = data.storage?.s3?.use_ssl || false;
+    }
+
+    // ──────────── Save Config ────────────
+
+    async function saveClusterConfig() {
+        const saveBtn = document.getElementById('saveConfigBtn');
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>保存中...';
+
+        try {
+            const config = collectConfigFromForm();
+
+            const response = await fetch('/api/cluster/config', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(config)
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.status === 'success') {
+                originalConfig = JSON.parse(JSON.stringify(config));
+                document.getElementById('configDirtyHint').style.display = 'none';
+                showRestartDialog();
+            } else {
+                showNotification('保存失败: ' + (result.error || '未知错误'), 'error');
+            }
+        } catch (error) {
+            showNotification('保存配置请求失败: ' + error.message, 'error');
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i class="fas fa-save mr-1"></i>保存配置';
+        }
+    }
+
+    function collectConfigFromForm() {
+        const modeRadio = document.querySelector('input[name="configMode"]:checked');
+        const mode = modeRadio ? modeRadio.value : 'standalone';
+
+        return {
+            mode: mode,
+            node: {
+                id: document.getElementById('configNodeId').value.trim(),
+                name: document.getElementById('configNodeName').value.trim(),
+                advertise_addr: document.getElementById('configAdvertiseAddr').value.trim(),
+                api_port: parseInt(document.getElementById('configApiPort').value) || 8000,
+                role: document.getElementById('configNodeRole').value
+            },
+            database: {
+                driver: document.getElementById('configDbDriver').value,
+                sqlite: {
+                    path: document.getElementById('configSqlitePath').value.trim() || './c2platform.db'
+                },
+                postgres: {
+                    host: document.getElementById('configPgHost').value.trim(),
+                    port: parseInt(document.getElementById('configPgPort').value) || 5432,
+                    user: document.getElementById('configPgUser').value.trim(),
+                    password: document.getElementById('configPgPassword').value,
+                    dbname: document.getElementById('configPgDbname').value.trim(),
+                    sslmode: document.getElementById('configPgSslmode').value,
+                    max_open_conns: originalConfig?.database?.postgres?.max_open_conns || 25,
+                    max_idle_conns: originalConfig?.database?.postgres?.max_idle_conns || 10,
+                    conn_max_lifetime_min: originalConfig?.database?.postgres?.conn_max_lifetime_min || 30
+                }
+            },
+            redis: {
+                enabled: document.getElementById('configRedisEnabled').checked,
+                addr: document.getElementById('configRedisAddr').value.trim(),
+                password: document.getElementById('configRedisPassword').value,
+                db: parseInt(document.getElementById('configRedisDb').value) || 0,
+                pool_size: parseInt(document.getElementById('configRedisPoolSize').value) || 20,
+                prefix: document.getElementById('configRedisPrefix').value.trim() || 'cerberus:'
+            },
+            cluster: {
+                heartbeat_interval_sec: parseInt(document.getElementById('configHeartbeatInterval').value) || 10,
+                node_timeout_sec: parseInt(document.getElementById('configNodeTimeout').value) || 30,
+                event_channel: originalConfig?.cluster?.event_channel || 'cerberus:events',
+                node_channel: originalConfig?.cluster?.node_channel || 'cerberus:nodes'
+            },
+            websocket: originalConfig?.websocket || {
+                enabled: false,
+                path: '/ws',
+                ping_interval_sec: 30,
+                pong_timeout_sec: 10
+            },
+            storage: {
+                driver: document.getElementById('configStorageDriver').value,
+                local: {
+                    base_path: document.getElementById('configLocalBasePath').value.trim() || './'
+                },
+                s3: {
+                    endpoint: document.getElementById('configS3Endpoint').value.trim(),
+                    bucket: document.getElementById('configS3Bucket').value.trim(),
+                    access_key: document.getElementById('configS3AccessKey').value.trim(),
+                    secret_key: document.getElementById('configS3SecretKey').value,
+                    region: document.getElementById('configS3Region').value.trim(),
+                    use_ssl: document.getElementById('configS3UseSSL').checked
+                }
+            }
+        };
+    }
+
+    // ──────────── Restart Confirmation Dialog ────────────
+
+    function showRestartDialog() {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+            <div class="bg-gray-800 rounded-lg p-6 w-[480px] max-w-[90vw]">
+                <div class="flex items-center mb-4">
+                    <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center mr-3">
+                        <i class="fas fa-check text-green-400 text-lg"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold">配置已保存</h3>
+                </div>
+                <p class="text-sm text-gray-400 mb-2">
+                    配置已成功写入 <code class="text-blue-400">config/distributed.json</code>。
+                </p>
+                <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3 mb-4">
+                    <p class="text-sm text-yellow-400">
+                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                        <strong>注意：</strong>配置更改需要重启 TeamServer 后才能生效。
+                        数据库连接、Redis 连接等核心组件在启动时初始化，无法热更新。
+                    </p>
+                </div>
+                <div class="flex justify-end">
+                    <button id="closeRestartDialogBtn" class="btn-primary">
+                        <i class="fas fa-check mr-1"></i>知道了
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        document.getElementById('closeRestartDialogBtn').addEventListener('click', function() {
+            modal.remove();
+        });
+
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) modal.remove();
+        });
+    }
+
+    // ──────────── Failover Dialog ────────────
+
+    function showFailoverDialog() {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+            <div class="bg-gray-800 rounded-lg p-6 w-96 max-w-[90vw]">
+                <h3 class="text-lg font-semibold mb-4">手动故障转移</h3>
+                <p class="text-sm text-gray-400 mb-4">
+                    选择要切换为新的主节点。当前主节点将释放主节点锁。
+                </p>
+                <div class="mb-4">
+                    <label class="form-label">选择新主节点 ID</label>
+                    <input type="text" id="newPrimaryId" class="input-field" placeholder="输入节点 ID">
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button id="cancelFailoverBtn" class="btn-secondary">取消</button>
+                    <button id="confirmFailoverBtn" class="btn-danger">确认故障转移</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        document.getElementById('cancelFailoverBtn').addEventListener('click', function() {
+            modal.remove();
+        });
+
+        document.getElementById('confirmFailoverBtn').addEventListener('click', async function() {
+            const newPrimaryId = document.getElementById('newPrimaryId').value;
+            if (!newPrimaryId) {
+                showNotification('请输入节点 ID', 'warning');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/cluster/failover', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ new_primary_id: newPrimaryId })
+                });
+
+                if (response.ok) {
+                    showNotification('故障转移已发起', 'success');
+                    loadClusterStatus();
+                } else {
+                    const error = await response.json();
+                    showNotification('故障转移失败: ' + (error.error || '未知错误'), 'error');
+                }
+            } catch (error) {
+                showNotification('故障转移请求失败: ' + error.message, 'error');
+            }
+
+            modal.remove();
+        });
+
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) modal.remove();
+        });
+    }
+
+    // ──────────── Auto Refresh ────────────
+
+    function startAutoRefresh() {
+        if (refreshInterval) return;
+        refreshInterval = setInterval(() => {
+            loadClusterStatus();
+            loadClusterEvents();
+        }, 10000);
+    }
+
+    function stopAutoRefresh() {
+        if (refreshInterval) {
+            clearInterval(refreshInterval);
+            refreshInterval = null;
+        }
+    }
+
+    // ──────────── Utility Functions ────────────
+
+    function getRoleName(role) {
+        const roles = {
+            'primary': 'Primary',
+            'worker': 'Worker',
+            'redirector': 'Redirector'
+        };
+        return roles[role] || role;
+    }
+
+    function formatTime(timestamp) {
+        if (!timestamp) return '-';
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diff = now - date;
+
+        if (diff < 60000) return '刚刚';
+        if (diff < 3600000) return Math.floor(diff / 60000) + ' 分钟前';
+        if (diff < 86400000) return Math.floor(diff / 3600000) + ' 小时前';
+        return date.toLocaleString();
+    }
+
+    function showNotification(message, type) {
+        if (typeof window.showNotification === 'function') {
+            window.showNotification(message, type);
+        } else {
+            alert(message);
+        }
+    }
+
+    console.log('[Cluster] Cluster management page loaded');
+})();
+</script>

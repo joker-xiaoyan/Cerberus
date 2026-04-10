@@ -1,0 +1,2190 @@
+﻿<!-- beacons 页面 - 从 1index.html 自动提取 -->
+<div id="beaconsPage" class="page-content">
+    <!-- Beacon列表内容 -->
+    <div id="beacon-list" class="beacon-sub-content">
+        <div class="max-w-full mx-auto px-6 py-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold">Beacon管理</h2>
+                <div class="flex items-center space-x-3">
+                    <div class="relative">
+                        <input type="text" id="beaconSearch" placeholder="搜索Beacon..." class="search-input">
+                        <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                    <select id="protocolFilter" class="filter-select">
+                        <option value="all">所有协议</option>
+                        <option value="tcp">TCP</option>
+                        <option value="http">HTTP</option>
+                        <option value="https">HTTPS</option>
+                        <option value="websocket">WebSocket</option>
+                        <option value="dns">DNS</option>
+                    </select>
+                    <select id="statusFilter" class="filter-select">
+                        <option value="all">所有状态</option>
+                        <option value="online">在线</option>
+                        <option value="offline">离线</option>
+                        <option value="sleeping">休眠</option>
+                    </select>
+                    <button onclick="clearOfflineBeacons()" class="px-3 py-2 bg-red-600/80 hover:bg-red-600 text-white text-sm rounded-lg transition-colors flex items-center" title="清除所有掉线的Beacon">
+                        <i class="fas fa-trash-alt mr-1"></i>清除掉线
+                    </button>
+                </div>
+            </div>
+
+            <!-- Beacon列表 -->
+            <div class="chart-card">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="table-header">状态</th>
+                                <th class="table-header">Beacon ID</th>
+                                <th class="table-header">主机名</th>
+                                <th class="table-header">InternelIP</th>
+                                <th class="table-header">ExternelIP</th>
+                                <th class="table-header">协议</th>
+                                <th class="table-header">操作系统</th>
+                                <th class="table-header">用户</th>
+                                <th class="table-header">进程名</th>
+                                <th class="table-header">pid</th>
+                                <th class="table-header">权限</th>
+                                <th class="table-header">架构</th>
+                                <th class="table-header">最后心跳</th>
+                                <th class="table-header">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="beaconTableBody">
+                            <!-- 动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Beacon进阶渗透页面 -->
+    <div id="beacon-advanced" class="beacon-sub-content hidden">
+            <div class="max-w-full mx-auto px-6 py-6">
+                <!-- 标题和Beacon选择器 -->
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold flex items-center">
+                        <i class="fas fa-rocket mr-2 text-purple-400"></i>
+                        进阶渗透工具
+                    </h2>
+                    <div class="relative">
+                        <select id="advancedBeaconSelect" class="bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none min-w-64">
+                            <option value="">选择Beacon</option>
+                        </select>
+                        <div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                            <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Beacon信息卡片 -->
+                <div id="selectedBeaconInfo" class="chart-card mb-6 hidden">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-broadcast-tower text-purple-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <h3 id="selectedBeaconName" class="font-semibold text-lg text-white">-</h3>
+                                    <span id="selectedBeaconID" class="text-sm font-mono text-purple-400 bg-purple-500/20 px-2 py-1 rounded">-</span>
+                                </div>
+                                <p class="text-sm text-gray-400">
+                                    <span id="selectedBeaconIP">-</span> |
+                                    <span id="selectedBeaconOS">-</span> |
+                                    <span id="selectedBeaconUser">-</span>
+                                </p>
+                            </div>
+                        </div>
+                        <span id="selectedBeaconStatus" class="status-badge status-unknown">
+                            未知
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 进阶工具网格 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="advancedToolsGrid">
+                    <!-- 文件上传 -->
+                    <div class="bg-gray-800 rounded-lg p-6 hover:bg-gray-750 hover:border-purple-500/50 transition-all cursor-pointer border border-gray-700" onclick="window.openFileUploadFromPage()">
+                        <div class="flex flex-col items-center space-y-4">
+                            <div class="w-16 h-16 bg-yellow-500/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-upload text-yellow-400 text-2xl"></i>
+                            </div>
+                            <div class="text-center">
+                                <h4 class="font-semibold text-lg text-white mb-1">文件上传</h4>
+                                <p class="text-gray-400 text-sm">上传文件到目标主机</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 文件传输 -->
+                    <div class="bg-gray-800 rounded-lg p-6 hover:bg-gray-750 hover:border-purple-500/50 transition-all cursor-pointer border border-gray-700" onclick="window.openFileDownloadFromPage()">
+                        <div class="flex flex-col items-center space-y-4">
+                            <div class="w-16 h-16 bg-yellow-500/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-exchange-alt text-yellow-400 text-2xl"></i>
+                            </div>
+                            <div class="text-center">
+                                <h4 class="font-semibold text-lg text-white mb-1">文件传输</h4>
+                                <p class="text-gray-400 text-sm">上传/下载目标文件</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOF执行 -->
+                    <div class="bg-gray-800 rounded-lg p-6 hover:bg-gray-750 hover:border-purple-500/50 transition-all cursor-pointer border border-gray-700" onclick="window.openBOFFromPage()">
+                        <div class="flex flex-col items-center space-y-4">
+                            <div class="w-16 h-16 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-bolt text-purple-400 text-2xl"></i>
+                            </div>
+                            <div class="text-center">
+                                <h4 class="font-semibold text-lg text-white mb-1">BOF执行</h4>
+                                <p class="text-gray-400 text-sm">执行Beacon Object File</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RDI注入 -->
+                    <div class="bg-gray-800 rounded-lg p-6 hover:bg-gray-750 hover:border-purple-500/50 transition-all cursor-pointer border border-gray-700" onclick="window.openRDIFromPage()">
+                        <div class="flex flex-col items-center space-y-4">
+                            <div class="w-16 h-16 bg-pink-500/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-code text-pink-400 text-2xl"></i>
+                            </div>
+                            <div class="text-center">
+                                <h4 class="font-semibold text-lg text-white mb-1">RDI注入</h4>
+                                <p class="text-gray-400 text-sm">反射式DLL注入</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 屏幕截图 -->
+                    <div class="bg-gray-800 rounded-lg p-6 hover:bg-gray-750 hover:border-purple-500/50 transition-all cursor-pointer border border-gray-700" onclick="window.openScreenshotFromPage()">
+                        <div class="flex flex-col items-center space-y-4">
+                            <div class="w-16 h-16 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-camera text-blue-400 text-2xl"></i>
+                            </div>
+                            <div class="text-center">
+                                <h4 class="font-semibold text-lg text-white mb-1">屏幕截图</h4>
+                                <p class="text-gray-400 text-sm">捕获目标屏幕</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 权限提升 -->
+                    <div class="bg-gray-800 rounded-lg p-6 hover:bg-gray-750 hover:border-purple-500/50 transition-all cursor-pointer border border-gray-700" onclick="window.openPrivilegeEscalationFromPage()">
+                        <div class="flex flex-col items-center space-y-4">
+                            <div class="w-16 h-16 bg-green-500/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-crown text-green-400 text-2xl"></i>
+                            </div>
+                            <div class="text-center">
+                                <h4 class="font-semibold text-lg text-white mb-1">权限提升</h4>
+                                <p class="text-gray-400 text-sm">提权到SYSTEM</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- InlineExecute PE -->
+                    <div class="bg-gray-800 rounded-lg p-6 hover:bg-gray-750 hover:border-purple-500/50 transition-all cursor-pointer border border-gray-700" onclick="window.openInlineExecutePEFromPage()">
+                        <div class="flex flex-col items-center space-y-4">
+                            <div class="w-16 h-16 bg-orange-500/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-memory text-orange-400 text-2xl"></i>
+                            </div>
+                            <div class="text-center">
+                                <h4 class="font-semibold text-lg text-white mb-1">InlineExecute PE</h4>
+                                <p class="text-gray-400 text-sm">内存加载执行PE文件</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 动态装载DLL -->
+                    <div class="bg-gray-800 rounded-lg p-6 hover:bg-gray-750 hover:border-purple-500/50 transition-all cursor-pointer border border-gray-700" onclick="window.openDllLoaderFromPage()">
+                        <div class="flex flex-col items-center space-y-4">
+                            <div class="w-16 h-16 bg-indigo-500/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-cubes text-indigo-400 text-2xl"></i>
+                            </div>
+                            <div class="text-center">
+                                <h4 class="font-semibold text-lg text-white mb-1">动态装载DLL</h4>
+                                <p class="text-gray-400 text-sm">加载/执行/卸载DLL</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 代理连接 -->
+                    <div class="bg-gray-800 rounded-lg p-6 hover:bg-gray-750 hover:border-purple-500/50 transition-all cursor-pointer border border-gray-700" onclick="window.openSocksProxyFromPage()">
+                        <div class="flex flex-col items-center space-y-4">
+                            <div class="w-16 h-16 bg-orange-500/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-network-wired text-orange-400 text-2xl"></i>
+                            </div>
+                            <div class="text-center">
+                                <h4 class="font-semibold text-lg text-white mb-1">代理连接</h4>
+                                <p class="text-gray-400 text-sm">通过SOCKS代理连接</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <!-- Beacon BOF管理页面 -->
+    <div id="beacon-bof" class="beacon-sub-content hidden">
+        <div class="max-w-full mx-auto px-6 py-6 space-y-6">
+            <div class="flex items-center justify-between">
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-bolt mr-2 text-yellow-400"></i>
+                    BOF管理
+                </h2>
+                <div class="flex items-center space-x-3">
+                    <div class="relative">
+                        <select id="bofBeaconSelect" class="bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-yellow-500 appearance-none min-w-80">
+                            <option value="">选择Beacon用于执行</option>
+                        </select>
+                        <div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                            <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-primary" id="bofRefreshBtn">
+                        <i class="fas fa-sync-alt mr-2"></i>刷新
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <!-- 左侧：上传与列表 -->
+                <div class="space-y-6 xl:col-span-2">
+                    <!-- 上传BOF模块 -->
+                    <div class="chart-card">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold flex items-center">
+                                <i class="fas fa-upload mr-2 text-yellow-400"></i>
+                                上传 BOF 模块
+                            </h3>
+                        </div>
+                        <form id="bofUploadForm" class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="form-label">显示名称</label>
+                                    <input id="bofNameInput" type="text" class="input-field" placeholder="不填则使用文件名" />
+                                </div>
+                                <div>
+                                    <label class="form-label">标签（逗号分隔）</label>
+                                    <input id="bofTagsInput" type="text" class="input-field" placeholder="如：横向移动, 内存执行" />
+                                </div>
+                            </div>
+                            <div>
+                                <label class="form-label">描述</label>
+                                <textarea id="bofDescInput" class="input-field" rows="2" placeholder="简要说明此 BOF 的用途"></textarea>
+                            </div>
+                            <div class="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-3 md:space-y-0">
+                                <div class="flex-1">
+                                    <label class="form-label">选择 COFF 文件</label>
+                                    <input id="bofFileInput" type="file" accept=".o,.obj,.coff" class="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-yellow-500/10 file:text-yellow-400 hover:file:bg-yellow-500/20" />
+                                </div>
+                                <button type="submit" class="btn-primary mt-2 md:mt-6">
+                                    <i class="fas fa-cloud-upload-alt mr-2"></i>上传并保存
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- BOF 模块列表 -->
+                    <div class="chart-card">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold flex items-center">
+                                <i class="fas fa-list mr-2 text-yellow-400"></i>
+                                BOF 模块列表
+                            </h3>
+                            <div class="flex items-center space-x-3">
+                                <input id="bofSearchInput" type="text" class="input-field h-9" placeholder="按名称/标签搜索" />
+                                <span class="text-sm text-gray-400" id="bofCountLabel">0 个模块</span>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="table-auto w-full">
+                                <thead>
+                                    <tr class="border-b border-gray-700">
+                                        <th class="table-header text-left">名称</th>
+                                        <th class="table-header text-left">标签</th>
+                                        <th class="table-header text-left">大小</th>
+                                        <th class="table-header text-left">创建时间</th>
+                                        <th class="table-header text-left">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bofTableBody">
+                                    <!-- 动态生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右侧：执行面板 -->
+                <div class="space-y-6">
+                    <div class="chart-card">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-play mr-2 text-green-400"></i>
+                            对 Beacon 执行 BOF
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="form-label">选择 BOF 模块</label>
+                                <select id="bofModuleSelect" class="input-field">
+                                    <option value="">请选择一个 BOF 模块</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">参数（OptionName，可选）</label>
+                                <input id="bofOptionNameInput" type="text" class="input-field" placeholder="将作为 BeaconPack 中的字符串参数传入" />
+                            </div>
+                            <button type="button" id="bofExecuteBtn" class="btn-primary w-full">
+                                <i class="fas fa-bolt mr-2"></i>对选中 Beacon 执行 BOF
+                            </button>
+                            <p class="text-xs text-gray-500 leading-relaxed">
+                                提示：BOF 内容在服务端以 Base64 编码后下发，Beacon 端会解码并进行 COFF 头校验，仅支持 0x014C/0x8664 机器类型。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Beacon SO管理页面 (Linux SO Loader 插件系统) -->
+    <div id="beacon-so" class="beacon-sub-content hidden">
+        <div class="max-w-full mx-auto px-6 py-6 space-y-6">
+            <div class="flex items-center justify-between">
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-plug mr-2 text-green-400"></i>
+                    SO插件管理
+                    <span class="ml-3 text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400 font-normal">🐧 Linux</span>
+                </h2>
+                <div class="flex items-center space-x-3">
+                    <div class="relative">
+                        <select id="soBeaconSelect" class="bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-green-500 appearance-none min-w-80">
+                            <option value="">选择Linux Beacon用于执行</option>
+                        </select>
+                        <div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                            <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-primary" id="soRefreshBtn">
+                        <i class="fas fa-sync-alt mr-2"></i>刷新
+                    </button>
+                </div>
+            </div>
+
+            <!-- 插件开发指南提示 -->
+            <div class="bg-green-500/5 border border-green-500/20 rounded-lg p-4">
+                <div class="flex items-start space-x-3">
+                    <i class="fas fa-info-circle text-green-400 mt-0.5"></i>
+                    <div class="text-sm text-gray-300 leading-relaxed">
+                        <p class="font-semibold text-green-400 mb-1">SO 插件开发指南</p>
+                        <p>SO Loader 是 Linux 平台的类 BOF 插件机制，支持内存加载 <code class="text-green-300">.so</code> 共享库并执行指定函数。</p>
+                        <p class="mt-1">编译命令：<code class="text-green-300">gcc -shared -fPIC -o plugin.so plugin.c</code></p>
+                        <p class="mt-1">入口函数签名：<code class="text-green-300">int go(unsigned char *args, int args_len)</code></p>
+                        <p class="mt-1">默认入口点依次尝试：<code class="text-green-300">go</code> → <code class="text-green-300">run</code> → <code class="text-green-300">execute</code> → <code class="text-green-300">plugin_main</code></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <!-- 左侧：上传与列表 -->
+                <div class="space-y-6 xl:col-span-2">
+                    <!-- 上传SO模块 -->
+                    <div class="chart-card">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold flex items-center">
+                                <i class="fas fa-upload mr-2 text-green-400"></i>
+                                上传 SO 插件
+                            </h3>
+                        </div>
+                        <form id="soUploadForm" class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="form-label">显示名称</label>
+                                    <input id="soNameInput" type="text" class="input-field" placeholder="不填则使用文件名" />
+                                </div>
+                                <div>
+                                    <label class="form-label">标签（逗号分隔）</label>
+                                    <input id="soTagsInput" type="text" class="input-field" placeholder="如：信息搜集, 提权" />
+                                </div>
+                                <div>
+                                    <label class="form-label">入口函数名</label>
+                                    <input id="soFuncNameInput" type="text" class="input-field" placeholder="默认: go" />
+                                </div>
+                            </div>
+                            <div>
+                                <label class="form-label">描述</label>
+                                <textarea id="soDescInput" class="input-field" rows="2" placeholder="简要说明此 SO 插件的用途"></textarea>
+                            </div>
+                            <div class="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-3 md:space-y-0">
+                                <div class="flex-1">
+                                    <label class="form-label">选择 .so 文件</label>
+                                    <input id="soFileInput" type="file" accept=".so" class="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-500/10 file:text-green-400 hover:file:bg-green-500/20" />
+                                </div>
+                                <button type="submit" class="btn-primary mt-2 md:mt-6">
+                                    <i class="fas fa-cloud-upload-alt mr-2"></i>上传并保存
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- SO 模块列表 -->
+                    <div class="chart-card">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold flex items-center">
+                                <i class="fas fa-list mr-2 text-green-400"></i>
+                                SO 插件列表
+                            </h3>
+                            <div class="flex items-center space-x-3">
+                                <input id="soSearchInput" type="text" class="input-field h-9" placeholder="按名称/标签搜索" />
+                                <span class="text-sm text-gray-400" id="soCountLabel">0 个插件</span>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="table-auto w-full">
+                                <thead>
+                                    <tr class="border-b border-gray-700">
+                                        <th class="table-header text-left">名称</th>
+                                        <th class="table-header text-left">入口函数</th>
+                                        <th class="table-header text-left">标签</th>
+                                        <th class="table-header text-left">大小</th>
+                                        <th class="table-header text-left">创建时间</th>
+                                        <th class="table-header text-left">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="soTableBody">
+                                    <!-- 动态生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右侧：执行面板 -->
+                <div class="space-y-6">
+                    <div class="chart-card">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-play mr-2 text-green-400"></i>
+                            对 Beacon 执行 SO 插件
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="form-label">选择 SO 插件</label>
+                                <select id="soModuleSelect" class="input-field">
+                                    <option value="">请选择一个 SO 插件</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">入口函数名（可选，覆盖默认）</label>
+                                <input id="soExecFuncNameInput" type="text" class="input-field" placeholder="留空使用插件默认入口函数" />
+                            </div>
+                            <div>
+                                <label class="form-label">参数（可选，文本）</label>
+                                <input id="soExecArgsInput" type="text" class="input-field" placeholder="传递给插件函数的参数" />
+                            </div>
+                            <button type="button" id="soExecuteBtn" class="btn-primary w-full">
+                                <i class="fas fa-plug mr-2"></i>对选中 Beacon 执行 SO 插件
+                            </button>
+                            <p class="text-xs text-gray-500 leading-relaxed">
+                                提示：SO 插件在 Beacon 端同进程直接执行（无 fork），通过信号处理器实现崩溃保护。stdout/stderr 输出会被捕获并回传。仅支持 Linux x86_64 Beacon。
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 快速示例 -->
+                    <div class="chart-card">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-code mr-2 text-blue-400"></i>
+                            插件模板
+                        </h3>
+                        <div class="bg-gray-900 rounded-lg p-4 text-xs font-mono text-green-300 leading-relaxed overflow-x-auto">
+                            <pre>// plugin.c
+#include &lt;stdio.h&gt;
+
+int go(unsigned char *args, int args_len) {
+    printf("[+] Hello from SO plugin!\n");
+    if (args &amp;&amp; args_len &gt; 0) {
+        printf("[*] Args: %.*s\n", args_len, args);
+    }
+    return 0;
+}</pre>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-3">
+                            编译：<code class="text-green-400">gcc -shared -fPIC -o plugin.so plugin.c</code>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Beacon级联管理页面 -->
+    <div id="beacon-cascade" class="beacon-sub-content hidden">
+        <div class="max-w-full mx-auto px-6 py-6">
+            <!-- 标题栏 -->
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-link mr-2 text-cyan-400"></i>
+                    级联管理
+                </h2>
+                <div class="flex items-center space-x-3">
+                    <button onclick="window.refreshCascadePage()" class="btn-secondary">
+                        <i class="fas fa-sync-alt mr-2"></i>刷新
+                    </button>
+                </div>
+            </div>
+
+            <!-- 操作说明卡片 -->
+            <div class="chart-card mb-6">
+                <div class="flex items-start space-x-4">
+                    <div class="w-10 h-10 bg-cyan-500/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                        <i class="fas fa-info-circle text-cyan-400 text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-cyan-300 mb-2">P2P 级联操作指南</h3>
+                        <div class="text-sm text-gray-400 space-y-1">
+                            <p>• <strong class="text-gray-300">步骤1：</strong>在<span class="text-emerald-400">子 Beacon</span> 上启动 SMB Listener（创建 Named Pipe 等待连接）</p>
+                            <p>• <strong class="text-gray-300">步骤2：</strong>在<span class="text-purple-400">父 Beacon</span> 上执行 Link SMB 连接到子 Beacon</p>
+                            <p>• <strong class="text-gray-300">步骤3：</strong>连接成功后，子 Beacon 的所有通信将通过父 Beacon 中继到 TeamServer</p>
+                            <p class="text-xs text-gray-500 mt-2">💡 子 Beacon 和父 Beacon 都需要在编译时启用 <code class="bg-gray-700 px-1 rounded">link_smb</code> 功能</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 两列布局：左侧操作面板，右侧当前链路 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- 左侧：操作面板 -->
+                <div class="space-y-6">
+                    <!-- Step 1: 启动 SMB Listener -->
+                    <div class="chart-card">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <span class="w-6 h-6 bg-emerald-500/30 rounded-full flex items-center justify-center text-emerald-400 text-xs font-bold mr-2">1</span>
+                            <i class="fas fa-broadcast-tower mr-2 text-emerald-400"></i>
+                            启动 SMB Listener（子 Beacon）
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-1">选择子 Beacon</label>
+                                <select id="cascadeChildBeaconSelect" class="bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                    <option value="">选择要作为子节点的 Beacon</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-1">管道名称</label>
+                                <input id="cascadeListenerPipeName" type="text" class="input-field w-full" placeholder="例如: cerberus_p2p" value="cerberus_p2p" />
+                            </div>
+                            <div class="flex space-x-3">
+                                <button onclick="window.cascadeStartListener()" class="btn-primary flex-1">
+                                    <i class="fas fa-play mr-2"></i>启动 Listener
+                                </button>
+                                <button onclick="window.cascadeStopListener()" class="bg-red-600/80 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+                                    <i class="fas fa-stop mr-2"></i>停止
+                                </button>
+                            </div>
+                            <div id="cascadeListenerStatus" class="hidden">
+                                <div class="bg-gray-800/50 rounded-lg p-3 text-sm">
+                                    <div class="flex items-center space-x-2">
+                                        <i class="fas fa-spinner fa-spin text-cyan-400"></i>
+                                        <span class="text-gray-300" id="cascadeListenerStatusText">等待操作...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Link SMB -->
+                    <div class="chart-card">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <span class="w-6 h-6 bg-purple-500/30 rounded-full flex items-center justify-center text-purple-400 text-xs font-bold mr-2">2</span>
+                            <i class="fas fa-link mr-2 text-purple-400"></i>
+                            建立 P2P 链接（父 Beacon）
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-1">选择父 Beacon</label>
+                                <select id="cascadeParentBeaconSelect" class="bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                    <option value="">选择要作为父节点的 Beacon</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-1">目标主机（子 Beacon 的 IP）</label>
+                                <input id="cascadeLinkTarget" type="text" class="input-field w-full" placeholder="例如: 192.168.1.100 或 . (本机)" />
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-1">管道名称（需与步骤1一致）</label>
+                                <input id="cascadeLinkPipeName" type="text" class="input-field w-full" placeholder="例如: cerberus_p2p" value="cerberus_p2p" />
+                            </div>
+                            <button onclick="window.cascadeLinkSmb()" class="btn-primary w-full">
+                                <i class="fas fa-link mr-2"></i>建立 P2P 链接
+                            </button>
+                            <div id="cascadeLinkStatus" class="hidden">
+                                <div class="bg-gray-800/50 rounded-lg p-3 text-sm">
+                                    <div class="flex items-center space-x-2">
+                                        <i class="fas fa-spinner fa-spin text-purple-400"></i>
+                                        <span class="text-gray-300" id="cascadeLinkStatusText">等待操作...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick: 查看链路 -->
+                    <div class="chart-card">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-search mr-2 text-yellow-400"></i>
+                            查看 Beacon 链路
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-1">选择 Beacon</label>
+                                <select id="cascadeQueryBeaconSelect" class="bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                                    <option value="">选择要查询的 Beacon</option>
+                                </select>
+                            </div>
+                            <button onclick="window.cascadeQueryLinks()" class="btn-secondary w-full">
+                                <i class="fas fa-project-diagram mr-2"></i>查询活跃链路
+                            </button>
+                            <div id="cascadeQueryResult" class="hidden">
+                                <div class="bg-gray-800/50 rounded-lg p-3 text-sm">
+                                    <pre class="text-gray-300 whitespace-pre-wrap" id="cascadeQueryResultText"></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右侧：当前级联链路列表 -->
+                <div class="space-y-6">
+                    <!-- 统计卡片 -->
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="chart-card">
+                            <div class="text-center">
+                                <p class="text-gray-400 text-xs mb-1">总 Beacon</p>
+                                <h3 class="text-2xl font-bold text-white" id="cascadeTotalBeacons">0</h3>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="text-center">
+                                <p class="text-gray-400 text-xs mb-1">直连节点</p>
+                                <h3 class="text-2xl font-bold text-emerald-400" id="cascadeDirectBeacons">0</h3>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="text-center">
+                                <p class="text-gray-400 text-xs mb-1">级联节点</p>
+                                <h3 class="text-2xl font-bold text-cyan-400" id="cascadeCascadedBeacons">0</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 当前级联链路表 -->
+                    <div class="chart-card">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-sitemap mr-2 text-cyan-400"></i>
+                            当前级联链路
+                        </h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b border-gray-700">
+                                        <th class="table-header">子 Beacon</th>
+                                        <th class="table-header">父 Beacon</th>
+                                        <th class="table-header">链路类型</th>
+                                        <th class="table-header">状态</th>
+                                        <th class="table-header">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cascadeLinkTableBody">
+                                    <tr>
+                                        <td colspan="5" class="text-center py-8 text-gray-400">
+                                            <i class="fas fa-unlink text-2xl mb-2 block"></i>
+                                            暂无级联链路
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 直连 Beacon 列表 -->
+                    <div class="chart-card">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-server mr-2 text-emerald-400"></i>
+                            直连 Beacon
+                        </h3>
+                        <div class="overflow-x-auto max-h-64 overflow-y-auto">
+                            <table class="w-full">
+                                <thead class="sticky top-0 bg-gray-800">
+                                    <tr class="border-b border-gray-700">
+                                        <th class="table-header">ID</th>
+                                        <th class="table-header">主机名</th>
+                                        <th class="table-header">IP</th>
+                                        <th class="table-header">状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cascadeDirectBeaconTableBody">
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4 text-gray-400">
+                                            加载中...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Beacon拓扑页面 -->
+    <div id="beacon-topology" class="beacon-sub-content hidden">
+        <div class="max-w-full mx-auto px-6 py-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-project-diagram mr-2 text-cyan-400"></i>
+                    Beacon拓扑
+                </h2>
+                <div class="flex items-center space-x-3">
+                    <button onclick="window.refreshTopology()" class="btn-secondary">
+                        <i class="fas fa-sync-alt mr-2"></i>刷新
+                    </button>
+                    <button onclick="window.exportTopology()" class="btn-secondary">
+                        <i class="fas fa-download mr-2"></i>导出
+                    </button>
+                    <button onclick="window.resetTopologyView()" class="btn-secondary">
+                        <i class="fas fa-compress mr-2"></i>重置视图
+                    </button>
+                </div>
+            </div>
+
+            <!-- 统计信息卡片 -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">总节点数</p>
+                            <h3 class="text-3xl font-bold text-white" id="topologyTotalNodes">0</h3>
+                        </div>
+                        <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-circle text-blue-400 text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">在线节点</p>
+                            <h3 class="text-3xl font-bold text-green-400" id="topologyOnlineNodes">0</h3>
+                        </div>
+                        <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-check-circle text-green-400 text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">离线节点</p>
+                            <h3 class="text-3xl font-bold text-red-400" id="topologyOfflineNodes">0</h3>
+                        </div>
+                        <div class="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-times-circle text-red-400 text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">连接数</p>
+                            <h3 class="text-3xl font-bold text-cyan-400" id="topologyConnections">0</h3>
+                        </div>
+                        <div class="w-10 h-10 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-link text-cyan-400 text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">级联节点</p>
+                            <h3 class="text-3xl font-bold text-cyan-300" id="topologyCascadedNodes">0</h3>
+                        </div>
+                        <div class="w-10 h-10 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-project-diagram text-cyan-300 text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">P2P 链路</p>
+                            <h3 class="text-3xl font-bold text-purple-400" id="topologyP2PLinks">0</h3>
+                        </div>
+                        <div class="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-exchange-alt text-purple-400 text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 拓扑图容器 -->
+            <div class="chart-card mb-6">
+                <div id="topologyCanvas" style="width: 100%; height: 700px; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 8px; position: relative; overflow: hidden;">
+                    <div id="topologyLoading" class="flex items-center justify-center h-full">
+                        <div class="text-center">
+                            <i class="fas fa-spinner fa-spin text-4xl text-cyan-400 mb-4"></i>
+                            <p class="text-gray-400">正在加载拓扑数据...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 图例和控制面板 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- 图例 -->
+                <div class="chart-card">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i class="fas fa-info-circle mr-2 text-blue-400"></i>
+                        图例说明
+                    </h3>
+                    <div class="space-y-3">
+                        <!-- 基础节点 -->
+                        <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">节点类型</p>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded flex items-center justify-center text-lg" style="background: #7f1d1d; border: 1px solid #ef4444;">🔥</div>
+                            <span class="text-gray-300">C2服务器（Core Server）</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded flex items-center justify-center text-lg" style="background: #1e3a8a; border: 1px solid #3b82f6;">🌐</div>
+                            <span class="text-gray-300">监听器（Listener）</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded flex items-center justify-center text-lg" style="background: #065f46; border: 1px solid #10b981;">💻</div>
+                            <span class="text-gray-300">在线Beacon（直连）</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded flex items-center justify-center text-lg" style="background: #1a3a4a; border: 1px solid #06b6d4;">🔗</div>
+                            <span class="text-gray-300">级联Beacon（P2P）</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded flex items-center justify-center text-lg" style="background: #7f1d1d; border: 1px solid #ef4444;">💻</div>
+                            <span class="text-gray-300">离线Beacon</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded flex items-center justify-center text-lg" style="background: #78350f; border: 1px solid #fbbf24;">💻</div>
+                            <span class="text-gray-300">休眠Beacon</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded flex items-center justify-center text-lg" style="background: #4a1d1d; border: 1px solid #f97316;">⚠️</div>
+                            <span class="text-gray-300">孤儿节点（父节点丢失）</span>
+                        </div>
+
+                        <!-- 连线类型 -->
+                        <div class="mt-3 pt-3 border-t border-gray-700">
+                            <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-3">连线类型</p>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-16 h-0.5" style="background: linear-gradient(to right, #10b981 0%, transparent 100%); border-top: 1px dashed #10b981;"></div>
+                                <span class="text-gray-300">直连链路（Listener ↔ Beacon）</span>
+                            </div>
+                            <div class="flex items-center space-x-3 mt-2">
+                                <div class="w-16 h-0.5" style="background: linear-gradient(to right, #06b6d4 0%, #06b6d4 100%); height: 2.5px; border-radius: 1px;"></div>
+                                <span class="text-gray-300">P2P链路（Beacon ↔ Beacon）</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 pt-3 border-t border-gray-700">
+                            <p class="text-xs text-gray-500">💡 提示：</p>
+                            <p class="text-xs text-gray-400 mt-1">• 点击节点查看详情</p>
+                            <p class="text-xs text-gray-400">• 拖拽节点调整位置</p>
+                            <p class="text-xs text-gray-400">• 滚轮缩放视图</p>
+                            <p class="text-xs text-gray-400">• 拖拽空白平移画布</p>
+                            <p class="text-xs text-gray-400">• 级联Beacon显示链路类型（SMB/TCP）</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 节点详情 -->
+                <div class="chart-card">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i class="fas fa-server mr-2 text-purple-400"></i>
+                        节点详情
+                    </h3>
+                    <div id="topologyNodeDetail" class="text-gray-400 text-sm">
+                        <p class="text-center py-8">点击节点查看详情</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Beacon代理管理页面 -->
+    <div id="beacon-proxy" class="beacon-sub-content hidden">
+        <div class="max-w-full mx-auto px-6 py-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-network-wired mr-2 text-orange-400"></i>
+                    代理管理
+                </h2>
+                <button onclick="window.loadProxies()" class="btn-primary">
+                    <i class="fas fa-sync-alt mr-2"></i>刷新
+                </button>
+            </div>
+
+            <!-- 代理服务器统计卡片 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">代理服务器数量</p>
+                            <h3 class="text-3xl font-bold text-white" id="proxyCount">0</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-server text-blue-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">活跃连接数</p>
+                            <h3 class="text-3xl font-bold text-green-400" id="activeConnections">0</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-link text-green-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">总流量</p>
+                            <h3 class="text-3xl font-bold text-purple-400" id="totalTraffic">0 MB</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-exchange-alt text-purple-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">在线Beacon</p>
+                            <h3 class="text-3xl font-bold text-cyan-400" id="onlineBeacons">0</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-satellite text-cyan-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 创建代理服务器 -->
+            <div class="chart-card mb-6">
+                <h3 class="text-lg font-semibold mb-6 flex items-center">
+                    <i class="fas fa-plus-circle mr-2 text-green-400"></i>
+                    创建代理服务器
+                </h3>
+                <form id="createProxyForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                        <label for="proxyName" class="form-label">
+                            <i class="fas fa-tag mr-2"></i>名称
+                        </label>
+                        <input type="text" id="proxyName" placeholder="SOCKS5代理1" class="input-field">
+                    </div>
+                    <div>
+                        <label for="proxyProtocol" class="form-label">
+                            <i class="fas fa-network-wired mr-2"></i>协议
+                        </label>
+                        <select id="proxyProtocol" class="input-field">
+                            <option value="socks5">SOCKS5</option>
+                            <option value="http">HTTP</option>
+                            <option value="https">HTTPS</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="proxyHost" class="form-label">
+                            <i class="fas fa-server mr-2"></i>监听地址
+                        </label>
+                        <input type="text" id="proxyHost" placeholder="0.0.0.0" class="input-field">
+                    </div>
+                    <div>
+                        <label for="proxyPort" class="form-label">
+                            <i class="fas fa-plug mr-2"></i>端口
+                        </label>
+                        <input type="number" id="proxyPort" placeholder="1080" min="1" max="65535" class="input-field">
+                    </div>
+                    <div>
+                        <label for="proxyUsername" class="form-label">
+                            <i class="fas fa-user mr-2"></i>用户名（可选）
+                        </label>
+                        <input type="text" id="proxyUsername" placeholder="admin" class="input-field">
+                    </div>
+                    <div>
+                        <label for="proxyPassword" class="form-label">
+                            <i class="fas fa-lock mr-2"></i>密码（可选）
+                        </label>
+                        <input type="password" id="proxyPassword" placeholder="password" class="input-field">
+                    </div>
+                    <div class="md:col-span-2 lg:col-span-3 flex items-end">
+                        <button type="submit" class="btn-primary w-full py-3">
+                            <i class="fas fa-plus mr-2"></i>创建代理
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 代理服务器列表 -->
+            <div class="chart-card">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-list mr-2 text-orange-400"></i>
+                    代理服务器列表
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="table-header">协议</th>
+                                <th class="table-header">监听地址</th>
+                                <th class="table-header">端口</th>
+                                <th class="table-header">状态</th>
+                                <th class="table-header">连接数</th>
+                                <th class="table-header">流量</th>
+                                <th class="table-header">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="proxyTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center py-8 text-gray-400">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i>加载中...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Beacon连接详情 -->
+            <div class="chart-card mt-6" id="proxyBeaconLaunchCard">
+                <h3 class="text-lg font-semibold mb-6 flex items-center">
+                    <i class="fas fa-satellite mr-2 text-orange-400"></i>
+                    为 Beacon 启动代理
+                </h3>
+                <p class="text-gray-400 text-sm mb-4">选择一个在线的 Beacon，自动向其下发 <code class="text-green-400 bg-gray-800 px-1 rounded">socks5</code> 连接命令，使 Beacon 连接到已创建的代理服务器。</p>
+                <form id="proxyBeaconLaunchForm" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="proxyBeaconSelect" class="form-label">
+                            <i class="fas fa-satellite mr-2"></i>选择 Beacon
+                        </label>
+                        <select id="proxyBeaconSelect" class="input-field">
+                            <option value="">选择 Beacon</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="proxyServerSelect" class="form-label">
+                            <i class="fas fa-server mr-2"></i>选择代理服务器
+                        </label>
+                        <select id="proxyServerSelect" class="input-field">
+                            <option value="">选择代理服务器</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="proxySocksAddr" class="form-label">
+                            <i class="fas fa-plug mr-2"></i>连接地址（自动填充）
+                        </label>
+                        <input type="text" id="proxySocksAddr" placeholder="127.0.0.1:1080" class="input-field">
+                    </div>
+                    <div class="md:col-span-3 flex items-end">
+                        <button type="submit" class="btn-primary w-full py-3">
+                            <i class="fas fa-play mr-2"></i>启动代理连接
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Beacon连接详情 -->
+            <div class="chart-card mt-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-link mr-2 text-cyan-400"></i>
+                    Beacon连接详情
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="table-header">Beacon ID</th>
+                                <th class="table-header">主机名</th>
+                                <th class="table-header">IP地址</th>
+                                <th class="table-header">连接代理</th>
+                                <th class="table-header">协议</th>
+                                <th class="table-header">状态</th>
+                                <th class="table-header">连接时间</th>
+                            </tr>
+                        </thead>
+                        <tbody id="proxyBeaconTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center py-8 text-gray-400">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i>加载中...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- EDR/iOA 绕过向导 -->
+            <div class="chart-card mt-6 border border-amber-500/30">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold flex items-center">
+                        <i class="fas fa-shield-alt mr-2 text-amber-400"></i>
+                        EDR 绕过向导 — 浏览器进程代理
+                    </h3>
+                    <button onclick="document.getElementById('edrBypassWizardBody').classList.toggle('hidden')" class="text-gray-400 hover:text-white transition-colors text-sm">
+                        <i class="fas fa-chevron-down mr-1"></i>展开/收起
+                    </button>
+                </div>
+                <div class="bg-amber-500/10 rounded-lg p-3 border border-amber-500/20 mb-4">
+                    <div class="flex items-start space-x-2">
+                        <i class="fas fa-lightbulb text-amber-400 mt-0.5"></i>
+                        <div class="text-xs text-gray-300 leading-relaxed">
+                            <p class="font-semibold text-amber-400 mb-1">💡 适用场景：目标安装了 iOA / 零信任 EDR</p>
+                            <p>当 EDR 对陌生进程的网络访问进行策略限制时（如需要用户二次确认），可以将 Beacon 注入到<strong class="text-green-400">浏览器进程</strong>中，
+                            利用浏览器的白名单信任身份发起反向 SOCKS5 代理，从而绕过网络访问限制。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="edrBypassWizardBody" class="hidden">
+                    <!-- 操作流程图 -->
+                    <div class="bg-gray-900/60 rounded-lg p-4 border border-gray-700 mb-4">
+                        <p class="text-xs text-gray-400 mb-3 font-semibold"><i class="fas fa-project-diagram mr-1"></i>操作流程</p>
+                        <div class="flex items-center justify-between text-center text-xs">
+                            <div class="flex-1">
+                                <div id="wizardStep1" class="w-10 h-10 mx-auto bg-blue-500/20 rounded-full flex items-center justify-center border-2 border-blue-500 mb-2">
+                                    <span class="text-blue-400 font-bold">1</span>
+                                </div>
+                                <p class="text-gray-400">创建 RSOCKS5<br>反向代理</p>
+                            </div>
+                            <div class="flex-shrink-0 text-gray-600 px-2"><i class="fas fa-arrow-right"></i></div>
+                            <div class="flex-1">
+                                <div id="wizardStep2" class="w-10 h-10 mx-auto bg-gray-700 rounded-full flex items-center justify-center border-2 border-gray-600 mb-2">
+                                    <span class="text-gray-400 font-bold">2</span>
+                                </div>
+                                <p class="text-gray-400">选择 Beacon<br>& 浏览器进程</p>
+                            </div>
+                            <div class="flex-shrink-0 text-gray-600 px-2"><i class="fas fa-arrow-right"></i></div>
+                            <div class="flex-1">
+                                <div id="wizardStep3" class="w-10 h-10 mx-auto bg-gray-700 rounded-full flex items-center justify-center border-2 border-gray-600 mb-2">
+                                    <span class="text-gray-400 font-bold">3</span>
+                                </div>
+                                <p class="text-gray-400">注入 Beacon<br>到浏览器</p>
+                            </div>
+                            <div class="flex-shrink-0 text-gray-600 px-2"><i class="fas fa-arrow-right"></i></div>
+                            <div class="flex-1">
+                                <div id="wizardStep4" class="w-10 h-10 mx-auto bg-gray-700 rounded-full flex items-center justify-center border-2 border-gray-600 mb-2">
+                                    <span class="text-gray-400 font-bold">4</span>
+                                </div>
+                                <p class="text-gray-400">新 Beacon 执行<br>socks5 连接</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 1: 选择/确认反向代理 -->
+                    <div class="bg-gray-900/40 rounded-lg p-4 border border-gray-700 mb-4">
+                        <h4 class="text-sm font-semibold text-blue-400 mb-3 flex items-center">
+                            <span class="w-6 h-6 bg-blue-500/20 rounded-full flex items-center justify-center mr-2 text-xs font-bold border border-blue-500">1</span>
+                            选择反向代理
+                        </h4>
+                        <div id="wizardProxySelect" class="space-y-2">
+                            <p class="text-xs text-gray-500"><i class="fas fa-spinner fa-spin mr-1"></i>加载中...</p>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">
+                            <i class="fas fa-info-circle mr-1"></i>如果没有可用的反向代理，请先在上方创建一个 <strong class="text-purple-400">RSOCKS5(反向)</strong> 代理。
+                        </p>
+                    </div>
+
+                    <!-- Step 2: 选择 Beacon 和浏览器进程 -->
+                    <div class="bg-gray-900/40 rounded-lg p-4 border border-gray-700 mb-4">
+                        <h4 class="text-sm font-semibold text-green-400 mb-3 flex items-center">
+                            <span class="w-6 h-6 bg-green-500/20 rounded-full flex items-center justify-center mr-2 text-xs font-bold border border-green-500">2</span>
+                            选择 Beacon & 目标浏览器进程
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-400 mb-1">
+                                    <i class="fas fa-satellite mr-1 text-orange-400"></i>源 Beacon（执行注入的 Beacon）
+                                </label>
+                                <select id="wizardBeaconSelect" class="input-field text-sm" onchange="window.wizardOnBeaconChange && window.wizardOnBeaconChange()">
+                                    <option value="">-- 选择 Beacon --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-400 mb-1">
+                                    <i class="fas fa-crosshairs mr-1 text-red-400"></i>目标浏览器进程
+                                </label>
+                                <select id="wizardBrowserSelect" class="input-field text-sm">
+                                    <option value="">-- 先选择 Beacon 后加载进程列表 --</option>
+                                </select>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <button onclick="window.wizardRefreshProcesses && window.wizardRefreshProcesses()" class="text-xs text-cyan-400 hover:text-cyan-300 transition-colors">
+                                        <i class="fas fa-sync-alt mr-1"></i>刷新进程列表
+                                    </button>
+                                    <span class="text-gray-600">|</span>
+                                    <span class="text-xs text-gray-500">推荐：<strong class="text-green-400">msedge.exe</strong> / <strong class="text-green-400">chrome.exe</strong> / <strong class="text-green-400">firefox.exe</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="wizardBrowserHint" class="mt-3 hidden">
+                            <div class="bg-green-500/10 rounded-lg p-2 border border-green-500/20">
+                                <div class="flex items-start space-x-2">
+                                    <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
+                                    <div class="text-xs text-gray-300" id="wizardBrowserHintText"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: 注入技术选择 -->
+                    <div class="bg-gray-900/40 rounded-lg p-4 border border-gray-700 mb-4">
+                        <h4 class="text-sm font-semibold text-purple-400 mb-3 flex items-center">
+                            <span class="w-6 h-6 bg-purple-500/20 rounded-full flex items-center justify-center mr-2 text-xs font-bold border border-purple-500">3</span>
+                            注入配置
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-400 mb-1">
+                                    <i class="fas fa-cog mr-1 text-purple-400"></i>注入技术
+                                </label>
+                                <select id="wizardInjectTech" class="input-field text-sm">
+                                    <option value="4" selected>Module Stomping（推荐 — MEM_IMAGE + RX，最隐蔽）</option>
+                                    <option value="2">Early Bird APC（Init-First Pattern）</option>
+                                    <option value="1">APC Injection</option>
+                                    <option value="0">Classic Remote Thread</option>
+                                    <option value="">自动选择（RDTSC 随机）</option>
+                                </select>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    <i class="fas fa-shield-alt mr-1 text-green-400"></i>Module Stomping 加载合法签名 DLL 后覆写 .text 段，内存外观完全合法
+                                </p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-400 mb-1">
+                                    <i class="fas fa-info-circle mr-1 text-yellow-400"></i>注入说明
+                                </label>
+                                <div class="bg-gray-800 rounded-lg p-3 border border-gray-600 text-xs text-gray-400 leading-relaxed">
+                                    <p>• 将生成新的 Beacon shellcode 并注入到浏览器进程</p>
+                                    <p>• 新 Beacon 将从浏览器进程上线（进程名显示为浏览器）</p>
+                                    <p>• 注入后需等待新 Beacon 上线（通常 5-30 秒）</p>
+                                    <p>• 上线后在新 Beacon 上执行 socks5 命令</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: 执行操作 -->
+                    <div class="bg-gray-900/40 rounded-lg p-4 border border-gray-700 mb-4">
+                        <h4 class="text-sm font-semibold text-orange-400 mb-3 flex items-center">
+                            <span class="w-6 h-6 bg-orange-500/20 rounded-full flex items-center justify-center mr-2 text-xs font-bold border border-orange-500">4</span>
+                            生成操作指南
+                        </h4>
+                        <div id="wizardSummary" class="bg-gray-800 rounded-lg p-3 border border-gray-600 mb-3 text-xs text-gray-400">
+                            <p>请完成上述步骤后生成操作指南。</p>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button onclick="window.wizardExecuteInject && window.wizardExecuteInject()" id="wizardExecuteBtn"
+                                    class="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                <i class="fas fa-clipboard-list mr-2"></i>生成操作指南 & 复制命令
+                            </button>
+                            <span class="text-xs text-gray-500">将生成详细的操作步骤并复制 socks5 连接命令到剪贴板</span>
+                        </div>
+                    </div>
+
+                    <!-- 操作日志 -->
+                    <div class="bg-gray-900/40 rounded-lg p-4 border border-gray-700">
+                        <h4 class="text-sm font-semibold text-gray-400 mb-2 flex items-center">
+                            <i class="fas fa-terminal mr-2"></i>操作日志
+                        </h4>
+                        <div id="wizardLog" class="bg-black/50 rounded-lg p-3 font-mono text-xs text-gray-500 max-h-40 overflow-y-auto">
+                            <p>[等待操作...]</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 为创建代理表单添加事件监听
+        document.addEventListener('DOMContentLoaded', function() {
+            const createProxyForm = document.getElementById('createProxyForm');
+            if (createProxyForm) {
+                createProxyForm.addEventListener('submit', window.createProxy);
+            }
+        });
+    </script>
+
+    <!-- Beacon屏幕截图页面 -->
+    <div id="beacon-screenshots" class="beacon-sub-content hidden">
+        <div class="max-w-full mx-auto px-6 py-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-image mr-2 text-cyan-400"></i>
+                    屏幕截图
+                </h2>
+                <button onclick="window.loadScreenshots()" class="btn-primary">
+                    <i class="fas fa-sync-alt mr-2"></i>刷新
+                </button>
+            </div>
+
+            <!-- Beacon 选择器卡片 -->
+            <div class="chart-card mb-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-satellite mr-2 text-cyan-400"></i>
+                    选择 Beacon
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="md:col-span-2">
+                        <label for="screenshotBeaconSelect" class="form-label">
+                            <i class="fas fa-desktop mr-2"></i>目标 Beacon
+                        </label>
+                        <select id="screenshotBeaconSelect" class="input-field">
+                            <option value="">选择Beacon</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="window.takeScreenshotFromPage()" class="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold w-full py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-cyan-500/25 flex items-center justify-center space-x-2">
+                            <i class="fas fa-camera"></i>
+                            <span>执行截图</span>
+                        </button>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="window.initScreenshotPage()" class="btn-primary w-full py-3">
+                            <i class="fas fa-sync-alt mr-2"></i>刷新列表
+                        </button>
+                    </div>
+                </div>
+                <!-- Selected Beacon info -->
+                <div id="screenshotSelectedBeaconInfo" class="mt-4 hidden">
+                    <div class="flex items-center space-x-3 bg-gray-800/50 rounded-lg px-4 py-3 border border-gray-700">
+                        <i class="fas fa-info-circle text-cyan-400"></i>
+                        <span class="text-gray-300">已选择: </span>
+                        <span id="screenshotSelectedBeaconName" class="text-white font-semibold"></span>
+                        <span class="text-gray-500">|</span>
+                        <span id="screenshotTaskStatus" class="text-gray-400 text-sm"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 截图列表 -->
+            <div class="chart-card">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="table-header">文件名</th>
+                                <th class="table-header">大小</th>
+                                <th class="table-header">Beacon ID</th>
+                                <th class="table-header">创建时间</th>
+                                <th class="table-header">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="screenshotsTableBody">
+                            <tr>
+                                <td colspan="5" class="text-center text-gray-400 py-8">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i>加载中...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rootkit管理页面 -->
+    <!-- ═══════════════════════ Injection Manager ═══════════════════════ -->
+    <div id="beacon-injection" class="beacon-sub-content hidden">
+        <div class="max-w-full mx-auto px-6 py-6">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-purple-500/30 to-pink-500/30 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-syringe text-purple-400 text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">注入进程管理</h2>
+                        <p class="text-xs text-gray-400 mt-0.5">管理注入的进程、Shellcode 库和注入执行</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="relative">
+                        <select id="injBeaconSelect" class="bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none min-w-64">
+                            <option value="">选择Beacon</option>
+                        </select>
+                        <div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                            <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                        </div>
+                    </div>
+                    <button onclick="window.refreshInjectionPage()" class="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg transition-all text-sm">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-gray-400 mb-1">注入记录</p>
+                            <p id="injTotalCount" class="text-lg font-bold text-white">0</p>
+                        </div>
+                        <div class="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-syringe text-purple-400"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-gray-400 mb-1">运行中</p>
+                            <p id="injRunningCount" class="text-lg font-bold text-green-400">0</p>
+                        </div>
+                        <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-play text-green-400"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-gray-400 mb-1">Shellcode 库</p>
+                            <p id="injShellcodeCount" class="text-lg font-bold text-blue-400">0</p>
+                        </div>
+                        <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-microchip text-blue-400"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="border-b border-gray-700 mb-6">
+                <div class="flex space-x-6">
+                    <button class="inj-tab-btn pb-3 text-sm font-medium border-b-2 border-purple-500 text-purple-400 transition-colors" data-inj-tab="records" onclick="window.switchInjTab('records')">
+                        <i class="fas fa-list mr-1.5"></i>注入记录
+                    </button>
+                    <button class="inj-tab-btn pb-3 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-gray-300 transition-colors" data-inj-tab="shellcode" onclick="window.switchInjTab('shellcode')">
+                        <i class="fas fa-microchip mr-1.5"></i>Shellcode 库
+                    </button>
+                    <button class="inj-tab-btn pb-3 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-gray-300 transition-colors" data-inj-tab="execute" onclick="window.switchInjTab('execute')">
+                        <i class="fas fa-play-circle mr-1.5"></i>执行注入
+                    </button>
+                    <button class="inj-tab-btn pb-3 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-gray-300 transition-colors" data-inj-tab="generate" onclick="window.switchInjTab('generate')">
+                        <i class="fas fa-magic mr-1.5"></i>生成 Shellcode
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab: Injection Records -->
+            <div id="inj-tab-records" class="inj-tab-content">
+                <div class="bg-gray-800/50 border border-gray-700/50 rounded-xl">
+                    <div class="flex items-center justify-between p-4 border-b border-gray-700/50">
+                        <h3 class="text-sm font-semibold text-white flex items-center">
+                            <i class="fas fa-list mr-2 text-purple-400"></i>注入记录
+                        </h3>
+                        <button onclick="window.clearInjectionRecords()" class="text-xs text-gray-500 hover:text-red-400 transition-colors">
+                            <i class="fas fa-trash-alt mr-1"></i>清空记录
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-gray-700/50 bg-gray-800/40">
+                                    <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-3">Beacon</th>
+                                    <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-3">PID</th>
+                                    <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-3">进程</th>
+                                    <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-3">注入技术</th>
+                                    <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-3">Shellcode</th>
+                                    <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-3">状态</th>
+                                    <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-3">时间</th>
+                                    <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-3">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="injectionRecordsBody">
+                                <tr>
+                                    <td colspan="8" class="text-center text-gray-500 py-12">
+                                        <i class="fas fa-syringe text-3xl mb-3 block text-gray-600"></i>
+                                        <span class="text-sm">暂无注入记录</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Shellcode Library -->
+            <div id="inj-tab-shellcode" class="inj-tab-content hidden">
+                <!-- Upload Shellcode -->
+                <div class="bg-gray-800/50 border border-gray-700/50 rounded-xl p-5 mb-6">
+                    <h3 class="text-sm font-semibold text-white mb-4 flex items-center">
+                        <i class="fas fa-upload mr-2 text-blue-400"></i>上传 Shellcode
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                        <div class="md:col-span-3">
+                            <label class="block text-xs text-gray-400 mb-1">名称 *</label>
+                            <input type="text" id="injShellcodeName" placeholder="例如: beacon_x64" class="w-full bg-gray-900/50 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                        <div class="md:col-span-3">
+                            <label class="block text-xs text-gray-400 mb-1">描述</label>
+                            <input type="text" id="injShellcodeDesc" placeholder="可选描述" class="w-full bg-gray-900/50 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                        <div class="md:col-span-1">
+                            <label class="block text-xs text-gray-400 mb-1">架构</label>
+                            <select id="injShellcodeArch" class="w-full bg-gray-900/50 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                <option value="x64">x64</option>
+                                <option value="x86">x86</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-3">
+                            <label class="block text-xs text-gray-400 mb-1">Shellcode 文件 (.bin)</label>
+                            <input type="file" id="injShellcodeFile" accept=".bin,.raw,.sc,.shellcode" class="w-full text-sm text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-purple-600/20 file:text-purple-400 hover:file:bg-purple-600/30 cursor-pointer">
+                            <span id="injShellcodeFileSize" class="text-xs text-gray-500 mt-1 block"></span>
+                        </div>
+                        <div class="md:col-span-2">
+                            <button onclick="window.uploadShellcode()" class="w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-lg transition-all text-sm font-medium">
+                                <i class="fas fa-upload mr-1.5"></i>上传
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shellcode List -->
+                <div class="bg-gray-800/50 border border-gray-700/50 rounded-xl">
+                    <div class="flex items-center justify-between p-4 border-b border-gray-700/50">
+                        <h3 class="text-sm font-semibold text-white flex items-center">
+                            <i class="fas fa-microchip mr-2 text-blue-400"></i>Shellcode 库
+                        </h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-gray-700/50 bg-gray-800/40">
+                                    <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-3">名称</th>
+                                    <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-3">描述</th>
+                                    <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-3">来源</th>
+                                    <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-3">大小</th>
+                                    <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-3">架构</th>
+                                    <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-3">创建时间</th>
+                                    <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-3">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shellcodeRecordsBody">
+                                <tr>
+                                    <td colspan="7" class="text-center text-gray-500 py-12">
+                                        <i class="fas fa-microchip text-3xl mb-3 block text-gray-600"></i>
+                                        <span class="text-sm">暂无 Shellcode，请上传或生成</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Execute Injection -->
+            <div id="inj-tab-execute" class="inj-tab-content hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Injection Config -->
+                    <div class="bg-gray-800/50 border border-gray-700/50 rounded-xl p-5">
+                        <h3 class="text-sm font-semibold text-white mb-4 flex items-center">
+                            <i class="fas fa-cog mr-2 text-purple-400"></i>注入配置
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">注入命令</label>
+                                <select id="injCommandSelect" class="w-full bg-gray-900/50 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                    <option value="inject">inject — 注入到已有进程</option>
+                                    <option value="proc_hollow">proc_hollow — Module Stomping（新建进程 + DLL 覆写）</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">目标 PID（inject 命令需要）</label>
+                                <input type="number" id="injTargetPID" placeholder="输入目标进程 PID" class="w-full bg-gray-900/50 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">选择 Shellcode *</label>
+                                <select id="injShellcodeSelect" class="w-full bg-gray-900/50 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                    <option value="">选择 Shellcode</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">注入技术</label>
+                                <select id="injTechniqueSelect" class="w-full bg-gray-900/50 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                    <option value="4" selected>⭐ 4 — Module Stomping（推荐 — MEM_IMAGE + RX，最隐蔽）</option>
+                                    <option value="2">🛡️ 2 — Early Bird APC（Init-First Pattern）</option>
+                                    <option value="-1">🎲 随机选择（RDTSC 随机）</option>
+                                    <option disabled>──────── 全部技术 ────────</option>
+                                    <option value="0">0 — Classic Remote Thread</option>
+                                    <option value="1">1 — APC Injection</option>
+                                    <option value="2">2 — Early Bird APC</option>
+                                    <option value="3">3 — Section Mapping</option>
+                                    <option value="4">4 — Module Stomping（进程镂空 + DLL 覆写）</option>
+                                    <option value="5">5 — Thread Hijacking</option>
+                                    <option value="6">6 — Callback: TimerQueue</option>
+                                    <option value="7">7 — Callback: EnumWindows</option>
+                                </select>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    <i class="fas fa-shield-alt mr-1 text-green-400"></i>Module Stomping 加载合法签名 DLL 后覆写 .text 段，内存类型 MEM_IMAGE + RX，完全合法外观
+                                </p>
+                            </div>
+                            <button onclick="window.executeInjection()" class="w-full px-4 py-2.5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white rounded-lg transition-all font-medium text-sm">
+                                <i class="fas fa-play mr-2"></i>执行注入
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Technique Info -->
+                    <div class="bg-gray-800/50 border border-gray-700/50 rounded-xl p-5">
+                        <h3 class="text-sm font-semibold text-white mb-4 flex items-center">
+                            <i class="fas fa-info-circle mr-2 text-blue-400"></i>注入技术说明
+                        </h3>
+                        <div class="space-y-3 text-xs">
+                            <!-- Recommended techniques highlighted at top -->
+                            <div class="p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+                                <div class="font-bold text-yellow-300 mb-1 flex items-center">
+                                    <i class="fas fa-star text-yellow-400 mr-1.5" style="font-size:10px"></i>
+                                    4 — Module Stomping（推荐）
+                                    <span class="ml-2 px-1.5 py-0.5 bg-green-500/20 text-green-400 text-[10px] rounded">OPSEC 最佳</span>
+                                </div>
+                                <div class="text-gray-300">CreateProcess(SUSPENDED+PPID Spoof) → 加载合法签名 DLL → 覆写 .text 段 → Resume</div>
+                                <div class="text-gray-500 mt-1">内存类型 MEM_IMAGE（非 MEM_PRIVATE），保护属性 RX，完全合法外观。避免 NtCreateSection(RWX) 和 VirtualAllocEx 等高危 IOC</div>
+                            </div>
+                            <div class="p-3 bg-green-500/5 rounded-lg border border-green-500/10">
+                                <div class="font-bold text-green-300 mb-1 flex items-center">
+                                    <i class="fas fa-shield-alt text-green-400 mr-1.5" style="font-size:10px"></i>
+                                    2 — Early Bird APC（推荐）
+                                    <span class="ml-2 px-1.5 py-0.5 bg-green-500/20 text-green-400 text-[10px] rounded">iOA 规避</span>
+                                </div>
+                                <div class="text-gray-300">CreateProcess(SUSPENDED+PPID Spoof) → Resume → [长延迟] → Suspend → QueueApcThread → Resume</div>
+                                <div class="text-gray-500 mt-1">Init-First Pattern 打破 "SUSPENDED→立即注入" 的 EDR 行为模式匹配，含 Remote ETW Patching</div>
+                            </div>
+
+                            <div class="border-t border-gray-700/50 my-2"></div>
+                            <div class="text-gray-500 font-medium mb-1">全部技术列表</div>
+
+                            <div class="p-3 bg-gray-900/50 rounded-lg">
+                                <div class="font-medium text-purple-400 mb-1">0 — Classic Remote Thread</div>
+                                <div class="text-gray-400">VirtualAllocEx → WriteProcessMemory → CreateRemoteThread (spoofed start address)</div>
+                            </div>
+                            <div class="p-3 bg-gray-900/50 rounded-lg">
+                                <div class="font-medium text-purple-400 mb-1">1 — APC Injection</div>
+                                <div class="text-gray-400">打开已存在线程 → QueueApcThread → 等待线程进入 alertable 状态</div>
+                            </div>
+                            <div class="p-3 bg-gray-900/50 rounded-lg">
+                                <div class="font-medium text-purple-400 mb-1">2 — Early Bird APC</div>
+                                <div class="text-gray-400">CreateProcess(SUSPENDED+PPID Spoof) → Init-First Pattern → QueueApcThread → Resume</div>
+                            </div>
+                            <div class="p-3 bg-gray-900/50 rounded-lg">
+                                <div class="font-medium text-purple-400 mb-1">3 — Section Mapping</div>
+                                <div class="text-gray-400">NtCreateSection → NtMapViewOfSection(local+remote) → CreateRemoteThread (spoofed)</div>
+                            </div>
+                            <div class="p-3 bg-gray-900/50 rounded-lg">
+                                <div class="font-medium text-purple-400 mb-1">4 — Module Stomping（进程镂空 + DLL 覆写）</div>
+                                <div class="text-gray-400">CreateProcess(SUSPENDED+PPID Spoof) → LoadLibrary(签名DLL) → 覆写 .text → SetContext → Resume</div>
+                            </div>
+                            <div class="p-3 bg-gray-900/50 rounded-lg">
+                                <div class="font-medium text-purple-400 mb-1">5 — Thread Hijacking</div>
+                                <div class="text-gray-400">SuspendThread → GetContext → SetContext(Rip=shellcode) → ResumeThread</div>
+                            </div>
+                            <div class="p-3 bg-gray-900/50 rounded-lg">
+                                <div class="font-medium text-purple-400 mb-1">6 — Callback: TimerQueue</div>
+                                <div class="text-gray-400">VirtualAllocEx → WriteProcessMemory → CreateTimerQueueTimer 回调执行</div>
+                            </div>
+                            <div class="p-3 bg-gray-900/50 rounded-lg">
+                                <div class="font-medium text-purple-400 mb-1">7 — Callback: EnumWindows</div>
+                                <div class="text-gray-400">VirtualAllocEx → WriteProcessMemory → EnumWindows 回调执行</div>
+                            </div>
+
+                            <!-- OPSEC Summary -->
+                            <div class="border-t border-gray-700/50 my-2"></div>
+                            <div class="p-3 bg-gray-900/30 rounded-lg border border-gray-700/30">
+                                <div class="font-medium text-blue-400 mb-2 flex items-center">
+                                    <i class="fas fa-lock mr-1.5"></i>OPSEC 增强（所有技术通用）
+                                </div>
+                                <div class="text-gray-500 space-y-1">
+                                    <p>• <strong class="text-gray-400">PPID Spoofing</strong> — 自动伪造父进程为 explorer.exe</p>
+                                    <p>• <strong class="text-gray-400">Thread Start Spoofing</strong> — CreateRemoteThread 起始地址指向 ntdll 合法导出</p>
+                                    <p>• <strong class="text-gray-400">RW→RX 分离</strong> — 严格遵循，永不分配 RWX 内存</p>
+                                    <p>• <strong class="text-gray-400">API Hash Resolution</strong> — 所有 API 通过 DJB2 hash 解析，不走 IAT</p>
+                                    <p>• <strong class="text-gray-400">Timing Evasion</strong> — API 调用间 300-800ms 随机延迟</p>
+                                    <p>• <strong class="text-gray-400">Remote ETW Patching</strong> — patch EtwEventWrite + NtTraceEvent + EtwEventWriteFull</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Generate Shellcode -->
+            <div id="inj-tab-generate" class="inj-tab-content hidden">
+                <div class="flex items-center justify-center py-16">
+                    <div class="bg-gray-800/50 border border-gray-700/50 rounded-xl p-8 max-w-lg text-center">
+                        <div class="w-16 h-16 bg-gradient-to-br from-indigo-500/30 to-purple-500/30 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                            <i class="fas fa-desktop text-indigo-400 text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-3">前往「客户端生成」页面</h3>
+                        <p class="text-sm text-gray-400 mb-6 leading-relaxed">
+                            Shellcode 生成功能已集成到<strong class="text-indigo-400">客户端生成</strong>页面中。
+                            在那里你可以完整配置 C2 连接参数、选择输出格式（Shellcode / Stager Shellcode）、
+                            配置 C2 Profile 流量伪装，并在构建完成后直接<strong class="text-purple-400">保存到 Shellcode 库</strong>供注入使用。
+                        </p>
+                        <div class="space-y-3">
+                            <button onclick="window.navigateToClientGenerator()" class="w-full px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-lg transition-all font-medium text-sm">
+                                <i class="fas fa-external-link-alt mr-2"></i>跳转到客户端生成
+                            </button>
+                            <p class="text-xs text-gray-500">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                提示：构建完成后点击「保存到 Shellcode 库」按钮，即可在此页面的 Shellcode 库中使用。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output Log -->
+            <div class="bg-gray-800/50 border border-gray-700/50 rounded-xl p-5 mt-6">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-semibold text-white flex items-center">
+                        <i class="fas fa-terminal mr-2 text-green-400"></i>操作日志
+                    </h3>
+                    <button onclick="document.getElementById('injectionOutputLog').innerHTML=''" class="text-xs text-gray-500 hover:text-gray-300 transition-colors">
+                        <i class="fas fa-eraser mr-1"></i>清空
+                    </button>
+                </div>
+                <div id="injectionOutputLog" class="bg-gray-900/80 rounded-lg p-4 font-mono text-sm text-green-400 max-h-48 overflow-y-auto whitespace-pre-wrap">
+                    <div style="color:#8b949e">[*] 注入管理器就绪，请选择 Beacon 并执行操作...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="beacon-rootkit" class="beacon-sub-content hidden">
+        <div class="max-w-full mx-auto px-6 py-6">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-red-500/30 to-orange-500/30 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-shield-alt text-red-400 text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Rootkit管理</h2>
+                        <p class="text-xs text-gray-400 mt-0.5">部署、控制和管理 miniRootkit 进程隐藏服务</p>
+                    </div>
+                </div>
+                <div class="relative">
+                    <select id="rootkitBeaconSelect" class="bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-red-500 appearance-none min-w-80">
+                        <option value="">选择Beacon</option>
+                    </select>
+                    <div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                        <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Card -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-gray-400 mb-1">服务状态</p>
+                            <p id="rootkitServiceStatus" class="text-lg font-bold text-gray-500">未知</p>
+                        </div>
+                        <div class="w-10 h-10 bg-gray-700/50 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-server text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-gray-400 mb-1">隐藏进程数</p>
+                            <p id="rootkitHiddenCount" class="text-lg font-bold text-gray-500">0</p>
+                        </div>
+                        <div class="w-10 h-10 bg-gray-700/50 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-eye-slash text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-gray-400 mb-1">目标Beacon</p>
+                            <p id="rootkitTargetBeacon" class="text-lg font-bold text-gray-500 truncate max-w-[180px]">未选择</p>
+                        </div>
+                        <div class="w-10 h-10 bg-gray-700/50 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-broadcast-tower text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- Deploy Card -->
+                <div class="bg-gray-800/50 border border-gray-700/50 rounded-xl p-5">
+                    <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+                        <i class="fas fa-rocket mr-2 text-red-400"></i>部署 Rootkit
+                    </h3>
+                    <p class="text-sm text-gray-400 mb-4">上传 rootkit-svc.exe 到目标主机并注册为 Windows 服务。服务将自动注入 Hook DLL 到 explorer.exe 实现进程隐藏。</p>
+                    <div class="mb-3">
+                        <label class="block text-xs text-gray-400 mb-1">选择 rootkit-svc.exe</label>
+                        <input type="file" id="rootkitBinaryFile" accept=".exe" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-red-600/20 file:text-red-400 hover:file:bg-red-600/30 cursor-pointer">
+                    </div>
+                    <button onclick="window.deployRootkit()" id="rootkitDeployBtn" class="w-full px-4 py-2.5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white rounded-lg transition-all font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        <i class="fas fa-upload mr-2"></i>部署 Rootkit
+                    </button>
+                </div>
+
+                <!-- Control Card -->
+                <div class="bg-gray-800/50 border border-gray-700/50 rounded-xl p-5">
+                    <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+                        <i class="fas fa-sliders-h mr-2 text-blue-400"></i>控制面板
+                    </h3>
+                    <div class="space-y-3">
+                        <button onclick="window.rootkitStatus()" class="w-full px-4 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-lg transition-all text-sm flex items-center justify-center">
+                            <i class="fas fa-info-circle mr-2"></i>查询状态
+                        </button>
+                        <div class="flex space-x-2">
+                            <input type="number" id="rootkitHidePid" placeholder="输入PID" class="flex-1 bg-gray-900/50 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <button onclick="window.rootkitHide()" class="px-4 py-2 bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 rounded-lg transition-all text-sm">
+                                <i class="fas fa-eye-slash mr-1"></i>隐藏
+                            </button>
+                        </div>
+                        <button onclick="window.rootkitUnhide()" class="w-full px-4 py-2 bg-green-600/20 hover:bg-green-600/30 text-green-400 rounded-lg transition-all text-sm flex items-center justify-center">
+                            <i class="fas fa-eye mr-2"></i>取消所有隐藏
+                        </button>
+                        <button onclick="window.rootkitUninstall()" class="w-full px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg transition-all text-sm flex items-center justify-center">
+                            <i class="fas fa-trash-alt mr-2"></i>卸载 Rootkit
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output Log -->
+            <div class="bg-gray-800/50 border border-gray-700/50 rounded-xl p-5">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-lg font-semibold text-white flex items-center">
+                        <i class="fas fa-terminal mr-2 text-green-400"></i>操作日志
+                    </h3>
+                    <button onclick="document.getElementById('rootkitOutputLog').innerHTML=''" class="text-xs text-gray-500 hover:text-gray-300 transition-colors">
+                        <i class="fas fa-eraser mr-1"></i>清空
+                    </button>
+                </div>
+                <div id="rootkitOutputLog" class="bg-gray-900/80 rounded-lg p-4 font-mono text-sm text-green-400 max-h-80 overflow-y-auto whitespace-pre-wrap">
+                    <span class="text-gray-500">[*] Rootkit管理器就绪，请选择Beacon并执行操作...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="server-downloads" class="beacon-sub-content hidden">
+        <div class="max-w-full mx-auto px-6 py-6">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-green-500/30 to-emerald-500/30 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-exchange-alt text-green-400 text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">文件传输</h2>
+                        <p class="text-xs text-gray-400 mt-0.5">在目标主机与服务器之间传输文件</p>
+                    </div>
+                </div>
+                <button onclick="window.loadServerFiles()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white rounded-lg transition-all text-sm border border-gray-600/50 hover:border-gray-500">
+                    <i class="fas fa-sync-alt mr-2"></i>刷新列表
+                </button>
+            </div>
+
+            <!-- Tab 切换：下载 / 上传 -->
+            <div class="flex space-x-1 mb-6 bg-gray-800/60 rounded-xl p-1 border border-gray-700/50 w-fit">
+                <button id="ftTabDownload" onclick="window.switchFileTransferTab('download')" class="px-5 py-2 rounded-lg text-sm font-medium transition-all bg-green-600 text-white shadow-lg">
+                    <i class="fas fa-download mr-2"></i>从目标下载
+                </button>
+                <button id="ftTabUpload" onclick="window.switchFileTransferTab('upload')" class="px-5 py-2 rounded-lg text-sm font-medium transition-all text-gray-400 hover:text-white hover:bg-gray-700/60">
+                    <i class="fas fa-upload mr-2"></i>上传到目标
+                </button>
+            </div>
+
+            <!-- ═══ 下载 Tab 内容 ═══ -->
+            <div id="ftDownloadContent">
+            <div class="bg-gradient-to-r from-gray-800/80 to-gray-800/60 rounded-xl border border-gray-700/80 p-6 mb-6 backdrop-blur-sm">
+                <div class="flex items-center space-x-2 mb-4">
+                    <i class="fas fa-plus-circle text-green-400"></i>
+                    <h3 class="text-base font-semibold text-white">新建下载任务</h3>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
+                    <!-- Beacon 选择 -->
+                    <div class="lg:col-span-3">
+                        <label class="block text-xs font-medium text-gray-400 mb-1.5">
+                            <i class="fas fa-broadcast-tower text-purple-400 mr-1"></i>选择 Beacon
+                        </label>
+                        <div class="relative">
+                            <select id="sdBeaconSelect" class="w-full bg-gray-700/80 border border-gray-600 text-white rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500/50 text-sm appearance-none pr-8 transition-all">
+                                <option value="">选择 Beacon...</option>
+                            </select>
+                            <div class="absolute right-2.5 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 文件路径 -->
+                    <div class="lg:col-span-6">
+                        <label class="block text-xs font-medium text-gray-400 mb-1.5">
+                            <i class="fas fa-file-alt text-yellow-400 mr-1"></i>目标文件路径
+                        </label>
+                        <input type="text" id="sdFilePathInput" placeholder="C:\Users\Public\Documents\example.txt"
+                               class="w-full bg-gray-700/80 border border-gray-600 text-white rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500/50 text-sm font-mono placeholder-gray-500 transition-all">
+                    </div>
+                    <!-- 下载按钮 -->
+                    <div class="lg:col-span-3 flex space-x-2">
+                        <button id="sdStartDownloadBtn" onclick="window.startPageDownload()" class="flex-1 px-4 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white rounded-lg transition-all text-sm font-medium shadow-lg shadow-green-500/20 flex items-center justify-center">
+                            <i class="fas fa-download mr-2"></i>开始下载
+                        </button>
+                        <div class="relative">
+                            <button onclick="document.getElementById('sdQuickPaths').classList.toggle('hidden')" class="px-3 py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg transition-all text-sm border border-gray-600/50" title="快捷路径">
+                                <i class="fas fa-folder-open"></i>
+                            </button>
+                            <div id="sdQuickPaths" class="hidden absolute right-0 top-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-xl z-10 w-48 py-1">
+                                <button onclick="window.sdSetQuickPath('desktop')" class="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">
+                                    <i class="fas fa-desktop mr-2 text-blue-400"></i>桌面
+                                </button>
+                                <button onclick="window.sdSetQuickPath('documents')" class="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">
+                                    <i class="fas fa-folder mr-2 text-yellow-400"></i>文档
+                                </button>
+                                <button onclick="window.sdSetQuickPath('downloads')" class="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">
+                                    <i class="fas fa-download mr-2 text-green-400"></i>下载
+                                </button>
+                                <button onclick="window.sdSetQuickPath('temp')" class="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">
+                                    <i class="fas fa-thermometer-half mr-2 text-orange-400"></i>临时目录
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 活跃下载任务区域（默认隐藏） -->
+            <div id="sdActiveDownloads" class="mb-6 hidden">
+                <div class="flex items-center space-x-2 mb-3">
+                    <i class="fas fa-tasks text-blue-400"></i>
+                    <h3 class="text-sm font-semibold text-gray-300">活跃下载任务</h3>
+                    <span id="sdActiveCount" class="bg-blue-500/20 text-blue-400 text-xs px-2 py-0.5 rounded-full border border-blue-500/30">0</span>
+                </div>
+                <div id="sdActiveDownloadsList" class="space-y-3">
+                    <!-- Dynamic download task cards -->
+                </div>
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-gray-800/60 rounded-xl border border-gray-700/50 p-4 flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-blue-500/15 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-file-archive text-blue-400"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-xs">总文件数</p>
+                        <p id="sdTotalFiles" class="text-white text-xl font-bold font-mono">0</p>
+                    </div>
+                </div>
+                <div class="bg-gray-800/60 rounded-xl border border-gray-700/50 p-4 flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-green-500/15 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-hdd text-green-400"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-xs">总大小</p>
+                        <p id="sdTotalSize" class="text-white text-xl font-bold font-mono">0 B</p>
+                    </div>
+                </div>
+                <div class="bg-gray-800/60 rounded-xl border border-gray-700/50 p-4 flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-purple-500/15 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-broadcast-tower text-purple-400"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-xs">关联 Beacon</p>
+                        <p id="sdBeaconCount" class="text-white text-xl font-bold font-mono">0</p>
+                    </div>
+                </div>
+                <div class="bg-gray-800/60 rounded-xl border border-gray-700/50 p-4 flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-yellow-500/15 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-clock text-yellow-400"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-xs">最近下载</p>
+                        <p id="sdLatestTime" class="text-white text-sm font-mono truncate">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 文件列表 -->
+            <div class="bg-gray-800/60 rounded-xl border border-gray-700/50 overflow-hidden">
+                <div class="flex items-center justify-between px-5 py-3 border-b border-gray-700/50">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-list text-gray-400 text-sm"></i>
+                        <span class="text-sm font-medium text-gray-300">已下载文件</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="text" id="sdSearchInput" placeholder="搜索文件名..."
+                               class="bg-gray-700/60 border border-gray-600/50 text-white rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-green-500/50 w-48 placeholder-gray-500"
+                               oninput="window.filterServerFiles(this.value)">
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700/50 bg-gray-800/40">
+                                <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-5 py-3">文件名</th>
+                                <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-5 py-3">大小</th>
+                                <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-5 py-3">Beacon</th>
+                                <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-5 py-3">任务ID</th>
+                                <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-5 py-3">下载时间</th>
+                                <th class="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-5 py-3">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="serverFilesTableBody">
+                            <tr>
+                                <td colspan="6" class="text-center text-gray-500 py-12">
+                                    <i class="fas fa-folder-open text-3xl mb-3 block text-gray-600"></i>
+                                    <span class="text-sm">暂无下载的文件</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            </div><!-- end ftDownloadContent -->
+
+            <!-- ═══ 上传 Tab 内容 ═══ -->
+            <div id="ftUploadContent" class="hidden">
+                <!-- 新建上传任务区域 -->
+                <div class="bg-gradient-to-r from-gray-800/80 to-gray-800/60 rounded-xl border border-gray-700/80 p-6 mb-6 backdrop-blur-sm">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i class="fas fa-cloud-upload-alt text-yellow-400"></i>
+                        <h3 class="text-base font-semibold text-white">新建上传任务</h3>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+                        <!-- Beacon 选择 -->
+                        <div class="lg:col-span-3">
+                            <label class="block text-xs font-medium text-gray-400 mb-1.5">
+                                <i class="fas fa-broadcast-tower text-purple-400 mr-1"></i>选择 Beacon
+                            </label>
+                            <div class="relative">
+                                <select id="ftUploadBeaconSelect" class="w-full bg-gray-700/80 border border-gray-600 text-white rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 text-sm appearance-none pr-8 transition-all">
+                                    <option value="">选择 Beacon...</option>
+                                </select>
+                                <div class="absolute right-2.5 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                    <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 目标路径 -->
+                        <div class="lg:col-span-4">
+                            <label class="block text-xs font-medium text-gray-400 mb-1.5">
+                                <i class="fas fa-folder text-yellow-400 mr-1"></i>目标保存路径
+                            </label>
+                            <input type="text" id="ftUploadTargetPath" placeholder="C:\Users\Public\Documents\example.exe"
+                                   class="w-full bg-gray-700/80 border border-gray-600 text-white rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 text-sm font-mono placeholder-gray-500 transition-all">
+                        </div>
+                        <!-- 文件选择 -->
+                        <div class="lg:col-span-3">
+                            <label class="block text-xs font-medium text-gray-400 mb-1.5">
+                                <i class="fas fa-file text-blue-400 mr-1"></i>选择本地文件
+                            </label>
+                            <div class="relative">
+                                <input type="file" id="ftUploadFileInput" class="hidden" onchange="window.handlePageUploadFileSelect(event)">
+                                <button onclick="document.getElementById('ftUploadFileInput').click()" class="w-full bg-gray-700/80 border border-gray-600 text-gray-300 hover:text-white rounded-lg px-3 py-2.5 text-sm transition-all hover:bg-gray-600/80 text-left truncate">
+                                    <i class="fas fa-paperclip mr-2 text-gray-400"></i>
+                                    <span id="ftUploadFileName">点击选择文件...</span>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- 上传按钮 -->
+                        <div class="lg:col-span-2 flex space-x-2 lg:pt-5">
+                            <button id="ftStartUploadBtn" onclick="window.startPageUpload()" class="flex-1 px-4 py-2.5 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white rounded-lg transition-all text-sm font-medium shadow-lg shadow-yellow-500/20 flex items-center justify-center">
+                                <i class="fas fa-upload mr-2"></i>上传
+                            </button>
+                            <div class="relative">
+                                <button onclick="document.getElementById('ftUploadQuickPaths').classList.toggle('hidden')" class="px-3 py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg transition-all text-sm border border-gray-600/50" title="快捷路径">
+                                    <i class="fas fa-folder-open"></i>
+                                </button>
+                                <div id="ftUploadQuickPaths" class="hidden absolute right-0 top-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-xl z-10 w-48 py-1">
+                                    <button onclick="window.ftUploadSetQuickPath('desktop')" class="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">
+                                        <i class="fas fa-desktop mr-2 text-blue-400"></i>桌面
+                                    </button>
+                                    <button onclick="window.ftUploadSetQuickPath('documents')" class="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">
+                                        <i class="fas fa-folder mr-2 text-yellow-400"></i>文档
+                                    </button>
+                                    <button onclick="window.ftUploadSetQuickPath('downloads')" class="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">
+                                        <i class="fas fa-download mr-2 text-green-400"></i>下载
+                                    </button>
+                                    <button onclick="window.ftUploadSetQuickPath('temp')" class="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">
+                                        <i class="fas fa-thermometer-half mr-2 text-orange-400"></i>临时目录
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 选中文件信息 -->
+                    <div id="ftUploadFileInfo" class="hidden mt-4 bg-gray-700/40 rounded-lg p-3 border border-gray-600/30">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-yellow-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-file text-yellow-400"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p id="ftUploadFileNameDisplay" class="text-white text-sm font-mono truncate">-</p>
+                                <p id="ftUploadFileSizeDisplay" class="text-gray-400 text-xs mt-0.5">-</p>
+                            </div>
+                            <button onclick="window.clearPageUploadFile()" class="text-gray-400 hover:text-red-400 transition-colors p-1">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 活跃上传任务区域 -->
+                <div id="ftActiveUploads" class="mb-6 hidden">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <i class="fas fa-tasks text-yellow-400"></i>
+                        <h3 class="text-sm font-semibold text-gray-300">上传任务</h3>
+                        <span id="ftUploadActiveCount" class="bg-yellow-500/20 text-yellow-400 text-xs px-2 py-0.5 rounded-full border border-yellow-500/30">0</span>
+                    </div>
+                    <div id="ftActiveUploadsList" class="space-y-3">
+                        <!-- Dynamic upload task cards -->
+                    </div>
+                </div>
+
+                <!-- 上传提示信息 -->
+                <div class="bg-gray-800/60 rounded-xl border border-gray-700/50 p-6">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-info-circle text-yellow-400 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-white font-semibold mb-2">文件上传说明</h3>
+                            <ul class="text-gray-400 text-sm space-y-1.5">
+                                <li><i class="fas fa-check text-green-400 mr-2 text-xs"></i>选择 Beacon 后，文件将通过 C2 通道上传到目标主机</li>
+                                <li><i class="fas fa-check text-green-400 mr-2 text-xs"></i>目标路径需要包含文件名，如 <code class="text-yellow-300 bg-gray-700/50 px-1 rounded">C:\Users\Public\test.exe</code></li>
+                                <li><i class="fas fa-check text-green-400 mr-2 text-xs"></i>如果目标目录不存在，Beacon 会自动创建</li>
+                                <li><i class="fas fa-exclamation-triangle text-yellow-400 mr-2 text-xs"></i>大文件上传受 Beacon 堆内存限制（32MB），建议分批传输</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- end ftUploadContent -->
+
+        </div>
+    </div>
+</div>

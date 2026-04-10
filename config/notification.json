@@ -1,0 +1,23 @@
+{
+  "channels": [
+    {
+      "id": "ch_1774967499539",
+      "name": "test",
+      "type": "email",
+      "webhook_url": "",
+      "enabled": false,
+      "created_at": "2026-03-31T14:31:39.539Z",
+      "smtp_host": "smtp.qq.com",
+      "smtp_port": "465",
+      "smtp_user": "1505385074@qq.com",
+      "smtp_password": "eciligvdvyvfjdgf",
+      "mail_to": "2923208596@qq.com"
+    }
+  ],
+  "events": {
+    "beacon_online": true,
+    "beacon_offline": true,
+    "new_task": false,
+    "task_failed": false
+  }
+}

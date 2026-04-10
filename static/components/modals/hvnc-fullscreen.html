@@ -1,0 +1,13 @@
+<div id="hvncFullscreenModal" class="fixed inset-0 bg-black z-50 hidden">
+        <div class="absolute top-4 right-4 z-10 flex items-center gap-2">
+            <span id="hvncFullscreenStatus" class="px-3 py-1 rounded text-sm bg-green-500/20 text-green-400">
+                已连接
+            </span>
+            <button onclick="window.hvncExitFullscreen()" class="bg-red-500/80 hover:bg-red-500 text-white px-4 py-2 rounded-lg transition-colors">
+                <i class="fas fa-times mr-2"></i>退出全屏
+            </button>
+        </div>
+        <div class="w-full h-full flex items-center justify-center">
+            <canvas id="hvncFullscreenCanvas" tabindex="0" style="image-rendering: pixelated; outline: none;"></canvas>
+        </div>
+    </div>

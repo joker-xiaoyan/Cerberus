@@ -1,0 +1,276 @@
+<div id="strategyModal" class="strat-modal-overlay">
+    <div class="strat-modal-container">
+        <!-- ===== 标题栏 — 渐变背景 + 动态图标 ===== -->
+        <div class="strat-modal-header">
+            <div class="strat-modal-header-bg"></div>
+            <div class="strat-modal-header-content">
+                <div class="strat-modal-title-row">
+                    <div class="strat-modal-icon-box">
+                        <i class="fas fa-chess-knight"></i>
+                    </div>
+                    <div>
+                        <h3 id="strategyModalTitle" class="strat-modal-title">创建自动化策略</h3>
+                        <p class="strat-modal-subtitle">配置 Beacon 上线后的自动化攻击编排流程</p>
+                    </div>
+                </div>
+                <button class="strat-modal-close-btn" onclick="closeStrategyModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== 模态框主体 ===== -->
+        <div class="strat-modal-body">
+            <form id="strategyForm">
+                <input type="hidden" id="strategyId">
+
+                <!-- ▸ 分区 1: 基本信息 -->
+                <div class="strat-section">
+                    <div class="strat-section-header">
+                        <div class="strat-section-icon" style="--sec-color: #22d3ee;">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div>
+                            <div class="strat-section-title">基本信息</div>
+                            <div class="strat-section-desc">定义策略的名称、平台和分类</div>
+                        </div>
+                    </div>
+                    <div class="strat-section-body">
+                        <div class="strat-grid-2">
+                            <div class="strat-field">
+                                <label class="strat-label">
+                                    <i class="fas fa-tag strat-label-icon"></i>策略名称 <span class="strat-required">*</span>
+                                </label>
+                                <input type="text" id="strategyName" class="strat-input" placeholder="例如: 初始信息收集" required>
+                            </div>
+                            <div class="strat-field">
+                                <label class="strat-label">
+                                    <i class="fas fa-desktop strat-label-icon"></i>目标平台 <span class="strat-required">*</span>
+                                </label>
+                                <div class="strat-select-wrapper">
+                                    <select id="strategyPlatform" class="strat-input strat-select" required>
+                                        <option value="">选择平台</option>
+                                        <option value="windows">🪟 Windows</option>
+                                        <option value="linux">🐧 Linux</option>
+                                        <option value="macos">🍎 macOS</option>
+                                        <option value="cross_platform">🌐 跨平台</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down strat-select-arrow"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="strat-field">
+                            <label class="strat-label">
+                                <i class="fas fa-align-left strat-label-icon"></i>策略描述
+                            </label>
+                            <textarea id="strategyDescription" class="strat-input strat-textarea" rows="2" placeholder="描述此策略的功能和用途…"></textarea>
+                        </div>
+
+                        <div class="strat-grid-2">
+                            <div class="strat-field">
+                                <label class="strat-label">
+                                    <i class="fas fa-folder strat-label-icon"></i>策略分类 <span class="strat-required">*</span>
+                                </label>
+                                <div class="strat-select-wrapper">
+                                    <select id="strategyCategory" class="strat-input strat-select" required>
+                                        <option value="">选择分类</option>
+                                        <option value="信息收集">🔍 信息收集</option>
+                                        <option value="权限提升">⬆️ 权限提升</option>
+                                        <option value="横向移动">↔️ 横向移动</option>
+                                        <option value="持久化">🔒 持久化</option>
+                                        <option value="数据窃取">📦 数据窃取</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down strat-select-arrow"></i>
+                                </div>
+                            </div>
+                            <div class="strat-field">
+                                <label class="strat-label">
+                                    <i class="fas fa-flag strat-label-icon"></i>优先级
+                                </label>
+                                <div class="strat-select-wrapper">
+                                    <select id="strategyPriority" class="strat-input strat-select">
+                                        <option value="1">🔴 1 - 最高</option>
+                                        <option value="2">🟠 2 - 高</option>
+                                        <option value="3" selected>🟡 3 - 中</option>
+                                        <option value="4">🟢 4 - 低</option>
+                                        <option value="5">⚪ 5 - 最低</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down strat-select-arrow"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ▸ 分区 2: 执行命令 -->
+                <div class="strat-section">
+                    <div class="strat-section-header">
+                        <div class="strat-section-icon" style="--sec-color: #a78bfa;">
+                            <i class="fas fa-terminal"></i>
+                        </div>
+                        <div class="strat-section-header-text">
+                            <div class="strat-section-title">执行命令</div>
+                            <div class="strat-section-desc">定义策略执行的命令步骤序列</div>
+                        </div>
+                        <button type="button" id="toggleCommandsMode" class="strat-mode-toggle">
+                            <i class="fas fa-magic"></i>
+                            <span>JSON 模式</span>
+                        </button>
+                    </div>
+                    <div class="strat-section-body">
+                        <!-- 可视化命令编辑器 -->
+                        <div id="commandBuilder" class="strat-builder">
+                            <div class="strat-builder-header">
+                                <div class="strat-builder-label">
+                                    <i class="fas fa-list-ol"></i>
+                                    <span>命令步骤</span>
+                                </div>
+                                <button type="button" id="addCommandStepBtn" class="strat-add-btn">
+                                    <i class="fas fa-plus"></i>
+                                    <span>添加步骤</span>
+                                </button>
+                            </div>
+                            <div id="commandStepsContainer" class="strat-steps-container">
+                                <!-- 命令步骤将在这里动态渲染 -->
+                            </div>
+                        </div>
+                        
+                        <!-- 高级 JSON 编辑器 -->
+                        <textarea id="strategyCommands" class="hidden strat-input strat-code-textarea" rows="6" placeholder='[{"type":"command","command":"whoami","parameters":{"timeout":10},"delay":2}]'></textarea>
+                        <p class="strat-hint">
+                            <i class="fas fa-lightbulb"></i>
+                            支持多步骤命令编排，每个步骤可配置延迟和参数
+                        </p>
+                    </div>
+                </div>
+
+                <!-- ▸ 分区 3: 触发条件 -->
+                <div class="strat-section">
+                    <div class="strat-section-header">
+                        <div class="strat-section-icon" style="--sec-color: #f59e0b;">
+                            <i class="fas fa-filter"></i>
+                        </div>
+                        <div class="strat-section-header-text">
+                            <div class="strat-section-title">触发条件</div>
+                            <div class="strat-section-desc">定义触发策略执行的匹配规则</div>
+                        </div>
+                        <button type="button" id="toggleConditionsMode" class="strat-mode-toggle">
+                            <i class="fas fa-magic"></i>
+                            <span>JSON 模式</span>
+                        </button>
+                    </div>
+                    <div class="strat-section-body">
+                        <!-- 可视化条件编辑器 -->
+                        <div id="conditionsBuilder" class="strat-builder">
+                            <div class="strat-builder-header">
+                                <div class="strat-builder-label">
+                                    <i class="fas fa-code-branch"></i>
+                                    <span>条件规则</span>
+                                </div>
+                                <button type="button" id="addConditionRowBtn" class="strat-add-btn">
+                                    <i class="fas fa-plus"></i>
+                                    <span>添加条件</span>
+                                </button>
+                            </div>
+                            <div id="conditionRowsContainer" class="strat-steps-container">
+                                <!-- 条件行将在这里动态渲染 -->
+                            </div>
+                        </div>
+                        
+                        <!-- 高级 JSON 编辑器 -->
+                        <textarea id="strategyConditions" class="hidden strat-input strat-code-textarea" rows="4" placeholder='[{"field":"status","operator":"==","value":"online"}]'></textarea>
+                        <p class="strat-hint">
+                            <i class="fas fa-lightbulb"></i>
+                            匹配 Beacon 在线状态、操作系统、权限级别等条件
+                        </p>
+                    </div>
+                </div>
+
+                <!-- ▸ 分区 4: 执行设置 -->
+                <div class="strat-section">
+                    <div class="strat-section-header">
+                        <div class="strat-section-icon" style="--sec-color: #34d399;">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <div>
+                            <div class="strat-section-title">执行设置</div>
+                            <div class="strat-section-desc">控制策略的启用状态和自动执行行为</div>
+                        </div>
+                    </div>
+                    <div class="strat-section-body">
+                        <div class="strat-toggle-group">
+                            <!-- 启用开关 -->
+                            <label class="strat-toggle-card">
+                                <div class="strat-toggle-info">
+                                    <div class="strat-toggle-icon strat-toggle-icon--green">
+                                        <i class="fas fa-power-off"></i>
+                                    </div>
+                                    <div>
+                                        <div class="strat-toggle-name">启用此策略</div>
+                                        <div class="strat-toggle-desc">关闭后策略将不会被触发</div>
+                                    </div>
+                                </div>
+                                <div class="strat-switch">
+                                    <input type="checkbox" id="strategyEnabled" checked>
+                                    <span class="strat-switch-slider"></span>
+                                </div>
+                            </label>
+
+                            <!-- 自动执行开关 -->
+                            <label class="strat-toggle-card">
+                                <div class="strat-toggle-info">
+                                    <div class="strat-toggle-icon strat-toggle-icon--amber">
+                                        <i class="fas fa-bolt"></i>
+                                    </div>
+                                    <div>
+                                        <div class="strat-toggle-name">Beacon 上线时自动执行</div>
+                                        <div class="strat-toggle-desc">新 Beacon 回连后自动下发此策略</div>
+                                    </div>
+                                </div>
+                                <div class="strat-switch">
+                                    <input type="checkbox" id="strategyAutoExecute">
+                                    <span class="strat-switch-slider"></span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- 延迟设置（自动执行时显示） -->
+                        <div id="autoExecuteDelaySection" class="strat-delay-section" style="display: none;">
+                            <div class="strat-delay-card">
+                                <div class="strat-delay-icon">
+                                    <i class="fas fa-hourglass-half"></i>
+                                </div>
+                                <div class="strat-delay-body">
+                                    <label class="strat-label" style="margin-bottom:4px;">
+                                        自动执行延迟 (秒)
+                                    </label>
+                                    <p class="strat-delay-hint">Beacon 上线后等待指定秒数再开始执行</p>
+                                    <input type="number" id="strategyAutoExecuteDelay" class="strat-input strat-delay-input" min="0" value="60" placeholder="60">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== 底部操作栏 ===== -->
+                <div class="strat-modal-footer">
+                    <div class="strat-footer-hint">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>策略保存后可随时编辑或禁用</span>
+                    </div>
+                    <div class="strat-footer-actions">
+                        <button type="button" class="strat-btn strat-btn--cancel" onclick="window.closeStrategyModal()">
+                            <i class="fas fa-times"></i>
+                            <span>取消</span>
+                        </button>
+                        <button type="submit" class="strat-btn strat-btn--save">
+                            <i class="fas fa-save"></i>
+                            <span>保存策略</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

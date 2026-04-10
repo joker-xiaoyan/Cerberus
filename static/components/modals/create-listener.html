@@ -1,0 +1,53 @@
+<!-- create-listener 模态框 -->
+<div id="createListenerModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="text-xl font-bold flex items-center">
+                <i class="fas fa-plus-circle mr-2 text-purple-400"></i>
+                新建监听器
+            </h3>
+            <button class="modal-close" onclick="window.closeCreateListenerModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="createListenerForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">监听器名称</label>
+                    <input type="text" id="listenerName" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:border-purple-500" placeholder="例如: HTTP-Listener-1" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">协议类型</label>
+                    <select id="listenerProtocol" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:border-purple-500">
+                        <option value="http">HTTP</option>
+                        <option value="https">HTTPS</option>
+                        <option value="tcp">TCP</option>
+                        <option value="udp">UDP</option>
+                        <option value="dns">DNS</option>
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1" id="protocolHint">标准HTTP通信协议</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">监听地址</label>
+                        <input type="text" id="listenerHost" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:border-purple-500" placeholder="0.0.0.0" value="0.0.0.0" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">监听端口</label>
+                        <input type="number" id="listenerPort" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:border-purple-500" placeholder="8080" min="1" max="65535" required>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="listenerAutoStart" class="w-4 h-4 text-purple-600 bg-gray-800 border-gray-600 rounded focus:ring-purple-500">
+                    <label for="listenerAutoStart" class="text-sm text-gray-300">创建后自动启动</label>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" class="btn-secondary" onclick="window.closeCreateListenerModal()">取消</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-check mr-2"></i>创建监听器
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

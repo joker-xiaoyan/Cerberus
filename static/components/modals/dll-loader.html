@@ -1,0 +1,157 @@
+<!-- dll-loader 模态框 - 从 1index.html 自动提取 -->
+<div id="dllLoaderModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50">
+    <div class="bg-gray-800 rounded-xl border border-gray-700 w-full max-w-5xl mx-4 shadow-2xl">
+        <div class="flex items-center justify-between p-6 border-b border-gray-700">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-indigo-500/20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-cubes text-indigo-400"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">动态装载DLL</h3>
+            </div>
+            <button onclick="window.closeDllLoaderModal()" class="text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 1. Load Module -->
+                <div class="bg-gray-900/50 rounded-lg p-6 border border-gray-700">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-upload text-green-400"></i>
+                        </div>
+                        <h4 class="font-bold text-white text-lg">Load Module</h4>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">上传DLL文件到Beacon并加载</p>
+                    <div class="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center cursor-pointer hover:border-indigo-500 transition-colors"
+                         onclick="document.getElementById('dllUploadInput').click()">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-500 mb-3"></i>
+                        <p class="text-gray-400" id="dllFileName">点击选择DLL文件</p>
+                        <input type="file" id="dllUploadInput" class="hidden" accept=".dll" onchange="window.handleDllSelect(event)">
+                    </div>
+                    <button onclick="window.loadDll()" class="w-full mt-4 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg transition-colors">
+                        <i class="fas fa-play mr-2"></i>加载DLL
+                    </button>
+                </div>
+
+                <!-- 2. Show Module -->
+                <div class="bg-gray-900/50 rounded-lg p-6 border border-gray-700">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-list text-blue-400"></i>
+                        </div>
+                        <h4 class="font-bold text-white text-lg">Show Module</h4>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">查看当前已加载的DLL模块</p>
+                    <button onclick="window.showLoadedModules()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg transition-colors">
+                        <i class="fas fa-eye mr-2"></i>查看已加载模块
+                    </button>
+                    <div id="loadedModulesList" class="mt-4 max-h-48 overflow-y-auto space-y-2 hidden">
+                        <!-- 动态填充 -->
+                    </div>
+                </div>
+
+                <!-- 3. Exec Module -->
+                <div class="bg-gray-900/50 rounded-lg p-6 border border-gray-700">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-play-circle text-purple-400"></i>
+                        </div>
+                        <h4 class="font-bold text-white text-lg">Exec Module</h4>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">执行已加载DLL的导出函数</p>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-gray-300 text-sm mb-1 block">DLL模块名</label>
+                            <input type="text" id="dllHandleInput" placeholder="DLL加载后的模块名"
+                                   class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                        <div>
+                            <label class="text-gray-300 text-sm mb-1 block">导出函数名</label>
+                            <input type="text" id="dllFunctionInput" placeholder="例如: DllMain"
+                                   class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                        <div>
+                            <label class="text-gray-300 text-sm mb-1 block">函数参数 (可选)</label>
+                            <input type="text" id="dllArgsInput" placeholder="函数参数"
+                                   class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                    </div>
+                    <button onclick="window.execDll()" class="w-full mt-4 bg-purple-500 hover:bg-purple-600 text-white py-2 rounded-lg transition-colors">
+                        <i class="fas fa-bolt mr-2"></i>执行导出函数
+                    </button>
+                </div>
+
+                <!-- 4. Unload Module -->
+                <div class="bg-gray-900/50 rounded-lg p-6 border border-gray-700">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-eject text-red-400"></i>
+                        </div>
+                        <h4 class="font-bold text-white text-lg">Unload Module</h4>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">卸载已加载的DLL模块</p>
+                    <div>
+                        <label class="text-gray-300 text-sm mb-1 block">DLL模块名</label>
+                        <input type="text" id="dllUnloadHandleInput" placeholder="要卸载的DLL模块名"
+                               class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+                    <button onclick="window.unloadDll()" class="w-full mt-4 bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg transition-colors">
+                        <i class="fas fa-trash mr-2"></i>卸载DLL
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-3 p-6 border-t border-gray-700">
+            <button onclick="window.closeDllLoaderModal()" class="px-6 py-2.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors">
+                关闭
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- HVNC全屏模态框 -->
+<div id="hvncFullscreenModal" class="fixed inset-0 bg-black z-50 hidden">
+    <div class="absolute top-4 right-4 z-10 flex items-center gap-2">
+        <span id="hvncFullscreenStatus" class="px-3 py-1 rounded text-sm bg-green-500/20 text-green-400">
+            已连接
+        </span>
+        <button onclick="window.hvncExitFullscreen()" class="bg-red-500/80 hover:bg-red-500 text-white px-4 py-2 rounded-lg transition-colors">
+            <i class="fas fa-times mr-2"></i>退出全屏
+        </button>
+    </div>
+    <div class="w-full h-full flex items-center justify-center">
+        <canvas id="hvncFullscreenCanvas" tabindex="0" style="image-rendering: pixelated; outline: none;"></canvas>
+    </div>
+</div>
+
+<style>
+    .hvnc-app-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        transition: all 0.2s;
+        color: white;
+    }
+    .hvnc-app-btn:hover {
+        transform: translateY(-2px);
+    }
+    .hvnc-app-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+    #hvncCanvas:focus {
+        box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.5);
+    }
+    #hvncFullscreenCanvas:focus {
+        box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.5);
+    }
+</style>
+
+<!-- SOCKS代理连接模态框 -->

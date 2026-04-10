@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cerberus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=1.2">
+    <script src="echarts.min.js?v=5.4.3-stub"></script>
+</head>
+<body class="bg-gray-900 text-gray-100">
+    <!-- 顶部导航栏容器 -->
+    <div id="header-container"></div>
+
+    <!-- 左侧导航栏容器 -->
+    <div id="sidebar-container"></div>
+
+    <!-- 主内容区 -->
+    <main class="pt-16 min-h-screen ml-64 transition-all duration-300">
+        <!-- 页面内容容器 - 所有页面动态加载到这里 -->
+        <div id="pages-container"></div>
+    </main>
+
+    <!-- 页脚容器 -->
+    <div id="footer-container"></div>
+
+    <!-- 模态框容器 - 所有模态框动态加载到这里 -->
+    <div id="modals-container"></div>
+
+    <!-- 组件加载器和初始化脚本 -->
+    <script>
+        // Create a global promise that resolves when all components are loaded.
+        window._componentsReady = new Promise(function(resolve) {
+            window._componentsReadyResolve = resolve;
+        });
+        window._componentsLoaded = false;
+    </script>
+    <script type="module">
+        import componentLoader from './components/component-loader.js';
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('[Cerberus] 开始加载组件...');
+            
+            try {
+                // 1. 加载布局组件（顺序加载，确保DOM结构正确）
+                console.log('[Cerberus] 加载布局组件...');
+                await componentLoader.loadComponent('layout/header.html', '#header-container');
+                await componentLoader.loadComponent('layout/sidebar.html', '#sidebar-container');
+                await componentLoader.loadComponent('layout/footer.html', '#footer-container');
+
+                // 2. 加载所有页面（如果组件文件不存在会静默跳过）
+                console.log('[Cerberus] 加载页面组件...');
+                const pagesLoaded = await componentLoader.loadPages();
+
+                // 3. 加载所有模态框
+                console.log('[Cerberus] 加载模态框组件...');
+                const modalsLoaded = await componentLoader.loadModals();
+
+                // 4. Mark components as loaded and resolve the global promise
+                window._componentsLoaded = true;
+                window._componentsReadyResolve();
+
+                // 5. 触发初始化完成事件 (kept for backward compatibility)
+                window.dispatchEvent(new CustomEvent('componentsLoaded'));
+                console.log(`[Cerberus] 组件加载完成: ${pagesLoaded} 页面, ${modalsLoaded} 模态框`);
+
+            } catch (error) {
+                console.error('[Cerberus] 组件加载失败:', error);
+                window._componentsLoaded = true;
+                window._componentsReadyResolve();
+            }
+        });
+        
+        // 监听组件加载完成事件，执行初始化
+        window.addEventListener('componentsLoaded', () => {
+            console.log('[Cerberus] 触发应用初始化...');
+        });
+    </script>
+
+    <!-- JavaScript模块 -->
+    <script type="module" src="data.js?v=1.2"></script>
+    <script type="module" src="ui.js?v=1.2"></script>
+    <script type="module" src="charts.js?v=1.2"></script>
+    <script type="module" src="ai.js?v=1.2"></script>
+    <script type="module" src="automation.js?v=1.0"></script>
+    <script type="module" src="navigation.js?v=1.0"></script>
+    <script type="module" src="notification.js?v=1.0"></script>
+    <script type="module" src="console.js?v=1.0"></script>
+    <script type="module" src="data-manager.js?v=1.0"></script>
+    <script type="module" src="listener-manager.js?v=1.0"></script>
+    <script type="module" src="file-manager.js?v=1.0"></script>
+    <script type="module" src="process-manager.js?v=1.0"></script>
+    <script src="beacon-topology.js?v=1.0"></script>
+    <script src="arsenal.js?v=1.0"></script>
+    <script src="rootkit-manager.js?v=1.0"></script>
+    <script type="module" src="main.js?v=2.0"></script>
+    <script type="module" src="client-generator.js?v=1.0"></script>
+
+    <!-- 内联初始化脚本（从原 index.html 提取） -->
+    <script>
+        // 处理自动执行复选框的交互
+        document.addEventListener('DOMContentLoaded', function() {
+            const autoExecuteCheckbox = document.getElementById('strategyAutoExecute');
+            const autoExecuteDelaySection = document.getElementById('autoExecuteDelaySection');
+
+            if (autoExecuteCheckbox && autoExecuteDelaySection) {
+                autoExecuteCheckbox.addEventListener('change', function() {
+                    autoExecuteDelaySection.style.display = this.checked ? 'block' : 'none';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

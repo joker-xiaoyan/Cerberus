@@ -1,0 +1,194 @@
+<!-- file-manager modal - Modern Cyber File Browser -->
+<div id="fileManagerModal" class="modal">
+    <div class="modal-content" style="max-width:1120px;width:95vw;">
+        <div class="modal-header" style="padding:0;border:none;background:transparent;">
+            <!-- Cyber-style title bar with glow accent -->
+            <div class="cs-titlebar">
+                <div class="cs-titlebar-left">
+                    <div class="cs-titlebar-icon-wrap">
+                        <i class="fas fa-folder-open"></i>
+                        <span class="cs-titlebar-pulse"></span>
+                    </div>
+                    <span>File Browser</span>
+                    <span class="cs-titlebar-beacon" id="fileBeaconName"></span>
+                </div>
+                <div class="cs-titlebar-right">
+                    <span class="cs-titlebar-tag"><i class="fas fa-shield-alt"></i> SECURE</span>
+                    <button class="cs-titlebar-close" onclick="window.closeFileManager()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body" style="padding:0;">
+            <div class="cs-fm">
+                <!-- Toolbar: navigation + address bar -->
+                <div class="cs-fm-toolbar">
+                    <div class="cs-fm-nav-btns">
+                        <button class="cs-fm-btn" onclick="window.fileManagerGoBack()" title="Up one level">
+                            <i class="fas fa-level-up-alt"></i>
+                        </button>
+                        <button class="cs-fm-btn" onclick="window.fileManagerRefresh()" title="Refresh">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div class="cs-fm-addr">
+                        <div class="cs-fm-addr-prefix">
+                            <i class="fas fa-terminal"></i>
+                            <span>PATH</span>
+                        </div>
+                        <input type="text" id="csPathInput" class="cs-fm-addr-input" placeholder="Enter path..."
+                               spellcheck="false" autocomplete="off" />
+                        <button class="cs-fm-btn cs-fm-addr-go" onclick="window.navigateToCustomPath()" title="Go">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="cs-fm-nav-btns">
+                        <button class="cs-fm-btn cs-fm-btn-accent" onclick="window.fileManagerUpload()" title="Upload">
+                            <i class="fas fa-upload"></i>
+                        </button>
+                        <button class="cs-fm-btn" onclick="window.fileManagerNewFolder()" title="Make Directory">
+                            <i class="fas fa-folder-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Main body: sidebar + file table -->
+                <div class="cs-fm-body">
+                    <!-- Left sidebar -->
+                    <div class="cs-fm-sidebar">
+                        <!-- Drives section -->
+                        <div class="cs-fm-sidebar-section">
+                            <div class="cs-fm-sidebar-title">
+                                <i class="fas fa-hdd"></i> Drives
+                            </div>
+                            <div id="csDriveList" class="cs-fm-sidebar-list">
+                                <!-- dynamically populated -->
+                            </div>
+                        </div>
+
+                        <!-- Directory Tree section -->
+                        <div class="cs-fm-sidebar-section cs-fm-sidebar-browsed">
+                            <div class="cs-fm-sidebar-title">
+                                <i class="fas fa-sitemap"></i> Directory Tree
+                                <span id="csBrowsedCount" class="cs-fm-sidebar-count"></span>
+                            </div>
+                            <div id="csBrowsedPaths" class="cs-fm-sidebar-list cs-fm-sidebar-scrollable">
+                                <!-- dynamically populated: tree view -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resize handle -->
+                    <div class="cs-fm-resize-handle"></div>
+
+                    <!-- Right: file table -->
+                    <div class="cs-fm-main">
+                        <div class="cs-fm-table-wrap">
+                            <table class="cs-fm-table">
+                                <thead>
+                                    <tr>
+                                        <th class="cs-fm-th cs-fm-th-name" data-sort="name">
+                                            Name <i class="fas fa-sort cs-fm-sort-icon"></i>
+                                        </th>
+                                        <th class="cs-fm-th cs-fm-th-size" data-sort="size">
+                                            Size <i class="fas fa-sort cs-fm-sort-icon"></i>
+                                        </th>
+                                        <th class="cs-fm-th cs-fm-th-modified" data-sort="modified">
+                                            Modified <i class="fas fa-sort cs-fm-sort-icon"></i>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="csFileTableBody">
+                                    <tr>
+                                        <td colspan="3" class="cs-fm-empty">
+                                            <i class="fas fa-folder-open"></i>
+                                            <span>Select a drive or enter a path to browse</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status bar -->
+                <div class="cs-fm-statusbar">
+                    <div class="cs-fm-statusbar-left">
+                        <span class="cs-fm-status-dot"></span>
+                        <span id="csPathDisplay"></span>
+                    </div>
+                    <span id="csStatusText"></span>
+                    <span id="csItemCount"></span>
+                </div>
+
+                <!-- Context menu -->
+                <div id="csContextMenu" class="cs-fm-ctx">
+                    <div class="cs-fm-ctx-item" data-action="open">
+                        <i class="fas fa-folder-open"></i> Open
+                    </div>
+                    <div class="cs-fm-ctx-item" data-action="download">
+                        <i class="fas fa-download"></i> Download
+                    </div>
+                    <div class="cs-fm-ctx-item" data-action="edit">
+                        <i class="fas fa-edit"></i> Edit
+                    </div>
+                    <div class="cs-fm-ctx-sep"></div>
+                    <div class="cs-fm-ctx-item" data-action="upload">
+                        <i class="fas fa-upload"></i> Upload Here
+                    </div>
+                    <div class="cs-fm-ctx-item" data-action="mkdir">
+                        <i class="fas fa-folder-plus"></i> Make Directory
+                    </div>
+                    <div class="cs-fm-ctx-sep"></div>
+                    <div class="cs-fm-ctx-item" data-action="rename">
+                        <i class="fas fa-pen"></i> Rename
+                    </div>
+                    <div class="cs-fm-ctx-item cs-fm-ctx-danger" data-action="delete">
+                        <i class="fas fa-trash"></i> Delete
+                    </div>
+                    <div class="cs-fm-ctx-sep"></div>
+                    <div class="cs-fm-ctx-item" data-action="refresh">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- File Editor Modal -->
+<div id="fileEditorModal" class="modal">
+    <div class="modal-content" style="max-width:900px;width:90vw;">
+        <div class="modal-header" style="padding:0;border:none;background:transparent;">
+            <div class="cs-titlebar">
+                <div class="cs-titlebar-left">
+                    <div class="cs-titlebar-icon-wrap">
+                        <i class="fas fa-file-code"></i>
+                        <span class="cs-titlebar-pulse"></span>
+                    </div>
+                    <span>File Editor</span>
+                    <span class="cs-titlebar-beacon" id="fileEditorPath" style="font-size:0.85em;opacity:0.7;"></span>
+                </div>
+                <div class="cs-titlebar-right">
+                    <button class="cs-fm-btn cs-fm-btn-accent" onclick="window.fileEditorSave()" title="Save (Ctrl+S)" style="margin-right:8px;">
+                        <i class="fas fa-save"></i> Save
+                    </button>
+                    <button class="cs-titlebar-close" onclick="window.closeFileEditor()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body" style="padding:0;">
+            <div style="position:relative;width:100%;height:60vh;">
+                <textarea id="fileEditorContent" spellcheck="false" autocomplete="off"
+                    style="width:100%;height:100%;resize:none;background:#1a1a2e;color:#e0e0e0;border:none;padding:16px;font-family:'Fira Code','Consolas','Courier New',monospace;font-size:13px;line-height:1.6;outline:none;tab-size:4;white-space:pre;overflow:auto;box-sizing:border-box;"></textarea>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 16px;background:#0d0d1a;border-top:1px solid rgba(0,255,136,0.1);font-size:12px;color:#888;">
+                <span id="fileEditorStatus">Ready</span>
+                <span id="fileEditorSize"></span>
+            </div>
+        </div>
+    </div>
+</div>

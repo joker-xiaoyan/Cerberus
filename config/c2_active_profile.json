@@ -1,0 +1,53 @@
+{
+  "name": "default",
+  "description": "默认 C2 Profile — 保持向后兼容的原始通信格式",
+  "author": "Cerberus",
+  "global": {
+    "sleep_ms": 10000,
+    "jitter_pct": 50,
+    "max_retry": 3,
+    "user_agent": "admin"
+  },
+  "crypto": {
+    "aes_key": "d1a70bb5799d2882",
+    "aes_iv": "e7b95f05a161ec0d"
+  },
+  "http_get": {
+    "uri_paths": [
+      "/static/js/app.{}.js",
+      "/indexd/{}.html"
+    ],
+    "cookie_name": "BA_HECTORDD",
+    "headers": {
+      "Accept": "*/*",
+      "Connection": "close"
+    },
+    "metadata": {
+      "transform": "base64_aes",
+      "location": "cookie"
+    }
+  },
+  "http_post": {
+    "uri_paths": [
+      "/static/js/app.{}.js",
+      "/indexd/{}.html"
+    ],
+    "cookie_name": "BA_HECTORDD",
+    "content_type": "application/octet-stream",
+    "headers": {
+      "Connection": "close"
+    },
+    "body": {
+      "transform": "aes"
+    }
+  },
+  "http_response": {
+    "content_type": "application/javascript",
+    "headers": {},
+    "body_template": "var $jscomp=$jscomp||{};$jscomp.scope={}; const hiddenData = {{DATA}};",
+    "data_marker": "const hiddenData",
+    "data_delimiter_start": "=",
+    "data_delimiter_end": ";",
+    "no_task_value": "UYz2QVy4ydqbZejA9lTAzQ=="
+  }
+}

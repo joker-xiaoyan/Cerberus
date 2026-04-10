@@ -1,0 +1,1441 @@
+<!-- automation 页面 - 从 1index.html 自动提取 -->
+<div id="automationPage" class="page-content">
+    <div class="max-w-full mx-auto px-6 py-6">
+        <!-- 策略管理页面 -->
+        <div id="automation-strategies" class="automation-subpage active">
+            <!-- 页面标题区域 -->
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                        <i class="fas fa-chess-knight text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">策略管理</h2>
+                        <p class="text-sm text-gray-400 mt-0.5">创建和管理自动化攻击策略，支持 Beacon 上线自动执行</p>
+                    </div>
+                </div>
+                <button id="createStrategyBtn" class="btn-primary px-5 py-2.5 text-sm font-medium shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 transition-all">
+                    <i class="fas fa-plus mr-2"></i>创建策略
+                </button>
+            </div>
+
+            <!-- 统计仪表盘 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div class="strategy-stat-card group">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">策略总数</p>
+                            <h3 class="text-2xl font-bold text-white" id="strategyTotalCount">0</h3>
+                        </div>
+                        <div class="w-11 h-11 bg-gradient-to-br from-blue-500/20 to-blue-600/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fas fa-layer-group text-blue-400"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3 h-1 bg-gray-700 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-blue-500 to-blue-400 rounded-full transition-all duration-500" id="strategyTotalBar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="strategy-stat-card group">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">已启用</p>
+                            <h3 class="text-2xl font-bold text-emerald-400" id="strategyEnabledCount">0</h3>
+                        </div>
+                        <div class="w-11 h-11 bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fas fa-check-double text-emerald-400"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3 h-1 bg-gray-700 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all duration-500" id="strategyEnabledBar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="strategy-stat-card group">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">自动执行</p>
+                            <h3 class="text-2xl font-bold text-amber-400" id="strategyAutoExecCount">0</h3>
+                        </div>
+                        <div class="w-11 h-11 bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fas fa-bolt text-amber-400"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3 h-1 bg-gray-700 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-500" id="strategyAutoExecBar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="strategy-stat-card group">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">平台覆盖</p>
+                            <h3 class="text-2xl font-bold text-purple-400" id="strategyPlatformCount">0</h3>
+                        </div>
+                        <div class="w-11 h-11 bg-gradient-to-br from-purple-500/20 to-purple-600/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fas fa-globe text-purple-400"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3 h-1 bg-gray-700 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-purple-500 to-purple-400 rounded-full transition-all duration-500" id="strategyPlatformBar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 过滤器工具栏 -->
+            <div class="flex items-center justify-between mb-6 bg-gray-800/40 rounded-xl px-5 py-3 border border-gray-700/50 backdrop-blur-sm">
+                <div class="flex items-center space-x-3">
+                    <span class="text-xs text-gray-500 font-medium uppercase tracking-wider">
+                        <i class="fas fa-filter mr-1.5"></i>筛选
+                    </span>
+                    <select id="strategyPlatformFilter" class="strategy-filter-select">
+                        <option value="">所有平台</option>
+                        <option value="windows">🪟 Windows</option>
+                        <option value="linux">🐧 Linux</option>
+                        <option value="macos">🍎 macOS</option>
+                        <option value="cross_platform">🌐 跨平台</option>
+                    </select>
+                    <select id="strategyCategoryFilter" class="strategy-filter-select">
+                        <option value="">所有分类</option>
+                        <option value="信息收集">🔍 信息收集</option>
+                        <option value="权限提升">⬆️ 权限提升</option>
+                        <option value="横向移动">↔️ 横向移动</option>
+                        <option value="持久化">📌 持久化</option>
+                        <option value="数据窃取">💾 数据窃取</option>
+                    </select>
+                </div>
+                <div class="flex items-center space-x-2 text-xs text-gray-500">
+                    <span id="strategyFilteredInfo">显示全部策略</span>
+                </div>
+            </div>
+
+            <div id="strategiesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- 策略卡片将通过JavaScript动态加载 -->
+            </div>
+        </div>
+
+        <!-- Windows策略页面 -->
+        <div id="automation-windows" class="automation-subpage">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold">Windows策略</h2>
+                <button class="btn-primary" onclick="showCreateStrategyModal('windows')">
+                    <i class="fas fa-plus mr-2"></i>创建Windows策略
+                </button>
+            </div>
+            <div id="windowsStrategiesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Windows策略卡片 -->
+            </div>
+        </div>
+
+        <!-- Linux策略页面 -->
+        <div id="automation-linux" class="automation-subpage">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold">Linux策略</h2>
+                <button class="btn-primary" onclick="showCreateStrategyModal('linux')">
+                    <i class="fas fa-plus mr-2"></i>创建Linux策略
+                </button>
+            </div>
+            <div id="linuxStrategiesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Linux策略卡片 -->
+            </div>
+        </div>
+
+        <!-- macOS策略页面 -->
+        <div id="automation-macos" class="automation-subpage">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold">macOS策略</h2>
+                <button class="btn-primary" onclick="showCreateStrategyModal('macos')">
+                    <i class="fas fa-plus mr-2"></i>创建macOS策略
+                </button>
+            </div>
+            <div id="macosStrategiesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- macOS策略卡片 -->
+            </div>
+        </div>
+
+        <!-- 跨平台策略页面 -->
+        <div id="automation-cross-platform" class="automation-subpage">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold">跨平台策略</h2>
+                <button class="btn-primary" onclick="showCreateStrategyModal('cross_platform')">
+                    <i class="fas fa-plus mr-2"></i>创建跨平台策略
+                </button>
+            </div>
+            <div id="crossPlatformStrategiesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- 跨平台策略卡片 -->
+            </div>
+        </div>
+
+        <!-- 执行记录页面 -->
+        <div id="automation-executions" class="automation-subpage">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold">执行记录</h2>
+                <div class="flex items-center space-x-4">
+                    <input type="text" id="executionSearch" placeholder="搜索执行记录..." class="search-input">
+                    <select id="executionStatusFilter" class="filter-select">
+                        <option value="">所有状态</option>
+                        <option value="pending">待执行</option>
+                        <option value="running">执行中</option>
+                        <option value="completed">已完成</option>
+                        <option value="failed">执行失败</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="table-header">策略名称</th>
+                                <th class="table-header">目标Beacon</th>
+                                <th class="table-header">状态</th>
+                                <th class="table-header">开始时间</th>
+                                <th class="table-header">结束时间</th>
+                                <th class="table-header">执行结果</th>
+                                <th class="table-header">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="executionsTableBody">
+                            <!-- 动态加载执行记录 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 武器库管理页面 -->
+        <div id="automation-arsenal" class="automation-subpage">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-bomb mr-2 text-red-400"></i>武器库 (Payload Arsenal)
+                </h2>
+                <div class="flex items-center space-x-4">
+                    <select id="arsenalPlatformFilter" class="filter-select" onchange="window.loadArsenalPayloads()">
+                        <option value="">所有平台</option>
+                        <option value="windows">Windows</option>
+                        <option value="linux">Linux</option>
+                        <option value="cross_platform">跨平台</option>
+                    </select>
+                    <select id="arsenalCategoryFilter" class="filter-select" onchange="window.loadArsenalPayloads()">
+                        <option value="">所有分类</option>
+                        <option value="信息收集">信息收集</option>
+                        <option value="权限提升">权限提升</option>
+                        <option value="横向移动">横向移动</option>
+                        <option value="持久化">持久化</option>
+                        <option value="凭据窃取">凭据窃取</option>
+                        <option value="通用工具">通用工具</option>
+                    </select>
+                    <button id="uploadPayloadBtn" class="btn-primary" onclick="document.getElementById('arsenalUploadModal').classList.remove('hidden'); document.getElementById('arsenalUploadModal').classList.add('flex');">
+                        <i class="fas fa-upload mr-2"></i>上传武器
+                    </button>
+                </div>
+            </div>
+
+            <!-- 武器库统计 -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">武器总数</p>
+                            <h3 class="text-2xl font-bold text-white" id="arsenalTotalCount">0</h3>
+                        </div>
+                        <div class="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-bomb text-red-400"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">已启用</p>
+                            <h3 class="text-2xl font-bold text-green-400" id="arsenalEnabledCount">0</h3>
+                        </div>
+                        <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-check-circle text-green-400"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">Windows</p>
+                            <h3 class="text-2xl font-bold text-blue-400" id="arsenalWinCount">0</h3>
+                        </div>
+                        <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fab fa-windows text-blue-400"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">部署次数</p>
+                            <h3 class="text-2xl font-bold text-purple-400" id="arsenalDeployCount">0</h3>
+                        </div>
+                        <div class="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-rocket text-purple-400"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 武器列表 -->
+            <div class="chart-card mb-6">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="table-header">名称</th>
+                                <th class="table-header">文件名</th>
+                                <th class="table-header">平台</th>
+                                <th class="table-header">架构</th>
+                                <th class="table-header">分类</th>
+                                <th class="table-header">大小</th>
+                                <th class="table-header">导出函数</th>
+                                <th class="table-header">状态</th>
+                                <th class="table-header">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="arsenalTableBody">
+                            <tr>
+                                <td colspan="9" class="text-center py-8 text-gray-400">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i>加载中...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 部署日志 -->
+            <div class="chart-card">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-history mr-2 text-yellow-400"></i>最近部署日志
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="table-header">武器</th>
+                                <th class="table-header">目标Beacon</th>
+                                <th class="table-header">操作</th>
+                                <th class="table-header">状态</th>
+                                <th class="table-header">时间</th>
+                            </tr>
+                        </thead>
+                        <tbody id="arsenalDeployLogsBody">
+                            <tr>
+                                <td colspan="5" class="text-center py-6 text-gray-400">暂无部署记录</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Beacon代理管理页面 -->
+    <div id="beacon-proxy" class="beacon-sub-content hidden">
+        <div class="max-w-full mx-auto px-6 py-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-network-wired mr-2 text-orange-400"></i>
+                    代理管理
+                </h2>
+                <button onclick="window.loadProxies()" class="btn-primary">
+                    <i class="fas fa-sync-alt mr-2"></i>刷新
+                </button>
+            </div>
+
+            <!-- 代理服务器统计卡片 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">代理服务器数量</p>
+                            <h3 class="text-3xl font-bold text-white" id="proxyCount">0</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-server text-blue-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">活跃连接数</p>
+                            <h3 class="text-3xl font-bold text-green-400" id="activeConnections">0</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-link text-green-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">总流量</p>
+                            <h3 class="text-3xl font-bold text-purple-400" id="totalTraffic">0 MB</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-exchange-alt text-purple-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">在线Beacon</p>
+                            <h3 class="text-3xl font-bold text-cyan-400" id="onlineBeacons">0</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-satellite text-cyan-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 创建代理服务器 -->
+            <div class="chart-card mb-6">
+                <h3 class="text-lg font-semibold mb-6 flex items-center">
+                    <i class="fas fa-plus-circle mr-2 text-green-400"></i>
+                    创建代理服务器
+                </h3>
+                <form id="createProxyForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                        <label for="proxyName" class="form-label">
+                            <i class="fas fa-tag mr-2"></i>名称
+                        </label>
+                        <input type="text" id="proxyName" placeholder="SOCKS5代理1" class="input-field">
+                    </div>
+                    <div>
+                        <label for="proxyProtocol" class="form-label">
+                            <i class="fas fa-network-wired mr-2"></i>协议
+                        </label>
+                        <select id="proxyProtocol" class="input-field">
+                            <option value="socks5">SOCKS5</option>
+                            <option value="http">HTTP</option>
+                            <option value="https">HTTPS</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="proxyHost" class="form-label">
+                            <i class="fas fa-server mr-2"></i>监听地址
+                        </label>
+                        <input type="text" id="proxyHost" placeholder="0.0.0.0" class="input-field">
+                    </div>
+                    <div>
+                        <label for="proxyPort" class="form-label">
+                            <i class="fas fa-plug mr-2"></i>端口
+                        </label>
+                        <input type="number" id="proxyPort" placeholder="1080" min="1" max="65535" class="input-field">
+                    </div>
+                    <div>
+                        <label for="proxyUsername" class="form-label">
+                            <i class="fas fa-user mr-2"></i>用户名（可选）
+                        </label>
+                        <input type="text" id="proxyUsername" placeholder="admin" class="input-field">
+                    </div>
+                    <div>
+                        <label for="proxyPassword" class="form-label">
+                            <i class="fas fa-lock mr-2"></i>密码（可选）
+                        </label>
+                        <input type="password" id="proxyPassword" placeholder="password" class="input-field">
+                    </div>
+                    <div class="md:col-span-2 lg:col-span-3 flex items-end">
+                        <button type="submit" class="btn-primary w-full py-3">
+                            <i class="fas fa-plus mr-2"></i>创建代理
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 代理服务器列表 -->
+            <div class="chart-card">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-list mr-2 text-orange-400"></i>
+                    代理服务器列表
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="table-header">协议</th>
+                                <th class="table-header">监听地址</th>
+                                <th class="table-header">端口</th>
+                                <th class="table-header">状态</th>
+                                <th class="table-header">连接数</th>
+                                <th class="table-header">流量</th>
+                                <th class="table-header">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="proxyTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center py-8 text-gray-400">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i>加载中...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 为 Beacon 启动代理 -->
+            <div class="chart-card mt-6" id="proxyBeaconLaunchCard">
+                <h3 class="text-lg font-semibold mb-6 flex items-center">
+                    <i class="fas fa-satellite mr-2 text-orange-400"></i>
+                    为 Beacon 启动代理
+                </h3>
+                <p class="text-gray-400 text-sm mb-4">选择一个在线的 Beacon，自动向其下发 <code class="text-green-400 bg-gray-800 px-1 rounded">socks5</code> 连接命令，使 Beacon 连接到已创建的代理服务器。</p>
+                <form id="proxyBeaconLaunchForm" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="proxyBeaconSelect" class="form-label">
+                            <i class="fas fa-satellite mr-2"></i>选择 Beacon
+                        </label>
+                        <select id="proxyBeaconSelect" class="input-field">
+                            <option value="">选择 Beacon</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="proxyServerSelect" class="form-label">
+                            <i class="fas fa-server mr-2"></i>选择代理服务器
+                        </label>
+                        <select id="proxyServerSelect" class="input-field">
+                            <option value="">选择代理服务器</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="proxySocksAddr" class="form-label">
+                            <i class="fas fa-plug mr-2"></i>连接地址（自动填充）
+                        </label>
+                        <input type="text" id="proxySocksAddr" placeholder="127.0.0.1:1080" class="input-field">
+                    </div>
+                    <div class="md:col-span-3 flex items-end">
+                        <button type="submit" class="btn-primary w-full py-3">
+                            <i class="fas fa-play mr-2"></i>启动代理连接
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Beacon连接详情 -->
+            <div class="chart-card mt-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-link mr-2 text-cyan-400"></i>
+                    Beacon连接详情
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="table-header">Beacon ID</th>
+                                <th class="table-header">主机名</th>
+                                <th class="table-header">IP地址</th>
+                                <th class="table-header">连接代理</th>
+                                <th class="table-header">协议</th>
+                                <th class="table-header">状态</th>
+                                <th class="table-header">连接时间</th>
+                            </tr>
+                        </thead>
+                        <tbody id="proxyBeaconTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center py-8 text-gray-400">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i>加载中...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 为创建代理表单添加事件监听
+        document.addEventListener('DOMContentLoaded', function() {
+            const createProxyForm = document.getElementById('createProxyForm');
+            if (createProxyForm) {
+                createProxyForm.addEventListener('submit', window.createProxy);
+            }
+        });
+    </script>
+
+    <!-- Beacon VNC管理页面 -->
+    <div id="beacon-vnc" class="beacon-sub-content hidden">
+        <div class="max-w-full mx-auto px-6 py-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-desktop mr-2 text-purple-400"></i>
+                    VNC管理
+                </h2>
+                <button onclick="window.loadVNCData()" class="btn-primary">
+                    <i class="fas fa-sync-alt mr-2"></i>刷新
+                </button>
+            </div>
+
+            <!-- VNC服务器统计卡片 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">VNC服务器数量</p>
+                            <h3 class="text-3xl font-bold text-white" id="vncServerCount">0</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-server text-purple-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">VNC会话数量</p>
+                            <h3 class="text-3xl font-bold text-green-400" id="vncSessionCount">0</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-link text-green-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">在线Beacon</p>
+                            <h3 class="text-3xl font-bold text-cyan-400" id="onlineBeaconsForVNC">0</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-satellite text-cyan-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 创建VNC服务器 -->
+            <div class="chart-card mb-6">
+                <h3 class="text-lg font-semibold mb-6 flex items-center">
+                    <i class="fas fa-plus-circle mr-2 text-green-400"></i>
+                    启动VNC服务器
+                </h3>
+                <form id="createVNCServerForm" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="vncSessionType" class="form-label">
+                            <i class="fas fa-desktop mr-2"></i>会话类型
+                        </label>
+                        <select id="vncSessionType" class="input-field">
+                            <option value="vnc">VNC（标准桌面）</option>
+                            <option value="hvnc">HVNC（隐藏桌面）</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="vncPort" class="form-label">
+                            <i class="fas fa-plug mr-2"></i>端口
+                        </label>
+                        <input type="number" id="vncPort" placeholder="5900 (VNC) / 5901 (HVNC)" min="1" max="65535" class="input-field">
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="btn-primary w-full py-3">
+                            <i class="fas fa-play mr-2"></i>启动服务器
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- VNC服务器列表 -->
+            <div class="chart-card mb-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-list mr-2 text-purple-400"></i>
+                    VNC服务器列表
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="table-header">服务器ID</th>
+                                <th class="table-header">会话类型</th>
+                                <th class="table-header">端口</th>
+                                <th class="table-header">状态</th>
+                                <th class="table-header">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vncServerTableBody">
+                            <tr>
+                                <td colspan="5" class="text-center py-8 text-gray-400">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i>加载中...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 创建VNC会话 -->
+            <div class="chart-card mb-6">
+                <h3 class="text-lg font-semibold mb-6 flex items-center">
+                    <i class="fas fa-link mr-2 text-cyan-400"></i>
+                    为Beacon创建VNC会话
+                </h3>
+                <form id="createVNCSessionForm" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="vncBeaconSelect" class="form-label">
+                            <i class="fas fa-satellite mr-2"></i>选择Beacon
+                        </label>
+                        <select id="vncBeaconSelect" class="input-field">
+                            <option value="">选择Beacon</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="vncServerSelect" class="form-label">
+                            <i class="fas fa-server mr-2"></i>选择VNC服务器
+                        </label>
+                        <select id="vncServerSelect" class="input-field">
+                            <option value="">选择服务器</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="vncSessionTypeForSession" class="form-label">
+                            <i class="fas fa-desktop mr-2"></i>会话类型
+                        </label>
+                        <select id="vncSessionTypeForSession" class="input-field">
+                            <option value="vnc">VNC</option>
+                            <option value="hvnc">HVNC</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-3 flex items-end">
+                        <button type="submit" class="btn-primary w-full py-3">
+                            <i class="fas fa-link mr-2"></i>创建会话
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- VNC会话列表 -->
+            <div class="chart-card mb-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-link mr-2 text-green-400"></i>
+                    VNC会话列表
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="table-header">会话ID</th>
+                                <th class="table-header">Beacon</th>
+                                <th class="table-header">会话类型</th>
+                                <th class="table-header">端口</th>
+                                <th class="table-header">状态</th>
+                                <th class="table-header">创建时间</th>
+                                <th class="table-header">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vncSessionTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center py-8 text-gray-400">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i>加载中...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- VNC会话预览 -->
+            <div class="chart-card mb-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-eye mr-2 text-cyan-400"></i>
+                    会话预览
+                </h3>
+                <div class="flex flex-col md:flex-row gap-6 items-start">
+                    <div class="flex-1">
+                        <div class="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
+                            <div class="px-4 py-2 border-b border-gray-700 flex items-center justify-between">
+                                <span class="text-sm text-gray-400">当前会话</span>
+                                <code id="vncPreviewSessionInfo" class="text-xs text-cyan-400">未选择</code>
+                            </div>
+                            <div class="bg-black flex items-center justify-center" style="min-height: 260px;">
+                                <span id="vncPreviewPlaceholder" class="text-gray-500 text-sm">点击会话列表中的预览按钮以加载画面</span>
+                                <img id="vncPreviewImage" src="" alt="VNC预览" class="max-h-96 w-full object-contain hidden" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-56 flex flex-col gap-3">
+                        <button id="vncPreviewRefreshBtn" onclick="window.refreshVNCPreview()" class="btn-primary w-full" disabled>
+                            <i class="fas fa-sync-alt mr-2"></i>刷新预览
+                        </button>
+                        <p class="text-xs text-gray-500 leading-relaxed">
+                            预览会复用当前会话关联 Beacon 的最新屏幕截图，不会对目标主机产生额外交互。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 快速操作 -->
+            <div class="chart-card">
+                <h3 class="text-lg font-semibold mb-6 flex items-center">
+                    <i class="fas fa-bolt mr-2 text-yellow-400"></i>
+                    快速启动（一键模式）
+                </h3>
+                <p class="text-gray-400 mb-4">快速启动会自动创建VNC服务器并创建Beacon会话，适合快速测试场景。</p>
+                <form id="quickVNCForm" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="quickVNCBeaconSelect" class="form-label">
+                            <i class="fas fa-satellite mr-2"></i>选择Beacon
+                        </label>
+                        <select id="quickVNCBeaconSelect" class="input-field">
+                            <option value="">选择Beacon</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="quickVNCType" class="form-label">
+                            <i class="fas fa-desktop mr-2"></i>会话类型
+                        </label>
+                        <select id="quickVNCType" class="input-field">
+                            <option value="vnc">VNC（标准桌面）</option>
+                            <option value="hvnc">HVNC（隐藏桌面）</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="quickVNCPort" class="form-label">
+                            <i class="fas fa-plug mr-2"></i>端口
+                        </label>
+                        <input type="number" id="quickVNCPort" placeholder="5900 (VNC) / 5901 (HVNC)" min="1" max="65535" class="input-field">
+                    </div>
+                    <div class="md:col-span-3 flex items-end">
+                        <button type="submit" class="btn-primary w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+                            <i class="fas fa-rocket mr-2"></i>快速启动VNC
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 为VNC表单添加事件监听
+        document.addEventListener('DOMContentLoaded', function() {
+            const createVNCServerForm = document.getElementById('createVNCServerForm');
+            if (createVNCServerForm) {
+                createVNCServerForm.addEventListener('submit', window.createVNCServer);
+            }
+
+            const createVNCSessionForm = document.getElementById('createVNCSessionForm');
+            if (createVNCSessionForm) {
+                createVNCSessionForm.addEventListener('submit', window.createVNCSession);
+            }
+
+            const quickVNCForm = document.getElementById('quickVNCForm');
+            if (quickVNCForm) {
+                quickVNCForm.addEventListener('submit', window.quickStartVNC);
+            }
+        });
+    </script>
+
+    <!-- Beacon远程监控页面 -->
+    <!-- 文件传输页面 -->
+    <!-- Beacon屏幕截图页面 -->
+    <div id="beacon-screenshots" class="beacon-sub-content hidden">
+        <div class="max-w-full mx-auto px-6 py-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-image mr-2 text-cyan-400"></i>
+                    屏幕截图
+                </h2>
+                <button onclick="window.loadScreenshots()" class="btn-primary">
+                    <i class="fas fa-sync-alt mr-2"></i>刷新
+                </button>
+            </div>
+
+            <!-- Beacon 选择器卡片 -->
+            <div class="chart-card mb-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-satellite mr-2 text-cyan-400"></i>
+                    选择 Beacon
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="md:col-span-2">
+                        <label for="screenshotBeaconSelect" class="form-label">
+                            <i class="fas fa-desktop mr-2"></i>目标 Beacon
+                        </label>
+                        <select id="screenshotBeaconSelect" class="input-field">
+                            <option value="">选择Beacon</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="window.takeScreenshotFromPage()" class="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold w-full py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-cyan-500/25 flex items-center justify-center space-x-2">
+                            <i class="fas fa-camera"></i>
+                            <span>执行截图</span>
+                        </button>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="window.initScreenshotPage()" class="btn-primary w-full py-3">
+                            <i class="fas fa-sync-alt mr-2"></i>刷新列表
+                        </button>
+                    </div>
+                </div>
+                <!-- Selected Beacon info -->
+                <div id="screenshotSelectedBeaconInfo" class="mt-4 hidden">
+                    <div class="flex items-center space-x-3 bg-gray-800/50 rounded-lg px-4 py-3 border border-gray-700">
+                        <i class="fas fa-info-circle text-cyan-400"></i>
+                        <span class="text-gray-300">已选择: </span>
+                        <span id="screenshotSelectedBeaconName" class="text-white font-semibold"></span>
+                        <span class="text-gray-500">|</span>
+                        <span id="screenshotTaskStatus" class="text-gray-400 text-sm"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 截图列表 -->
+            <div class="chart-card">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="table-header">文件名</th>
+                                <th class="table-header">Beacon ID</th>
+                                <th class="table-header">大小</th>
+                                <th class="table-header">创建时间</th>
+                                <th class="table-header">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="screenshotsTableBody">
+                            <tr>
+                                <td colspan="5" class="text-center text-gray-400 py-8">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i>加载中...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Beacon代理管理页面 -->
+    <div id="beacon-proxy" class="beacon-sub-content hidden">
+        <div class="max-w-full mx-auto px-6 py-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-network-wired mr-2 text-orange-400"></i>
+                    代理管理
+                </h2>
+                <button onclick="window.loadProxies()" class="btn-primary">
+                    <i class="fas fa-sync-alt mr-2"></i>刷新
+                </button>
+            </div>
+
+            <!-- 代理服务器统计卡片 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">代理服务器数量</p>
+                            <h3 class="text-3xl font-bold text-white" id="proxyCount">0</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-server text-blue-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">活跃连接数</p>
+                            <h3 class="text-3xl font-bold text-green-400" id="activeConnections">0</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-link text-green-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">总流量</p>
+                            <h3 class="text-3xl font-bold text-purple-400" id="totalTraffic">0 MB</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-exchange-alt text-purple-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">在线Beacon</p>
+                            <h3 class="text-3xl font-bold text-cyan-400" id="onlineBeacons">0</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-satellite text-cyan-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 创建代理服务器 -->
+            <div class="chart-card mb-6">
+                <h3 class="text-lg font-semibold mb-6 flex items-center">
+                    <i class="fas fa-plus-circle mr-2 text-green-400"></i>
+                    创建代理服务器
+                </h3>
+                <form id="createProxyForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                        <label for="proxyName" class="form-label">
+                            <i class="fas fa-tag mr-2"></i>名称
+                        </label>
+                        <input type="text" id="proxyName" placeholder="SOCKS5代理1" class="input-field">
+                    </div>
+                    <div>
+                        <label for="proxyProtocol" class="form-label">
+                            <i class="fas fa-network-wired mr-2"></i>协议
+                        </label>
+                        <select id="proxyProtocol" class="input-field">
+                            <option value="socks5">SOCKS5</option>
+                            <option value="http">HTTP</option>
+                            <option value="https">HTTPS</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="proxyHost" class="form-label">
+                            <i class="fas fa-server mr-2"></i>监听地址
+                        </label>
+                        <input type="text" id="proxyHost" placeholder="0.0.0.0" class="input-field">
+                    </div>
+                    <div>
+                        <label for="proxyPort" class="form-label">
+                            <i class="fas fa-plug mr-2"></i>端口
+                        </label>
+                        <input type="number" id="proxyPort" placeholder="1080" min="1" max="65535" class="input-field">
+                    </div>
+                    <div>
+                        <label for="proxyUsername" class="form-label">
+                            <i class="fas fa-user mr-2"></i>用户名（可选）
+                        </label>
+                        <input type="text" id="proxyUsername" placeholder="admin" class="input-field">
+                    </div>
+                    <div>
+                        <label for="proxyPassword" class="form-label">
+                            <i class="fas fa-lock mr-2"></i>密码（可选）
+                        </label>
+                        <input type="password" id="proxyPassword" placeholder="password" class="input-field">
+                    </div>
+                    <div class="md:col-span-2 lg:col-span-3 flex items-end">
+                        <button type="submit" class="btn-primary w-full py-3">
+                            <i class="fas fa-plus mr-2"></i>创建代理
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 代理服务器列表 -->
+            <div class="chart-card">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-list mr-2 text-orange-400"></i>
+                    代理服务器列表
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="table-header">协议</th>
+                                <th class="table-header">监听地址</th>
+                                <th class="table-header">端口</th>
+                                <th class="table-header">状态</th>
+                                <th class="table-header">连接数</th>
+                                <th class="table-header">流量</th>
+                                <th class="table-header">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="proxyTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center py-8 text-gray-400">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i>加载中...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 为 Beacon 启动代理 -->
+            <div class="chart-card mt-6" id="proxyBeaconLaunchCard">
+                <h3 class="text-lg font-semibold mb-6 flex items-center">
+                    <i class="fas fa-satellite mr-2 text-orange-400"></i>
+                    为 Beacon 启动代理
+                </h3>
+                <p class="text-gray-400 text-sm mb-4">选择一个在线的 Beacon，自动向其下发 <code class="text-green-400 bg-gray-800 px-1 rounded">socks5</code> 连接命令，使 Beacon 连接到已创建的代理服务器。</p>
+                <form id="proxyBeaconLaunchForm" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="proxyBeaconSelect" class="form-label">
+                            <i class="fas fa-satellite mr-2"></i>选择 Beacon
+                        </label>
+                        <select id="proxyBeaconSelect" class="input-field">
+                            <option value="">选择 Beacon</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="proxyServerSelect" class="form-label">
+                            <i class="fas fa-server mr-2"></i>选择代理服务器
+                        </label>
+                        <select id="proxyServerSelect" class="input-field">
+                            <option value="">选择代理服务器</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="proxySocksAddr" class="form-label">
+                            <i class="fas fa-plug mr-2"></i>连接地址（自动填充）
+                        </label>
+                        <input type="text" id="proxySocksAddr" placeholder="127.0.0.1:1080" class="input-field">
+                    </div>
+                    <div class="md:col-span-3 flex items-end">
+                        <button type="submit" class="btn-primary w-full py-3">
+                            <i class="fas fa-play mr-2"></i>启动代理连接
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Beacon连接详情 -->
+            <div class="chart-card mt-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-link mr-2 text-cyan-400"></i>
+                    Beacon连接详情
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="table-header">Beacon ID</th>
+                                <th class="table-header">主机名</th>
+                                <th class="table-header">IP地址</th>
+                                <th class="table-header">连接代理</th>
+                                <th class="table-header">协议</th>
+                                <th class="table-header">状态</th>
+                                <th class="table-header">连接时间</th>
+                            </tr>
+                        </thead>
+                        <tbody id="proxyBeaconTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center py-8 text-gray-400">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i>加载中...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 为创建代理表单添加事件监听
+        document.addEventListener('DOMContentLoaded', function() {
+            const createProxyForm = document.getElementById('createProxyForm');
+            if (createProxyForm) {
+                createProxyForm.addEventListener('submit', window.createProxy);
+            }
+        });
+    </script>
+
+    <!-- Beacon VNC管理页面 -->
+    <div id="beacon-vnc" class="beacon-sub-content hidden">
+        <div class="max-w-full mx-auto px-6 py-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-desktop mr-2 text-purple-400"></i>
+                    VNC管理
+                </h2>
+                <button onclick="window.loadVNCData()" class="btn-primary">
+                    <i class="fas fa-sync-alt mr-2"></i>刷新
+                </button>
+            </div>
+
+            <!-- VNC服务器统计卡片 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">VNC服务器数量</p>
+                            <h3 class="text-3xl font-bold text-white" id="vncServerCount">0</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-server text-purple-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">VNC会话数量</p>
+                            <h3 class="text-3xl font-bold text-green-400" id="vncSessionCount">0</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-link text-green-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">在线Beacon</p>
+                            <h3 class="text-3xl font-bold text-cyan-400" id="onlineBeaconsForVNC">0</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-satellite text-cyan-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 创建VNC服务器 -->
+            <div class="chart-card mb-6">
+                <h3 class="text-lg font-semibold mb-6 flex items-center">
+                    <i class="fas fa-plus-circle mr-2 text-green-400"></i>
+                    启动VNC服务器
+                </h3>
+                <form id="createVNCServerForm" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="vncSessionType" class="form-label">
+                            <i class="fas fa-desktop mr-2"></i>会话类型
+                        </label>
+                        <select id="vncSessionType" class="input-field">
+                            <option value="vnc">VNC（标准桌面）</option>
+                            <option value="hvnc">HVNC（隐藏桌面）</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="vncPort" class="form-label">
+                            <i class="fas fa-plug mr-2"></i>端口
+                        </label>
+                        <input type="number" id="vncPort" placeholder="5900 (VNC) / 5901 (HVNC)" min="1" max="65535" class="input-field">
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="btn-primary w-full py-3">
+                            <i class="fas fa-play mr-2"></i>启动服务器
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- VNC服务器列表 -->
+            <div class="chart-card mb-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-list mr-2 text-purple-400"></i>
+                    VNC服务器列表
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="table-header">服务器ID</th>
+                                <th class="table-header">会话类型</th>
+                                <th class="table-header">端口</th>
+                                <th class="table-header">状态</th>
+                                <th class="table-header">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vncServerTableBody">
+                            <tr>
+                                <td colspan="5" class="text-center py-8 text-gray-400">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i>加载中...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 创建VNC会话 -->
+            <div class="chart-card mb-6">
+                <h3 class="text-lg font-semibold mb-6 flex items-center">
+                    <i class="fas fa-link mr-2 text-cyan-400"></i>
+                    为Beacon创建VNC会话
+                </h3>
+                <form id="createVNCSessionForm" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="vncBeaconSelect" class="form-label">
+                            <i class="fas fa-satellite mr-2"></i>选择Beacon
+                        </label>
+                        <select id="vncBeaconSelect" class="input-field">
+                            <option value="">选择Beacon</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="vncServerSelect" class="form-label">
+                            <i class="fas fa-server mr-2"></i>选择VNC服务器
+                        </label>
+                        <select id="vncServerSelect" class="input-field">
+                            <option value="">选择服务器</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="vncSessionTypeForSession" class="form-label">
+                            <i class="fas fa-desktop mr-2"></i>会话类型
+                        </label>
+                        <select id="vncSessionTypeForSession" class="input-field">
+                            <option value="vnc">VNC</option>
+                            <option value="hvnc">HVNC</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-3 flex items-end">
+                        <button type="submit" class="btn-primary w-full py-3">
+                            <i class="fas fa-link mr-2"></i>创建会话
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- VNC会话列表 -->
+            <div class="chart-card mb-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-link mr-2 text-green-400"></i>
+                    VNC会话列表
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="table-header">会话ID</th>
+                                <th class="table-header">Beacon</th>
+                                <th class="table-header">会话类型</th>
+                                <th class="table-header">端口</th>
+                                <th class="table-header">状态</th>
+                                <th class="table-header">创建时间</th>
+                                <th class="table-header">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vncSessionTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center py-8 text-gray-400">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i>加载中...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- VNC会话预览 -->
+            <div class="chart-card mb-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-eye mr-2 text-cyan-400"></i>
+                    会话预览
+                </h3>
+                <div class="flex flex-col md:flex-row gap-6 items-start">
+                    <div class="flex-1">
+                        <div class="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
+                            <div class="px-4 py-2 border-b border-gray-700 flex items-center justify-between">
+                                <span class="text-sm text-gray-400">当前会话</span>
+                                <code id="vncPreviewSessionInfo" class="text-xs text-cyan-400">未选择</code>
+                            </div>
+                            <div class="bg-black flex items-center justify-center" style="min-height: 260px;">
+                                <span id="vncPreviewPlaceholder" class="text-gray-500 text-sm">点击会话列表中的预览按钮以加载画面</span>
+                                <img id="vncPreviewImage" src="" alt="VNC预览" class="max-h-96 w-full object-contain hidden" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-56 flex flex-col gap-3">
+                        <button id="vncPreviewRefreshBtn" onclick="window.refreshVNCPreview()" class="btn-primary w-full" disabled>
+                            <i class="fas fa-sync-alt mr-2"></i>刷新预览
+                        </button>
+                        <p class="text-xs text-gray-500 leading-relaxed">
+                            预览会复用当前会话关联 Beacon 的最新屏幕截图，不会对目标主机产生额外交互。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 快速操作 -->
+            <div class="chart-card">
+                <h3 class="text-lg font-semibold mb-6 flex items-center">
+                    <i class="fas fa-bolt mr-2 text-yellow-400"></i>
+                    快速启动（一键模式）
+                </h3>
+                <p class="text-gray-400 mb-4">快速启动会自动创建VNC服务器并创建Beacon会话，适合快速测试场景。</p>
+                <form id="quickVNCForm" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="quickVNCBeaconSelect" class="form-label">
+                            <i class="fas fa-satellite mr-2"></i>选择Beacon
+                        </label>
+                        <select id="quickVNCBeaconSelect" class="input-field">
+                            <option value="">选择Beacon</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="quickVNCType" class="form-label">
+                            <i class="fas fa-desktop mr-2"></i>会话类型
+                        </label>
+                        <select id="quickVNCType" class="input-field">
+                            <option value="vnc">VNC（标准桌面）</option>
+                            <option value="hvnc">HVNC（隐藏桌面）</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="quickVNCPort" class="form-label">
+                            <i class="fas fa-plug mr-2"></i>端口
+                        </label>
+                        <input type="number" id="quickVNCPort" placeholder="5900 (VNC) / 5901 (HVNC)" min="1" max="65535" class="input-field">
+                    </div>
+                    <div class="md:col-span-3 flex items-end">
+                        <button type="submit" class="btn-primary w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+                            <i class="fas fa-rocket mr-2"></i>快速启动VNC
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 为VNC表单添加事件监听
+        document.addEventListener('DOMContentLoaded', function() {
+            const createVNCServerForm = document.getElementById('createVNCServerForm');
+            if (createVNCServerForm) {
+                createVNCServerForm.addEventListener('submit', window.createVNCServer);
+            }
+
+            const createVNCSessionForm = document.getElementById('createVNCSessionForm');
+            if (createVNCSessionForm) {
+                createVNCSessionForm.addEventListener('submit', window.createVNCSession);
+            }
+
+            const quickVNCForm = document.getElementById('quickVNCForm');
+            if (quickVNCForm) {
+                quickVNCForm.addEventListener('submit', window.quickStartVNC);
+            }
+        });
+    </script>
+
+    <!-- Beacon远程监控页面 -->
+    <!-- 文件传输页面 -->
+    <div id="server-downloads" class="beacon-sub-content hidden">
+        <div class="max-w-full mx-auto px-6 py-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-exchange-alt mr-2 text-green-400"></i>
+                    文件传输
+                </h2>
+                <button onclick="window.loadServerFiles()" class="btn-primary">
+                    <i class="fas fa-sync-alt mr-2"></i>刷新
+                </button>
+            </div>
+
+            <!-- 文件列表 -->
+            <div class="chart-card">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="table-header">文件名</th>
+                                <th class="table-header">大小</th>
+                                <th class="table-header">Beacon ID</th>
+                                <th class="table-header">任务ID</th>
+                                <th class="table-header">下载时间</th>
+                                <th class="table-header">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="serverFilesTableBody">
+                            <!-- 动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

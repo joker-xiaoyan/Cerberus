@@ -1,0 +1,66 @@
+{
+  "name": "microsoft_teams",
+  "description": "伪装为 Microsoft Teams 客户端通信流量",
+  "author": "Cerberus",
+
+  "global": {
+    "sleep_ms": 15000,
+    "jitter_pct": 40,
+    "max_retry": 3,
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Teams/24295.606.3238.8740 Chrome/120.0.6099.291 Electron/28.3.3 Safari/537.36"
+  },
+
+  "crypto": {
+    "aes_key": "",
+    "aes_iv": ""
+  },
+
+  "http_get": {
+    "uri_paths": ["/v1/users/ME/conversations/{}/messages", "/api/csa/api/v1/teams/{}/channels", "/Ede0.{}.min.js"],
+    "cookie_name": "skypetoken_asm",
+    "headers": {
+      "Accept": "application/json, text/plain, */*",
+      "Accept-Language": "en-US,en;q=0.9",
+      "Connection": "keep-alive",
+      "X-Ms-Client-Type": "web",
+      "X-Ms-Client-Version": "49/24012820523",
+      "Origin": "https://teams.microsoft.com",
+      "Referer": "https://teams.microsoft.com/"
+    },
+    "metadata": {
+      "transform": "base64_aes",
+      "location": "cookie"
+    }
+  },
+
+  "http_post": {
+    "uri_paths": ["/v1/users/ME/conversations/{}/messages", "/api/csa/api/v1/teams/{}/operations"],
+    "cookie_name": "skypetoken_asm",
+    "content_type": "application/json; charset=utf-8",
+    "headers": {
+      "Accept": "application/json, text/plain, */*",
+      "Connection": "keep-alive",
+      "X-Ms-Client-Type": "web",
+      "Origin": "https://teams.microsoft.com",
+      "Referer": "https://teams.microsoft.com/"
+    },
+    "body": {
+      "transform": "aes"
+    }
+  },
+
+  "http_response": {
+    "content_type": "application/json; charset=utf-8",
+    "headers": {
+      "X-Content-Type-Options": "nosniff",
+      "X-Ms-Environment": "prod",
+      "X-Ms-ServiceVersion": "24.12.0",
+      "Strict-Transport-Security": "max-age=31536000"
+    },
+    "body_template": "{\"@odata.context\":\"https://graph.microsoft.com/v1.0/$metadata#teams\",\"value\":[{\"id\":\"{{DATA}}\",\"displayName\":\"General\",\"description\":\"Team channel\"}]}",
+    "data_marker": "\"id\":\"",
+    "data_delimiter_start": "\"id\":\"",
+    "data_delimiter_end": "\",\"displayName\"",
+    "no_task_value": "UYz2QVy4ydqbZejA9lTAzQ=="
+  }
+}

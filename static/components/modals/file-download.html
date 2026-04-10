@@ -1,0 +1,153 @@
+<!-- file-download 模态框 - 从 1index.html 自动提取 -->
+<div id="fileDownloadModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50">
+    <div class="bg-gray-800 rounded-xl border border-gray-700 w-full max-w-2xl mx-4 shadow-2xl transform transition-all">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-6 border-b border-gray-700">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-yellow-500/30 to-orange-500/30 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-download text-yellow-400"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-white">文件下载</h3>
+                    <p class="text-xs text-gray-400 mt-0.5">从目标主机下载文件到服务器</p>
+                </div>
+            </div>
+            <button onclick="window.closeFileDownloadModal()" class="text-gray-400 hover:text-white transition-colors p-1 hover:bg-gray-700 rounded-lg">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Body: Input Form (shown when not downloading) -->
+        <div id="downloadFormSection" class="p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- 左侧：目标文件路径 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                        <i class="fas fa-server text-yellow-400 mr-1.5"></i>目标主机文件路径
+                    </label>
+                    <input type="text" id="downloadPathInput" placeholder="C:\Users\Public\Documents\example.txt"
+                           class="w-full bg-gray-700/80 border border-gray-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 mb-3 font-mono text-sm placeholder-gray-500 transition-all">
+                    <div class="flex space-x-2 mb-4">
+                        <button onclick="window.suggestDownloadPath('desktop')" class="flex-1 bg-gray-700/60 hover:bg-gray-600 text-gray-300 py-2 px-3 rounded-lg text-xs transition-all hover:text-white border border-gray-600/50 hover:border-gray-500">
+                            <i class="fas fa-desktop mr-1.5 text-blue-400"></i>桌面
+                        </button>
+                        <button onclick="window.suggestDownloadPath('documents')" class="flex-1 bg-gray-700/60 hover:bg-gray-600 text-gray-300 py-2 px-3 rounded-lg text-xs transition-all hover:text-white border border-gray-600/50 hover:border-gray-500">
+                            <i class="fas fa-folder mr-1.5 text-yellow-400"></i>文档
+                        </button>
+                        <button onclick="window.suggestDownloadPath('downloads')" class="flex-1 bg-gray-700/60 hover:bg-gray-600 text-gray-300 py-2 px-3 rounded-lg text-xs transition-all hover:text-white border border-gray-600/50 hover:border-gray-500">
+                            <i class="fas fa-download mr-1.5 text-green-400"></i>下载
+                        </button>
+                    </div>
+                    <div class="bg-gray-700/30 rounded-lg p-3 border border-gray-600/30">
+                        <p class="text-gray-400 text-xs"><i class="fas fa-info-circle mr-1.5 text-blue-400"></i>请输入要下载的文件完整路径，支持绝对路径和相对路径。</p>
+                    </div>
+                </div>
+                <!-- 右侧：下载信息 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                        <i class="fas fa-info-circle text-blue-400 mr-1.5"></i>下载信息
+                    </label>
+                    <div class="bg-gradient-to-br from-blue-500/5 to-purple-500/5 border border-blue-500/20 rounded-lg p-4 mb-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-gray-500 text-xs mb-1">Beacon ID</p>
+                                <p id="downloadBeaconID" class="text-blue-300 font-mono text-sm truncate">-</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-xs mb-1">目标主机</p>
+                                <p id="downloadTargetHost" class="text-blue-300 font-mono text-sm truncate">-</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-700/30 rounded-lg p-3 border border-gray-600/30">
+                        <p class="text-gray-400 text-xs mb-2"><i class="fas fa-hdd mr-1.5 text-green-400"></i>保存位置</p>
+                        <p class="text-gray-300 text-sm font-mono">服务器 downloads/ 目录</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Body: Progress Section (shown during download) -->
+        <div id="downloadProgressSection" class="p-6 hidden">
+            <!-- File info bar -->
+            <div class="flex items-center space-x-3 mb-5 bg-gray-700/40 rounded-lg p-3 border border-gray-600/30">
+                <div class="w-10 h-10 bg-yellow-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i id="downloadProgressIcon" class="fas fa-file text-yellow-400"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <p id="downloadFileName" class="text-white text-sm font-mono truncate">-</p>
+                    <p id="downloadFileInfo" class="text-gray-400 text-xs mt-0.5">等待 Beacon 响应...</p>
+                </div>
+                <div id="downloadStatusBadge" class="flex-shrink-0 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+                    等待中
+                </div>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-gray-300 font-medium">下载进度</span>
+                    <span id="downloadProgressPercent" class="text-sm text-yellow-400 font-mono font-bold">0%</span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-3 overflow-hidden border border-gray-600/50">
+                    <div id="downloadProgressBar" class="h-full rounded-full transition-all duration-500 ease-out relative" style="width: 0%; background: linear-gradient(90deg, #f59e0b, #f97316);">
+                        <div class="absolute inset-0 rounded-full overflow-hidden">
+                            <div class="h-full w-full animate-pulse opacity-30" style="background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); animation: shimmer 2s infinite;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chunk details -->
+            <div class="grid grid-cols-3 gap-3 mb-4">
+                <div class="bg-gray-700/30 rounded-lg p-3 text-center border border-gray-600/20">
+                    <p class="text-gray-500 text-xs mb-1">已接收</p>
+                    <p id="downloadChunksReceived" class="text-white text-lg font-mono font-bold">0</p>
+                    <p class="text-gray-500 text-xs">chunks</p>
+                </div>
+                <div class="bg-gray-700/30 rounded-lg p-3 text-center border border-gray-600/20">
+                    <p class="text-gray-500 text-xs mb-1">总计</p>
+                    <p id="downloadChunksTotal" class="text-white text-lg font-mono font-bold">-</p>
+                    <p class="text-gray-500 text-xs">chunks</p>
+                </div>
+                <div class="bg-gray-700/30 rounded-lg p-3 text-center border border-gray-600/20">
+                    <p class="text-gray-500 text-xs mb-1">文件大小</p>
+                    <p id="downloadFileSize" class="text-white text-lg font-mono font-bold">-</p>
+                    <p class="text-gray-500 text-xs">MB</p>
+                </div>
+            </div>
+
+            <!-- Status log -->
+            <div id="downloadStatusLog" class="bg-gray-900/50 rounded-lg p-3 border border-gray-700/50 max-h-24 overflow-y-auto font-mono text-xs space-y-1">
+                <p class="text-gray-400"><span class="text-gray-500">[--:--:--]</span> 正在创建下载任务...</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex items-center justify-between p-6 border-t border-gray-700">
+            <div id="downloadFooterHint" class="text-xs text-gray-500">
+                <i class="fas fa-lightbulb text-yellow-500/50 mr-1"></i>文件将保存到服务器 downloads/ 目录
+            </div>
+            <div class="flex items-center space-x-3">
+                <button id="downloadCancelBtn" onclick="window.closeFileDownloadModal()" class="px-5 py-2.5 bg-gray-600 hover:bg-gray-500 text-white rounded-lg transition-all text-sm">
+                    取消
+                </button>
+                <button id="downloadStartBtn" onclick="window.confirmFileDownload()" class="px-5 py-2.5 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-white rounded-lg transition-all flex items-center text-sm font-medium shadow-lg shadow-yellow-500/20">
+                    <i class="fas fa-download mr-2"></i>开始下载
+                </button>
+                <button id="downloadDoneBtn" onclick="window.closeFileDownloadModal()" class="px-5 py-2.5 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-all flex items-center text-sm font-medium hidden">
+                    <i class="fas fa-check mr-2"></i>完成
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+</style>
+
+<!-- InlineExecute PE 模态框 -->

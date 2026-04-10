@@ -1,0 +1,66 @@
+{
+  "name": "azure_ad",
+  "description": "伪装为 Azure AD / Entra ID 认证和 Graph API 流量",
+  "author": "Cerberus",
+
+  "global": {
+    "sleep_ms": 18000,
+    "jitter_pct": 45,
+    "max_retry": 3,
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+  },
+
+  "crypto": {
+    "aes_key": "",
+    "aes_iv": ""
+  },
+
+  "http_get": {
+    "uri_paths": ["/common/oauth2/v2.0/token?client_id={}", "/v1.0/me/memberOf?$top={}", "/v1.0/organization/{}"],
+    "cookie_name": "ESTSAUTH",
+    "headers": {
+      "Accept": "application/json",
+      "Accept-Language": "en-US",
+      "Connection": "keep-alive",
+      "Client-Request-Id": "e5c6c7d8-1234-5678-9abc-def012345678",
+      "X-Client-SKU": "MSAL.Desktop",
+      "X-Client-Ver": "4.61.3.0",
+      "X-Client-OS": "10.0.22631"
+    },
+    "metadata": {
+      "transform": "base64_aes",
+      "location": "cookie"
+    }
+  },
+
+  "http_post": {
+    "uri_paths": ["/common/oauth2/v2.0/token", "/common/oauth2/authorize", "/v1.0/me/sendMail"],
+    "cookie_name": "ESTSAUTH",
+    "content_type": "application/x-www-form-urlencoded",
+    "headers": {
+      "Accept": "application/json",
+      "Connection": "keep-alive",
+      "Client-Request-Id": "e5c6c7d8-1234-5678-9abc-def012345678",
+      "X-Client-SKU": "MSAL.Desktop",
+      "Origin": "https://login.microsoftonline.com"
+    },
+    "body": {
+      "transform": "aes"
+    }
+  },
+
+  "http_response": {
+    "content_type": "application/json; charset=utf-8",
+    "headers": {
+      "X-Content-Type-Options": "nosniff",
+      "X-Ms-Request-Id": "a1b2c3d4-5678-90ab-cdef-1234567890ab",
+      "Cache-Control": "no-store, no-cache",
+      "Strict-Transport-Security": "max-age=31536000"
+    },
+    "body_template": "{\"token_type\":\"Bearer\",\"expires_in\":3599,\"access_token\":\"{{DATA}}\",\"refresh_token\":\"0.PLACEHOLDER\"}",
+    "data_marker": "\"access_token\":\"",
+    "data_delimiter_start": "\"access_token\":\"",
+    "data_delimiter_end": "\",\"refresh_token\"",
+    "no_task_value": "UYz2QVy4ydqbZejA9lTAzQ=="
+  }
+}

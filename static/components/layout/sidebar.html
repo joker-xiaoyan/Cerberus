@@ -1,0 +1,263 @@
+<!-- 左侧导航栏 -->
+<aside id="sidebar" class="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-gray-800 border-r border-gray-700 z-40 transition-all duration-300">
+    <div class="h-full flex flex-col">
+        <!-- 导航菜单 -->
+        <nav class="flex-1 overflow-y-auto py-4 px-3">
+            <!-- Dashboard 菜单项 -->
+            <div class="mb-2">
+                <button class="nav-menu-item active" data-page="dashboard">
+                    <i class="fas fa-chart-line mr-3"></i>
+                    <span class="flex-1 text-left">Dashboard</span>
+                </button>
+            </div>
+
+            <!-- Tasks 菜单项 -->
+            <div class="mb-2">
+                <button class="nav-menu-item" data-page="tasks">
+                    <i class="fas fa-tasks mr-3"></i>
+                    <span class="flex-1 text-left">Tasks</span>
+                </button>
+            </div>
+
+            <!-- AI助手 菜单项 -->
+            <div class="mb-2">
+                <button class="nav-menu-item" data-page="ai">
+                    <i class="fas fa-robot mr-3 text-purple-400"></i>
+                    <span class="flex-1 text-left">AI助手</span>
+                    <i class="fas fa-chevron-down text-xs transition-transform duration-200"></i>
+                </button>
+                <div class="nav-submenu">
+                    <a href="#" class="nav-submenu-item" data-subpage="ai-chat">
+                        <i class="fas fa-comments mr-3"></i>
+                        对话
+                    </a>
+                    <a href="#" class="nav-submenu-item" data-subpage="ai-config">
+                        <i class="fas fa-cog mr-3"></i>
+                        配置
+                    </a>
+                    <a href="#" class="nav-submenu-item" data-subpage="ai-operations">
+                        <i class="fas fa-cogs mr-3"></i>
+                        运营管理
+                    </a>
+                </div>
+            </div>
+
+            <!-- Beacon 菜单项 -->
+            <div class="mb-2">
+                <button class="nav-menu-item" data-page="beacons">
+                    <i class="fas fa-broadcast-tower mr-3"></i>
+                    <span class="flex-1 text-left">Beacon</span>
+                    <i class="fas fa-chevron-down text-xs transition-transform duration-200"></i>
+                </button>
+                <div class="nav-submenu">
+                    <!-- 分组：核心管理 -->
+                    <div class="nav-submenu-group">
+                        <div class="nav-submenu-group-header" data-group="beacon-core">
+                            <i class="fas fa-cube mr-2 text-blue-400"></i>
+                            <span>核心管理</span>
+                            <i class="fas fa-chevron-right text-xs ml-auto nav-group-chevron"></i>
+                        </div>
+                        <div class="nav-submenu-group-items">
+                            <a href="#" class="nav-submenu-item" data-subpage="beacon-list">
+                                <i class="fas fa-list mr-3"></i>
+                                Beacon列表
+                            </a>
+                            <a href="#" class="nav-submenu-item" data-subpage="server-downloads">
+                                <i class="fas fa-exchange-alt mr-3"></i>
+                                文件传输
+                            </a>
+                            <a href="#" class="nav-submenu-item" data-subpage="beacon-topology">
+                                <i class="fas fa-project-diagram mr-3"></i>
+                                Beacon拓扑
+                            </a>
+                        </div>
+                    </div>
+                    <!-- 分组：远程控制 -->
+                    <div class="nav-submenu-group">
+                        <div class="nav-submenu-group-header" data-group="beacon-remote">
+                            <i class="fas fa-tv mr-2 text-green-400"></i>
+                            <span>远程控制</span>
+                            <i class="fas fa-chevron-right text-xs ml-auto nav-group-chevron"></i>
+                        </div>
+                        <div class="nav-submenu-group-items">
+                            <a href="#" class="nav-submenu-item" data-subpage="beacon-screenshots">
+                                <i class="fas fa-image mr-3"></i>
+                                截图管理
+                            </a>
+                        </div>
+                    </div>
+                    <!-- 分组：网络与代理 -->
+                    <div class="nav-submenu-group">
+                        <div class="nav-submenu-group-header" data-group="beacon-network">
+                            <i class="fas fa-globe mr-2 text-cyan-400"></i>
+                            <span>网络与代理</span>
+                            <i class="fas fa-chevron-right text-xs ml-auto nav-group-chevron"></i>
+                        </div>
+                        <div class="nav-submenu-group-items">
+                            <a href="#" class="nav-submenu-item" data-subpage="beacon-proxy">
+                                <i class="fas fa-network-wired mr-3"></i>
+                                代理管理
+                            </a>
+                            <a href="#" class="nav-submenu-item" data-subpage="beacon-cascade">
+                                <i class="fas fa-link mr-3"></i>
+                                级联管理
+                            </a>
+                        </div>
+                    </div>
+                    <!-- 分组：高级攻击 -->
+                    <div class="nav-submenu-group">
+                        <div class="nav-submenu-group-header" data-group="beacon-attack">
+                            <i class="fas fa-crosshairs mr-2 text-red-400"></i>
+                            <span>高级攻击</span>
+                            <i class="fas fa-chevron-right text-xs ml-auto nav-group-chevron"></i>
+                        </div>
+                        <div class="nav-submenu-group-items">
+                            <a href="#" class="nav-submenu-item" data-subpage="beacon-bof">
+                                <i class="fas fa-bolt mr-3"></i>
+                                BOF管理
+                            </a>
+                            <a href="#" class="nav-submenu-item" data-subpage="beacon-so">
+                                <i class="fas fa-plug mr-3 text-green-400"></i>
+                                SO插件管理
+                                <span class="ml-auto text-xs px-1.5 py-0.5 rounded bg-green-500/20 text-green-400">🐧</span>
+                            </a>
+                            <a href="#" class="nav-submenu-item" data-subpage="beacon-advanced">
+                                <i class="fas fa-rocket mr-3"></i>
+                                进阶渗透
+                            </a>
+                            <a href="#" class="nav-submenu-item" data-subpage="beacon-injection">
+                                <i class="fas fa-syringe mr-3 text-purple-400"></i>
+                                注入管理
+                            </a>
+                            <a href="#" class="nav-submenu-item" data-subpage="beacon-rootkit">
+                                <i class="fas fa-shield-alt mr-3 text-red-400"></i>
+                                Rootkit管理
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 监听器菜单项 -->
+            <div class="mb-2">
+                <button class="nav-menu-item" data-page="listeners">
+                    <i class="fas fa-satellite-dish mr-3"></i>
+                    <span class="flex-1 text-left">监听器</span>
+                </button>
+            </div>
+
+            <!-- 自动编排菜单项 -->
+            <div class="mb-2">
+                <button class="nav-menu-item" data-page="automation">
+                    <i class="fas fa-robot mr-3 text-green-400"></i>
+                    <span class="flex-1 text-left">自动编排</span>
+                    <i class="fas fa-chevron-down text-xs transition-transform duration-200"></i>
+                </button>
+                <div class="nav-submenu">
+                    <a href="#" class="nav-submenu-item" data-subpage="automation-strategies">
+                        <i class="fas fa-cogs mr-3"></i>
+                        策略管理
+                    </a>
+                    <a href="#" class="nav-submenu-item" data-subpage="automation-arsenal">
+                        <i class="fas fa-bomb mr-3 text-red-400"></i>
+                        武器库
+                    </a>
+                    <a href="#" class="nav-submenu-item" data-subpage="automation-executions">
+                        <i class="fas fa-history mr-3"></i>
+                        执行记录
+                    </a>
+                </div>
+            </div>
+
+            <!-- 客户端生成菜单项 -->
+            <div class="mb-2">
+                <button class="nav-menu-item" data-page="loot">
+                    <i class="fas fa-trophy mr-3 text-yellow-400"></i>
+                    <span class="flex-1 text-left">战利品</span>
+                    <span id="sidebarLootBadge" class="hidden bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full font-bold mr-2">0</span>
+                    <i class="fas fa-chevron-down text-xs transition-transform duration-200"></i>
+                </button>
+                <div class="nav-submenu">
+                    <a href="#" class="nav-submenu-item" data-subpage="loot-overview">
+                        <i class="fas fa-list mr-3"></i>
+                        信息收集
+                    </a>
+                </div>
+            </div>
+
+            <!-- 客户端生成菜单项 -->
+            <div class="mb-2">
+                <button class="nav-menu-item" data-page="client">
+                    <i class="fas fa-desktop mr-3 text-indigo-400"></i>
+                    <span class="flex-1 text-left">客户端生成</span>
+                    <i class="fas fa-chevron-down text-xs transition-transform duration-200"></i>
+                </button>
+                <div class="nav-submenu">
+                    <a href="#" class="nav-submenu-item" data-subpage="client-build">
+                        <i class="fas fa-cog mr-3"></i>
+                        构建客户端
+                    </a>
+                </div>
+            </div>
+
+            <!-- 初始投递物菜单项 -->
+            <div class="mb-2">
+                <button class="nav-menu-item" data-page="delivery">
+                    <i class="fas fa-parachute-box mr-3 text-orange-400"></i>
+                    <span class="flex-1 text-left">初始投递物</span>
+                </button>
+            </div>
+
+            <!-- 集群管理菜单项 -->
+            <div class="mb-2">
+                <button class="nav-menu-item" data-page="cluster">
+                    <i class="fas fa-network-wired mr-3 text-purple-400"></i>
+                    <span class="flex-1 text-left">集群管理</span>
+                </button>
+            </div>
+
+            <!-- 系统管理菜单项 -->
+            <div class="mb-2">
+                <button class="nav-menu-item" data-page="system">
+                    <i class="fas fa-cog mr-3"></i>
+                    <span class="flex-1 text-left">系统管理</span>
+                    <i class="fas fa-chevron-down text-xs transition-transform duration-200"></i>
+                </button>
+                <div class="nav-submenu">
+                    <a href="#" class="nav-submenu-item" data-subpage="user-management">
+                        <i class="fas fa-users mr-3"></i>
+                        用户管理
+                    </a>
+                    <a href="#" class="nav-submenu-item" data-subpage="system-logs">
+                        <i class="fas fa-clipboard-list mr-3"></i>
+                        系统日志
+                    </a>
+                    <a href="#" class="nav-submenu-item" data-subpage="settings">
+                        <i class="fas fa-sliders-h mr-3"></i>
+                        系统设置
+                    </a>
+                    <a href="#" class="nav-submenu-item" data-subpage="http-template-settings">
+                        <i class="fas fa-code mr-3"></i>
+                        HTTP 模板配置
+                    </a>
+                    <a href="#" class="nav-submenu-item" data-subpage="notification-settings">
+                        <i class="fas fa-bell mr-3 text-amber-400"></i>
+                        通知设置
+                    </a>
+                    <a href="#" class="nav-submenu-item" data-subpage="c2-comm-settings">
+                        <i class="fas fa-route mr-3 text-cyan-400"></i>
+                        C2 通信管理
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 底部信息 -->
+        <div class="p-4 border-t border-gray-700">
+            <div class="text-xs text-gray-400 text-center">
+                <div class="mb-1">Cerberus</div>
+                <div>v1.0.0</div>
+            </div>
+        </div>
+    </div>
+</aside>

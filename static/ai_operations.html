@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI运营管理 - Cerberus C2</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .ai-active { background-color: #10b981 !important; }
+        .ai-inactive { background-color: #ef4444 !important; }
+        .strategy-card { transition: all 0.3s ease; }
+        .strategy-card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .beacon-status-online { color: #10b981; }
+        .beacon-status-offline { color: #ef4444; }
+        .beacon-status-idle { color: #f59e0b; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- 导航栏 -->
+    <nav class="bg-gray-800 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">
+                <i class="fas fa-robot mr-2"></i>AI运营管理
+            </h1>
+            <div class="space-x-4">
+                <a href="/" class="hover:text-gray-300">
+                    <i class="fas fa-home mr-1"></i>控制台
+                </a>
+                <a href="/beacons" class="hover:text-gray-300">
+                    <i class="fas fa-signal mr-1"></i>Beacon管理
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <div class="container mx-auto p-6">
+        <!-- AI运营状态面板 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700">AI运营状态</h3>
+                        <p id="ai-status" class="text-2xl font-bold mt-2">--</p>
+                    </div>
+                    <i class="fas fa-robot text-3xl text-blue-500"></i>
+                </div>
+                <button id="toggle-ai" class="w-full mt-4 py-2 px-4 rounded text-white font-semibold">
+                    启动AI运营
+                </button>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700">管理的Beacon</h3>
+                        <p id="beacons-managed" class="text-2xl font-bold mt-2">--</p>
+                    </div>
+                    <i class="fas fa-signal text-3xl text-green-500"></i>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">当前在线Beacon数量</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700">执行的任务</h3>
+                        <p id="tasks-executed" class="text-2xl font-bold mt-2">--</p>
+                    </div>
+                    <i class="fas fa-tasks text-3xl text-purple-500"></i>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">AI自动执行的任务数量</p>
+            </div>
+        </div>
+
+        <!-- Beacon运营状态 -->
+        <div class="bg-white rounded-lg shadow mb-8">
+            <div class="p-6 border-b">
+                <h2 class="text-xl font-semibold text-gray-700">
+                    <i class="fas fa-list mr-2"></i>Beacon运营状态
+                </h2>
+            </div>
+            <div class="p-6">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Beacon</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">当前策略</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">最后活动</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="beacon-operations-table" class="bg-white divide-y divide-gray-200">
+                            <!-- 动态加载数据 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 运营策略 -->
+        <div class="bg-white rounded-lg shadow mb-8">
+            <div class="p-6 border-b flex justify-between items-center">
+                <h2 class="text-xl font-semibold text-gray-700">
+                    <i class="fas fa-cogs mr-2"></i>运营策略
+                </h2>
+                <div class="flex space-x-2">
+                    <button id="create-strategy-btn" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+                        <i class="fas fa-plus mr-2"></i>创建策略
+                    </button>
+                    <button id="apply-strategy-btn" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition">
+                        <i class="fas fa-play mr-2"></i>应用策略
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="strategies-container">
+                    <!-- 策略卡片将动态加载 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 创建策略模态框 -->
+        <div id="create-strategy-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-lg p-6 w-11/12 max-w-2xl max-h-screen overflow-y-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        <i class="fas fa-plus-circle mr-2"></i>创建运营策略
+                    </h3>
+                    <button id="close-create-modal" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <form id="create-strategy-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">策略名称</label>
+                        <input type="text" id="strategy-name" required 
+                            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">描述</label>
+                        <textarea id="strategy-description" rows="2" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">优先级 (1-10)</label>
+                        <input type="number" id="strategy-priority" min="1" max="10" value="5" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-sm font-medium text-gray-700">触发条件</label>
+                            <button type="button" id="add-condition-btn" class="text-sm bg-blue-500 text-white px-2 py-1 rounded">
+                                <i class="fas fa-plus mr-1"></i>添加条件
+                            </button>
+                        </div>
+                        <div id="conditions-container" class="space-y-2">
+                            <!-- 条件将动态添加 -->
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-sm font-medium text-gray-700">执行动作</label>
+                            <button type="button" id="add-action-btn" class="text-sm bg-green-500 text-white px-2 py-1 rounded">
+                                <i class="fas fa-plus mr-1"></i>添加动作
+                            </button>
+                        </div>
+                        <div id="actions-container" class="space-y-2">
+                            <!-- 动作将动态添加 -->
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-2 pt-4">
+                        <button type="button" id="cancel-create-strategy" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
+                            取消
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                            创建策略
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 应用策略模态框 -->
+        <div id="apply-strategy-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-lg p-6 w-11/12 max-w-lg">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        <i class="fas fa-play-circle mr-2"></i>应用策略到Beacon
+                    </h3>
+                    <button id="close-apply-modal" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <form id="apply-strategy-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">选择策略</label>
+                        <select id="strategy-select" required 
+                            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">请选择策略...</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">选择Beacon</label>
+                        <div id="beacon-checkboxes" class="space-y-2 max-h-48 overflow-y-auto border border-gray-300 rounded p-2">
+                            <!-- Beacon复选框将动态添加 -->
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-2 pt-4">
+                        <button type="button" id="cancel-apply-strategy" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
+                            取消
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                            应用策略
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- AI分析控制台 -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="p-6 border-b">
+                <h2 class="text-xl font-semibold text-gray-700">
+                    <i class="fas fa-terminal mr-2"></i>AI分析控制台
+                </h2>
+            </div>
+            <div class="p-6">
+                <div class="mb-4">
+                    <textarea id="ai-console-input" 
+                        class="w-full p-3 border border-gray-300 rounded-lg" 
+                        rows="4" 
+                        placeholder="输入要分析的命令或结果..."></textarea>
+                </div>
+                <div class="flex space-x-4 mb-4">
+                    <button id="analyze-command" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        分析命令
+                    </button>
+                    <button id="analyze-result" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        分析结果
+                    </button>
+                    <button id="generate-suggestions" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                        生成建议
+                    </button>
+                </div>
+                <div id="ai-console-output" class="bg-gray-800 text-green-400 p-4 rounded-lg font-mono text-sm">
+                    <!-- AI分析结果将显示在这里 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // 全局状态
+        let aiStatus = {
+            active: false,
+            currentStrategy: '',
+            beaconsManaged: 0,
+            tasksExecuted: 0
+        };
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAIOperationsStatus();
+            loadBeaconOperations();
+            loadStrategies();
+            setupEventListeners();
+            
+            // 每30秒刷新一次状态
+            setInterval(() => {
+                loadAIOperationsStatus();
+                loadBeaconOperations();
+            }, 30000);
+        });
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            document.getElementById('toggle-ai').addEventListener('click', toggleAIOperations);
+            document.getElementById('analyze-command').addEventListener('click', analyzeCommand);
+            document.getElementById('analyze-result').addEventListener('click', analyzeResult);
+            document.getElementById('generate-suggestions').addEventListener('click', generateSuggestions);
+        }
+
+        // 加载AI运营状态
+        async function loadAIOperationsStatus() {
+            try {
+                const response = await fetch('/api/ai/operations/status');
+                const status = await response.json();
+                
+                aiStatus = status;
+                updateStatusDisplay(status);
+            } catch (error) {
+                console.error('加载AI运营状态失败:', error);
+            }
+        }
+
+        // 更新状态显示
+        function updateStatusDisplay(status) {
+            const statusElement = document.getElementById('ai-status');
+            const toggleButton = document.getElementById('toggle-ai');
+            
+            if (status.active) {
+                statusElement.textContent = '运行中';
+                statusElement.className = 'text-2xl font-bold mt-2 text-green-600';
+                toggleButton.textContent = '停止AI运营';
+                toggleButton.className = 'w-full mt-4 py-2 px-4 rounded text-white font-semibold bg-red-500 hover:bg-red-600';
+            } else {
+                statusElement.textContent = '已停止';
+                statusElement.className = 'text-2xl font-bold mt-2 text-red-600';
+                toggleButton.textContent = '启动AI运营';
+                toggleButton.className = 'w-full mt-4 py-2 px-4 rounded text-white font-semibold bg-green-500 hover:bg-green-600';
+            }
+
+            document.getElementById('beacons-managed').textContent = status.beaconsManaged;
+            document.getElementById('tasks-executed').textContent = status.tasksExecuted;
+        }
+
+        // 切换AI运营状态
+        async function toggleAIOperations() {
+            try {
+                if (aiStatus.active) {
+                    // 停止AI运营
+                    const response = await fetch('/api/ai/operations/stop', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ reason: '用户手动停止' })
+                    });
+                    
+                    if (response.ok) {
+                        showNotification('AI运营已停止', 'success');
+                        loadAIOperationsStatus();
+                    }
+                } else {
+                    // 启动AI运营
+                    const response = await fetch('/api/ai/operations/start', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ strategy_id: '', beacon_ids: [] })
+                    });
+                    
+                    if (response.ok) {
+                        showNotification('AI运营已启动', 'success');
+                        loadAIOperationsStatus();
+                    }
+                }
+            } catch (error) {
+                console.error('切换AI运营状态失败:', error);
+                showNotification('操作失败: ' + error.message, 'error');
+            }
+        }
+
+        // 加载Beacon运营状态
+        async function loadBeaconOperations() {
+            try {
+                const response = await fetch('/api/ai/operations/beacons');
+                const operations = await response.json();
+                
+                renderBeaconOperations(operations);
+            } catch (error) {
+                console.error('加载Beacon运营状态失败:', error);
+            }
+        }
+
+        // 渲染Beacon运营状态
+        function renderBeaconOperations(operations) {
+            const tableBody = document.getElementById('beacon-operations-table');
+            
+            if (operations.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                            暂无Beacon运营数据
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tableBody.innerHTML = operations.map(op => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">${op.hostname}</div>
+                                <div class="text-sm text-gray-500">${op.beacon_id}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                            ${op.strategy_name || '无'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full beacon-status-${op.status}">
+                            ${op.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${new Date(op.updated_at).toLocaleString()}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button class="text-indigo-600 hover:text-indigo-900 mr-3" onclick="viewBeaconDetails('${op.beacon_id}')">
+                            查看详情
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 加载策略列表
+        async function loadStrategies() {
+            try {
+                const response = await fetch('/api/ai/operations/strategies');
+                const data = await response.json();
+                
+                renderStrategies(data.strategies);
+            } catch (error) {
+                console.error('加载策略列表失败:', error);
+            }
+        }
+
+        // 渲染策略列表
+        function renderStrategies(strategies) {
+            const container = document.getElementById('strategies-container');
+            
+            container.innerHTML = strategies.map(strategy => `
+                <div class="strategy-card bg-white border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-semibold text-gray-800">${strategy.name}</h3>
+                        <span class="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded">优先级 ${strategy.priority}</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-4">${strategy.description}</p>
+                    <div class="text-xs text-gray-500 mb-4">
+                        <div>条件: ${strategy.conditions?.length || 0} 个</div>
+                        <div>动作: ${strategy.actions?.length || 0} 个</div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="flex-1 bg-blue-500 text-white py-1 px-2 rounded text-xs hover:bg-blue-600">
+                            编辑
+                        </button>
+                        <button class="flex-1 bg-green-500 text-white py-1 px-2 rounded text-xs hover:bg-green-600">
+                            启用
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // AI分析功能
+        async function analyzeCommand() {
+            const input = document.getElementById('ai-console-input').value.trim();
+            if (!input) {
+                showNotification('请输入要分析的命令', 'warning');
+                return;
+            }
+
+            showAIConsoleOutput('正在分析命令...');
+            
+            try {
+                // 这里调用AI分析API
+                const response = await fetch('/api/ai/analyze-command', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command: input })
+                });
+                
+                const result = await response.json();
+                showAIConsoleOutput(result.analysis || '分析完成');
+            } catch (error) {
+                showAIConsoleOutput('分析失败: ' + error.message);
+            }
+        }
+
+        async function analyzeResult() {
+            const input = document.getElementById('ai-console-input').value.trim();
+            if (!input) {
+                showNotification('请输入要分析的结果', 'warning');
+                return;
+            }
+
+            showAIConsoleOutput('正在分析结果...');
+            
+            try {
+                // 这里调用AI结果分析API
+                const response = await fetch('/api/ai/analyze-result', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ result: input })
+                });
+                
+                const result = await response.json();
+                showAIConsoleOutput(result.analysis || '分析完成');
+            } catch (error) {
+                showAIConsoleOutput('分析失败: ' + error.message);
+            }
+        }
+
+        async function generateSuggestions() {
+            showAIConsoleOutput('正在生成建议...');
+            
+            try {
+                // 这里调用AI建议生成API
+                const response = await fetch('/api/ai/generate-suggestions');
+                const result = await response.json();
+                showAIConsoleOutput(result.suggestions || '建议生成完成');
+            } catch (error) {
+                showAIConsoleOutput('生成建议失败: ' + error.message);
+            }
+        }
+
+        // 显示AI控制台输出
+        function showAIConsoleOutput(message) {
+            const outputElement = document.getElementById('ai-console-output');
+            outputElement.innerHTML = `<div class="mb-2">${new Date().toLocaleTimeString()}</div>
+                                    <div>${message.replace(/\n/g, '<br>')}</div>`;
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            // 简单的通知实现
+            alert(`${type.toUpperCase()}: ${message}`);
+        }
+
+        // 查看Beacon详情
+        function viewBeaconDetails(beaconId) {
+            window.open(`/beacons/${beaconId}`, '_blank');
+        }
+
+        // 策略管理功能
+        let strategyConditionCount = 0;
+        let strategyActionCount = 0;
+        let strategies = [];
+
+        // 初始化事件监听器
+        document.addEventListener('DOMContentLoaded', function() {
+            // 创建策略相关
+            document.getElementById('create-strategy-btn').addEventListener('click', showCreateStrategyModal);
+            document.getElementById('close-create-modal').addEventListener('click', hideCreateStrategyModal);
+            document.getElementById('cancel-create-strategy').addEventListener('click', hideCreateStrategyModal);
+            document.getElementById('create-strategy-form').addEventListener('submit', handleCreateStrategy);
+            document.getElementById('add-condition-btn').addEventListener('click', addCondition);
+            document.getElementById('add-action-btn').addEventListener('click', addAction);
+
+            // 应用策略相关
+            document.getElementById('apply-strategy-btn').addEventListener('click', showApplyStrategyModal);
+            document.getElementById('close-apply-modal').addEventListener('click', hideApplyStrategyModal);
+            document.getElementById('cancel-apply-strategy').addEventListener('click', hideApplyStrategyModal);
+            document.getElementById('apply-strategy-form').addEventListener('submit', handleApplyStrategy);
+        });
+
+        // 显示创建策略模态框
+        function showCreateStrategyModal() {
+            document.getElementById('create-strategy-modal').classList.remove('hidden');
+            // 添加一个默认条件和动作
+            addCondition();
+            addAction();
+        }
+
+        // 隐藏创建策略模态框
+        function hideCreateStrategyModal() {
+            document.getElementById('create-strategy-modal').classList.add('hidden');
+            document.getElementById('create-strategy-form').reset();
+            document.getElementById('conditions-container').innerHTML = '';
+            document.getElementById('actions-container').innerHTML = '';
+            strategyConditionCount = 0;
+            strategyActionCount = 0;
+        }
+
+        // 添加条件
+        function addCondition() {
+            const conditionId = `condition-${strategyConditionCount++}`;
+            const conditionHtml = `
+                <div id="${conditionId}" class="border border-gray-200 rounded p-3">
+                    <div class="grid grid-cols-4 gap-2">
+                        <select class="condition-type px-2 py-1 border border-gray-300 rounded">
+                            <option value="beacon_status">Beacon状态</option>
+                            <option value="system_info">系统信息</option>
+                            <option value="operation_state">操作状态</option>
+                            <option value="network_info">网络信息</option>
+                        </select>
+                        <select class="condition-field px-2 py-1 border border-gray-300 rounded">
+                            <option value="status">状态</option>
+                            <option value="privilege">权限</option>
+                            <option value="os">操作系统</option>
+                            <option value="last_checkin">最后连接</option>
+                        </select>
+                        <select class="condition-operator px-2 py-1 border border-gray-300 rounded">
+                            <option value="==">等于</option>
+                            <option value="!=">不等于</option>
+                            <option value=">">大于</option>
+                            <option value="<">小于</option>
+                            <option value="contains">包含</option>
+                        </select>
+                        <div class="flex">
+                            <input type="text" class="condition-value flex-1 px-2 py-1 border border-gray-300 rounded" placeholder="值">
+                            <button type="button" class="ml-2 text-red-500 hover:text-red-700" onclick="removeElement('${conditionId}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('conditions-container').insertAdjacentHTML('beforeend', conditionHtml);
+        }
+
+        // 添加动作
+        function addAction() {
+            const actionId = `action-${strategyActionCount++}`;
+            const actionHtml = `
+                <div id="${actionId}" class="border border-gray-200 rounded p-3">
+                    <div class="grid grid-cols-4 gap-2">
+                        <select class="action-type px-2 py-1 border border-gray-300 rounded">
+                            <option value="command">执行命令</option>
+                            <option value="analysis">AI分析</option>
+                            <option value="upload">上传文件</option>
+                            <option value="download">下载文件</option>
+                        </select>
+                        <input type="text" class="action-command col-span-2 px-2 py-1 border border-gray-300 rounded" placeholder="命令或操作内容">
+                        <div class="flex">
+                            <input type="number" class="action-delay w-16 px-2 py-1 border border-gray-300 rounded" placeholder="延时(秒)" value="5">
+                            <button type="button" class="ml-2 text-red-500 hover:text-red-700" onclick="removeElement('${actionId}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('actions-container').insertAdjacentHTML('beforeend', actionHtml);
+        }
+
+        // 移除元素
+        function removeElement(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.remove();
+            }
+        }
+
+        // 处理创建策略表单提交
+        async function handleCreateStrategy(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('strategy-name').value;
+            const description = document.getElementById('strategy-description').value;
+            const priority = parseInt(document.getElementById('strategy-priority').value);
+            
+            // 收集条件
+            const conditions = [];
+            document.querySelectorAll('#conditions-container > div').forEach(conditionEl => {
+                conditions.push({
+                    type: conditionEl.querySelector('.condition-type').value,
+                    field: conditionEl.querySelector('.condition-field').value,
+                    operator: conditionEl.querySelector('.condition-operator').value,
+                    value: conditionEl.querySelector('.condition-value').value
+                });
+            });
+            
+            // 收集动作
+            const actions = [];
+            document.querySelectorAll('#actions-container > div').forEach(actionEl => {
+                actions.push({
+                    type: actionEl.querySelector('.action-type').value,
+                    command: actionEl.querySelector('.action-command').value,
+                    delay: parseInt(actionEl.querySelector('.action-delay').value) || 5,
+                    params: {}
+                });
+            });
+            
+            try {
+                const response = await fetch('/api/ai/operations/strategy', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name,
+                        description,
+                        priority,
+                        conditions,
+                        actions,
+                        state: {}
+                    })
+                });
+                
+                if (response.ok) {
+                    showNotification('策略创建成功', 'success');
+                    hideCreateStrategyModal();
+                    loadStrategies(); // 重新加载策略列表
+                } else {
+                    const error = await response.json();
+                    showNotification('策略创建失败: ' + error.error, 'error');
+                }
+            } catch (error) {
+                showNotification('策略创建失败: ' + error.message, 'error');
+            }
+        }
+
+        // 显示应用策略模态框
+        async function showApplyStrategyModal() {
+            document.getElementById('apply-strategy-modal').classList.remove('hidden');
+            
+            // 加载策略列表
+            try {
+                const response = await fetch('/api/ai/operations/strategies');
+                const data = await response.json();
+                strategies = data.strategies;
+                
+                const strategySelect = document.getElementById('strategy-select');
+                strategySelect.innerHTML = '<option value="">请选择策略...</option>';
+                strategies.forEach(strategy => {
+                    strategySelect.innerHTML += `<option value="${strategy.id}">${strategy.name} (优先级: ${strategy.priority})</option>`;
+                });
+            } catch (error) {
+                showNotification('加载策略失败: ' + error.message, 'error');
+            }
+            
+            // 加载Beacon列表
+            try {
+                const response = await fetch('/api/beacons');
+                const beacons = await response.json();
+                
+                const beaconCheckboxes = document.getElementById('beacon-checkboxes');
+                beaconCheckboxes.innerHTML = '';
+                
+                beacons.forEach(beacon => {
+                    const checkboxId = `beacon-${beacon.id}`;
+                    beaconCheckboxes.innerHTML += `
+                        <div class="flex items-center">
+                            <input type="checkbox" id="${checkboxId}" value="${beacon.id}" class="mr-2">
+                            <label for="${checkboxId}" class="text-sm">
+                                ${beacon.hostname} (${beacon.ip || beacon.ip || 'N/A'}) - ${beacon.user || 'N/A'} - ${beacon.status || 'unknown'}
+                            </label>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                showNotification('加载Beacon失败: ' + error.message, 'error');
+            }
+        }
+
+        // 隐藏应用策略模态框
+        function hideApplyStrategyModal() {
+            document.getElementById('apply-strategy-modal').classList.add('hidden');
+            document.getElementById('apply-strategy-form').reset();
+        }
+
+        // 处理应用策略表单提交
+        async function handleApplyStrategy(e) {
+            e.preventDefault();
+            
+            const strategyId = document.getElementById('strategy-select').value;
+            if (!strategyId) {
+                showNotification('请选择策略', 'warning');
+                return;
+            }
+            
+            // 收集选中的Beacon IDs
+            const beaconIds = [];
+            document.querySelectorAll('#beacon-checkboxes input:checked').forEach(checkbox => {
+                beaconIds.push(checkbox.value);
+            });
+            
+            if (beaconIds.length === 0) {
+                showNotification('请选择至少一个Beacon', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/ai/operations/apply-strategy', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        strategy_id: strategyId,
+                        beacon_ids: beaconIds
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showNotification(result.message, 'success');
+                    if (result.failed_beacons && result.failed_beacons.length > 0) {
+                        showNotification(`部分Beacon应用策略失败: ${result.failed_beacons.join(', ')}`, 'warning');
+                    }
+                    hideApplyStrategyModal();
+                    loadBeaconOperations(); // 重新加载Beacon操作状态
+                } else {
+                    showNotification('应用策略失败: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showNotification('应用策略失败: ' + error.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

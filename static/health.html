@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C2平台 - 健康检查</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-2xl w-full">
+        <div class="bg-gray-800 rounded-2xl shadow-2xl p-8 border border-gray-700">
+            <!-- 标题 -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mb-4">
+                    <i class="fas fa-heartbeat text-white text-3xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    C2平台健康检查
+                </h1>
+                <p class="text-gray-400 mt-2">检查后端服务和API连接状态</p>
+            </div>
+
+            <!-- 检查结果 -->
+            <div class="space-y-4 mb-8">
+                <!-- 后端服务 -->
+                <div id="backendStatus" class="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-server text-gray-400 text-xl"></i>
+                        <span class="font-medium">后端服务</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-spinner fa-spin text-blue-400"></i>
+                        <span class="text-sm text-gray-400">检查中...</span>
+                    </div>
+                </div>
+
+                <!-- API连接 -->
+                <div id="apiStatus" class="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-plug text-gray-400 text-xl"></i>
+                        <span class="font-medium">API连接</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-spinner fa-spin text-blue-400"></i>
+                        <span class="text-sm text-gray-400">检查中...</span>
+                    </div>
+                </div>
+
+                <!-- 数据库 -->
+                <div id="dbStatus" class="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-database text-gray-400 text-xl"></i>
+                        <span class="font-medium">数据库</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-spinner fa-spin text-blue-400"></i>
+                        <span class="text-sm text-gray-400">检查中...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 总体状态 -->
+            <div id="overallStatus" class="text-center p-6 bg-gray-700 rounded-lg mb-6">
+                <i class="fas fa-spinner fa-spin text-blue-400 text-3xl mb-3"></i>
+                <p class="text-lg font-medium">正在检查系统状态...</p>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="flex space-x-4">
+                <button onclick="checkHealth()" class="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105">
+                    <i class="fas fa-redo mr-2"></i>重新检查
+                </button>
+                <a href="/" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-6 rounded-lg text-center transition-all duration-200">
+                    <i class="fas fa-home mr-2"></i>返回主页
+                </a>
+            </div>
+
+            <!-- 帮助信息 -->
+            <div class="mt-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                <div class="flex items-start space-x-3">
+                    <i class="fas fa-info-circle text-blue-400 mt-1"></i>
+                    <div class="text-sm text-gray-300">
+                        <p class="font-medium text-blue-400 mb-1">提示：</p>
+                        <p>如果检查失败，请确保Go后端服务正在运行。</p>
+                        <p class="mt-1">启动命令：<code class="bg-gray-700 px-2 py-1 rounded">./start.sh</code> 或 <code class="bg-gray-700 px-2 py-1 rounded">start.bat</code></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <div class="text-center mt-6 text-gray-500 text-sm">
+            <p>C2平台 - 健康检查页面 </p>
+        </div>
+    </div>
+
+    <script>
+        // 更新状态显示
+        function updateStatus(elementId, success, message) {
+            const element = document.getElementById(elementId);
+            const statusDiv = element.querySelector('div:last-child');
+            
+            if (success) {
+                statusDiv.innerHTML = `
+                    <i class="fas fa-check-circle text-green-400"></i>
+                    <span class="text-sm text-green-400">${message}</span>
+                `;
+            } else {
+                statusDiv.innerHTML = `
+                    <i class="fas fa-times-circle text-red-400"></i>
+                    <span class="text-sm text-red-400">${message}</span>
+                `;
+            }
+        }
+
+        // 检查健康状态
+        async function checkHealth() {
+            let allSuccess = true;
+
+            // 重置状态
+            ['backendStatus', 'apiStatus', 'dbStatus'].forEach(id => {
+                const element = document.getElementById(id);
+                const statusDiv = element.querySelector('div:last-child');
+                statusDiv.innerHTML = `
+                    <i class="fas fa-spinner fa-spin text-blue-400"></i>
+                    <span class="text-sm text-gray-400">检查中...</span>
+                `;
+            });
+
+            // 检查后端服务
+            try {
+                const response = await fetch('/api/stats');
+                if (response.ok) {
+                    updateStatus('backendStatus', true, '运行正常');
+                    updateStatus('apiStatus', true, '连接成功');
+                    
+                    // 检查数据库（通过stats API间接检查）
+                    const data = await response.json();
+                    updateStatus('dbStatus', true, '连接正常');
+                } else {
+                    throw new Error('API响应异常');
+                }
+            } catch (error) {
+                allSuccess = false;
+                updateStatus('backendStatus', false, '无法连接');
+                updateStatus('apiStatus', false, '连接失败');
+                updateStatus('dbStatus', false, '未知');
+            }
+
+            // 更新总体状态
+            const overallStatus = document.getElementById('overallStatus');
+            if (allSuccess) {
+                overallStatus.innerHTML = `
+                    <i class="fas fa-check-circle text-green-400 text-3xl mb-3"></i>
+                    <p class="text-lg font-medium text-green-400">系统运行正常</p>
+                    <p class="text-sm text-gray-400 mt-2">所有服务都已就绪，可以正常使用</p>
+                `;
+            } else {
+                overallStatus.innerHTML = `
+                    <i class="fas fa-exclamation-triangle text-red-400 text-3xl mb-3"></i>
+                    <p class="text-lg font-medium text-red-400">系统异常</p>
+                    <p class="text-sm text-gray-400 mt-2">请检查Go后端服务是否正在运行</p>
+                    <a href="/troubleshoot.md" class="inline-block mt-3 text-blue-400 hover:text-blue-300 text-sm">
+                        <i class="fas fa-book mr-1"></i>查看故障排查指南
+                    </a>
+                `;
+            }
+        }
+
+        // 页面加载时自动检查
+        window.addEventListener('DOMContentLoaded', checkHealth);
+    </script>
+</body>
+</html>

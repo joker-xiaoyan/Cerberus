@@ -1,0 +1,130 @@
+<!-- inline-execute-pe 模态框 - 从 1index.html 自动提取 -->
+<div id="inlineExecutePEModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50">
+    <div class="bg-gray-800 rounded-xl border border-gray-700 w-full max-w-3xl mx-4 shadow-2xl">
+        <div class="flex items-center justify-between p-6 border-b border-gray-700">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-memory text-orange-400"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-white">InlineExecute PE</h3>
+                    <p class="text-sm text-gray-400">在内存中加载并执行PE文件</p>
+                </div>
+            </div>
+            <button onclick="window.closeInlineExecutePEModal()" class="text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        <div class="p-6 space-y-6">
+            <!-- Beacon信息 -->
+            <div class="bg-gray-750 rounded-lg p-4 border border-gray-700">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-broadcast-tower text-orange-400"></i>
+                        <div>
+                            <p class="text-sm text-gray-400">目标Beacon</p>
+                            <p id="inlineExecBeaconName" class="text-white font-medium">-</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-gray-400">系统信息</p>
+                        <p id="inlineExecBeaconOS" class="text-white font-mono text-sm">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PE文件选择 -->
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-3">
+                    <i class="fas fa-file-code mr-2 text-orange-400"></i>选择PE文件
+                </label>
+                <div class="border-2 border-dashed border-gray-600 rounded-lg p-6 hover:border-orange-500 transition-all cursor-pointer bg-gray-750" 
+                     onclick="document.getElementById('peFileInput').click()">
+                    <div class="text-center">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-500 mb-3"></i>
+                        <p class="text-gray-400 mb-2">点击选择PE文件或拖拽文件到此处</p>
+                        <p class="text-xs text-gray-500">支持 .exe 和 .dll 文件</p>
+                        <div id="peFileInfo" class="mt-4 hidden">
+                            <div class="bg-gray-800 rounded-lg p-4 text-left">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fas fa-file text-orange-400 text-2xl"></i>
+                                        <div>
+                                            <p id="peFileName" class="text-white font-medium">-</p>
+                                            <p id="peFileSize" class="text-sm text-gray-400">-</p>
+                                        </div>
+                                    </div>
+                                    <button onclick="window.clearPEFile(); event.stopPropagation();" class="text-red-400 hover:text-red-300 transition-colors">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <input type="file" id="peFileInput" accept=".exe,.dll" class="hidden">
+            </div>
+
+            <!-- 参数输入 -->
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">
+                    <i class="fas fa-terminal mr-2 text-orange-400"></i>命令行参数 (可选)
+                </label>
+                <input type="text" id="peParameters" 
+                       placeholder="例如: -flag value --verbose"
+                       class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500 font-mono text-sm">
+                <p class="text-xs text-gray-500 mt-2">
+                    <i class="fas fa-info-circle mr-1"></i>参数将传递给PE的入口点函数
+                </p>
+            </div>
+
+            <!-- 执行选项 -->
+            <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                <p class="text-blue-400 text-sm mb-3 flex items-center">
+                    <i class="fas fa-shield-alt mr-2"></i>执行信息
+                </p>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p class="text-gray-400 mb-1">执行方式</p>
+                        <p class="text-blue-300 font-medium">内存加载 (InlineExecute)</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-400 mb-1">超时时间</p>
+                        <p class="text-blue-300 font-medium">30秒</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-400 mb-1">磁盘落地</p>
+                        <p class="text-green-400 font-medium">❌ 否</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-400 mb-1">创建进程</p>
+                        <p class="text-green-400 font-medium">❌ 否</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 警告提示 -->
+            <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+                <p class="text-yellow-400 text-sm flex items-start">
+                    <i class="fas fa-exclamation-triangle mr-2 mt-0.5"></i>
+                    <span>
+                        <strong>注意事项：</strong><br>
+                        • PE文件架构必须与Beacon一致（x86/x64）<br>
+                        • 执行可能触发杀软告警，请确保已规避<br>
+                        • 建议先在测试环境验证功能
+                    </span>
+                </p>
+            </div>
+        </div>
+        <div class="flex items-center justify-end space-x-3 p-6 border-t border-gray-700">
+            <button onclick="window.closeInlineExecutePEModal()" class="px-6 py-2.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors">
+                取消
+            </button>
+            <button onclick="window.confirmInlineExecutePE()" class="px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors flex items-center">
+                <i class="fas fa-play mr-2"></i>执行PE
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- VNC预览全屏模态框 -->

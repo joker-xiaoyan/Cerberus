@@ -1,0 +1,213 @@
+<!-- 初始投递物页面 -->
+<div id="deliveryPage" class="page-content">
+    <div class="p-6">
+        <!-- Page Header -->
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                    <i class="fas fa-parachute-box text-orange-400"></i>
+                    初始投递物
+                    <span class="text-sm font-normal text-gray-400 ml-2">Initial Access Delivery</span>
+                </h2>
+                <p class="text-gray-400 mt-1 text-sm">生成初始投递物用于目标投递，支持 HTA / VBA宏 / LNK / HTML Smuggling / ISO 等多种格式</p>
+            </div>
+            <button onclick="window.showDeliveryGenerateModal()" class="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors flex items-center gap-2">
+                <i class="fas fa-plus"></i>
+                生成投递物
+            </button>
+        </div>
+
+        <!-- Template Cards -->
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                <i class="fas fa-th-large text-orange-400"></i>
+                可用模板
+            </h3>
+            <div id="deliveryTemplateCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                <!-- Templates loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- Generated Items Table -->
+        <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-700 flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                    <i class="fas fa-history text-blue-400"></i>
+                    已生成的投递物
+                </h3>
+                <button onclick="window.loadDeliveryItems()" class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg text-sm transition-colors">
+                    <i class="fas fa-sync-alt mr-1"></i> 刷新
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-750 text-gray-400 text-xs uppercase">
+                            <th class="px-4 py-3 text-left">名称</th>
+                            <th class="px-4 py-3 text-left">类型</th>
+                            <th class="px-4 py-3 text-left">变体</th>
+                            <th class="px-4 py-3 text-left">目标URL</th>
+                            <th class="px-4 py-3 text-left">OPSEC</th>
+                            <th class="px-4 py-3 text-left">混淆等级</th>
+                            <th class="px-4 py-3 text-left">大小</th>
+                            <th class="px-4 py-3 text-left">下载次数</th>
+                            <th class="px-4 py-3 text-left">创建时间</th>
+                            <th class="px-4 py-3 text-center">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deliveryItemsTable" class="divide-y divide-gray-700">
+                        <tr>
+                            <td colspan="10" class="px-4 py-8 text-center text-gray-500">
+                                <i class="fas fa-inbox text-3xl mb-2 block"></i>
+                                暂无投递物，点击"生成投递物"开始
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generate Modal -->
+    <div id="deliveryGenerateModal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 rounded-xl border border-gray-600 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="px-6 py-4 border-b border-gray-700 flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                    <i class="fas fa-magic text-orange-400"></i>
+                    生成投递物
+                </h3>
+                <button onclick="window.hideDeliveryGenerateModal()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <!-- Delivery Type -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">投递物类型 <span class="text-red-400">*</span></label>
+                    <select id="deliveryType" onchange="window.onDeliveryTypeChange()" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                        <option value="">-- 选择类型 --</option>
+                    </select>
+                    <p id="deliveryTypeDesc" class="text-xs text-gray-500 mt-1"></p>
+                </div>
+
+                <!-- Variant -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">变体</label>
+                    <select id="deliveryVariant" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                        <option value="">-- 先选择类型 --</option>
+                    </select>
+                </div>
+
+                <!-- Name -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">自定义名称 <span class="text-gray-500">(可选)</span></label>
+                    <input type="text" id="deliveryName" placeholder="留空则自动生成随机名称" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                </div>
+
+                <!-- Payload URL -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Payload URL <span class="text-red-400">*</span></label>
+                    <div class="flex gap-2">
+                        <input type="text" id="deliveryPayloadURL" placeholder="https://your-c2-server/staging/payload" class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                        <button onclick="window.showHostedFilePicker()" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm whitespace-nowrap flex items-center gap-1" title="从已托管的文件中选择">
+                            <i class="fas fa-cloud text-xs"></i>
+                            已托管文件
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">投递物将引导目标从此URL下载并执行Payload（可使用已托管文件、Staging URI或自定义URL）</p>
+                </div>
+
+                <!-- Listener Info -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">关联监听器 <span class="text-gray-500">(可选)</span></label>
+                        <select id="deliveryListenerID" onchange="window.onDeliveryListenerChange()" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                            <option value="">-- 不关联 --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">监听器地址</label>
+                        <input type="text" id="deliveryListenerHost" placeholder="自动填充" readonly class="w-full bg-gray-600 border border-gray-600 rounded-lg px-3 py-2 text-gray-400">
+                    </div>
+                </div>
+
+                <!-- Obfuscation Level -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">混淆等级</label>
+                    <div class="flex gap-3">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="deliveryObfLevel" value="0" checked class="text-orange-500 focus:ring-orange-500">
+                            <span class="text-sm text-gray-300">无混淆</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="deliveryObfLevel" value="1" class="text-orange-500 focus:ring-orange-500">
+                            <span class="text-sm text-gray-300">基础混淆</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="deliveryObfLevel" value="2" class="text-orange-500 focus:ring-orange-500">
+                            <span class="text-sm text-gray-300">高级混淆</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- OPSEC Rating Preview -->
+                <div id="deliveryOpsecPreview" class="hidden bg-gray-750 rounded-lg p-3 border border-gray-600">
+                    <div class="flex items-center gap-2 text-sm">
+                        <i class="fas fa-shield-alt text-blue-400"></i>
+                        <span class="text-gray-300">OPSEC 风险评估:</span>
+                        <span id="deliveryOpsecBadge" class="px-2 py-0.5 rounded text-xs font-bold"></span>
+                    </div>
+                    <p id="deliveryOpsecNote" class="text-xs text-gray-500 mt-1"></p>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-700 flex justify-end gap-3">
+                <button onclick="window.hideDeliveryGenerateModal()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg transition-colors">
+                    取消
+                </button>
+                <button onclick="window.generateDelivery()" class="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors flex items-center gap-2">
+                    <i class="fas fa-cog"></i>
+                    生成
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="deliveryPreviewModal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 rounded-xl border border-gray-600 w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="px-6 py-4 border-b border-gray-700 flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                    <i class="fas fa-eye text-blue-400"></i>
+                    投递物详情
+                </h3>
+                <button onclick="document.getElementById('deliveryPreviewModal').classList.add('hidden')" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="deliveryPreviewContent" class="p-6">
+                <!-- Content loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Hosted File Picker Modal -->
+    <div id="hostedFilePickerModal" class="fixed inset-0 bg-black bg-opacity-60 z-[60] hidden flex items-center justify-center">
+        <div class="bg-gray-800 rounded-xl border border-gray-600 w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto">
+            <div class="px-6 py-4 border-b border-gray-700 flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                    <i class="fas fa-cloud text-blue-400"></i>
+                    选择已托管文件
+                </h3>
+                <button onclick="document.getElementById('hostedFilePickerModal').classList.add('hidden')" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div id="hostedFilePickerList" class="space-y-2">
+                    <p class="text-gray-500 text-center py-4"><i class="fas fa-spinner fa-spin mr-2"></i>加载中...</p>
+                </div>
+                <p class="text-xs text-gray-500 mt-4">提示：先在"客户端生成"页面构建 Beacon，然后点击"托管到服务器"将其托管。</p>
+            </div>
+        </div>
+    </div>
+</div>

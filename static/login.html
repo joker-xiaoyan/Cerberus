@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cerberus 登录</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #111827;
+            color: #f3f4f6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .bg-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(88,28,135,0.4), #111827, #000);
+            pointer-events: none;
+        }
+        .login-wrapper { position: relative; z-index: 10; width: 100%; max-width: 28rem; padding: 0 1.5rem; }
+        .login-card {
+            background: rgba(31,41,55,0.9);
+            border: 1px solid #374151;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            padding: 2rem;
+            backdrop-filter: blur(8px);
+        }
+        .logo-header { display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; }
+        .logo-icon {
+            width: 3rem; height: 3rem;
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            border-radius: 0.75rem;
+            display: flex; align-items: center; justify-content: center;
+            margin-right: 0.75rem;
+            font-size: 1.5rem; color: white;
+        }
+        .logo-title {
+            font-size: 1.5rem; font-weight: 700;
+            background: linear-gradient(to right, #c084fc, #f472b6);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .logo-subtitle { font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem; }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label { display: block; font-size: 0.875rem; font-weight: 500; color: #d1d5db; margin-bottom: 0.25rem; }
+        .form-label .icon { color: #a855f7; margin-right: 0.5rem; }
+        .form-input {
+            width: 100%; padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            background: #111827; border: 1px solid #374151;
+            color: #f3f4f6; font-size: 0.875rem;
+            outline: none; transition: box-shadow 0.2s, border-color 0.2s;
+        }
+        .form-input:focus { border-color: #a855f7; box-shadow: 0 0 0 2px rgba(168,85,247,0.5); }
+        .form-input::placeholder { color: #6b7280; }
+        .error-box {
+            display: none;
+            font-size: 0.875rem; color: #f87171;
+            background: rgba(127,29,29,0.3); border: 1px solid #7f1d1d;
+            border-radius: 0.5rem; padding: 0.5rem 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+        .error-box.visible { display: block; }
+        .login-btn {
+            width: 100%; display: flex; align-items: center; justify-content: center;
+            padding: 0.625rem 1rem;
+            border-radius: 0.5rem; border: none; cursor: pointer;
+            background: linear-gradient(to right, #a855f7, #ec4899);
+            color: white; font-size: 0.875rem; font-weight: 500;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+            transition: opacity 0.2s;
+        }
+        .login-btn:hover { opacity: 0.9; }
+        .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .login-btn .icon { margin-right: 0.5rem; }
+        .hint { font-size: 0.75rem; color: #6b7280; text-align: center; margin-top: 0.75rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner { display: inline-block; width: 1em; height: 1em; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 0.5rem; vertical-align: middle; }
+    </style>
+</head>
+<body>
+    <div class="bg-overlay"></div>
+
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="logo-header">
+                <div class="logo-icon">&#x1F6E1;</div>
+                <div>
+                    <div class="logo-title">Cerberus 控制台</div>
+                    <div class="logo-subtitle">请登录以访问 C2 管理平台</div>
+                </div>
+            </div>
+
+            <form id="loginForm" onsubmit="return false;">
+                <div class="form-group">
+                    <label class="form-label" for="username">
+                        <span class="icon">&#x1F464;</span>用户名
+                    </label>
+                    <input id="username" name="username" type="text" autocomplete="username"
+                        class="form-input" placeholder="admin">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">
+                        <span class="icon">&#x1F512;</span>密码
+                    </label>
+                    <input id="password" name="password" type="password" autocomplete="current-password"
+                        class="form-input" placeholder="password">
+                </div>
+
+                <div id="loginError" class="error-box"></div>
+
+                <button type="button" id="loginButton" class="login-btn" onclick="doLogin()">
+                    <span class="icon">&#x27A1;</span>
+                    <span id="loginBtnText">登录</span>
+                </button>
+
+                <p class="hint">管理员凭据由启动参数指定</p>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        console.log('[Cerberus Login] Page loaded, JS version: 3.0 (form-submit)');
+
+        // Check if redirected back due to login failure
+        (function() {
+            var params = new URLSearchParams(window.location.search);
+            if (params.get('error')) {
+                var errorDiv = document.getElementById('loginError');
+                errorDiv.textContent = '登录失败，请检查用户名和密码';
+                errorDiv.className = 'error-box visible';
+                // Clean up URL without reloading
+                history.replaceState(null, '', '/');
+            }
+        })();
+
+        // Allow Enter key to trigger login
+        document.getElementById('username').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
+        document.getElementById('password').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
+
+        function doLogin() {
+            var errorDiv = document.getElementById('loginError');
+            var loginBtn = document.getElementById('loginButton');
+            var btnText  = document.getElementById('loginBtnText');
+            var username = document.getElementById('username').value.trim();
+            var password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                errorDiv.textContent = '请输入用户名和密码';
+                errorDiv.className = 'error-box visible';
+                return;
+            }
+
+            // Disable button & show loading
+            loginBtn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span>登录中...';
+            errorDiv.className = 'error-box';
+
+            // Use a hidden form to do a traditional POST submission.
+            // The browser natively handles Set-Cookie + 303 redirect,
+            // which is 100% reliable (no JS cookie-timing race).
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/api/login';
+            form.style.display = 'none';
+
+            var uField = document.createElement('input');
+            uField.name = 'username';
+            uField.value = username;
+            form.appendChild(uField);
+
+            var pField = document.createElement('input');
+            pField.name = 'password';
+            pField.type = 'hidden';
+            pField.value = password;
+            form.appendChild(pField);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!-- process-manager 模态框 -->
+<div id="processManagerModal" class="modal">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h3 class="text-xl font-bold flex items-center">
+                <i class="fas fa-microchip mr-2 text-green-400"></i>
+                进程管理 - <span id="processBeaconName" class="text-green-400 ml-2"></span>
+            </h3>
+            <button class="modal-close" onclick="window.closeProcessManager()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <!-- Enhanced Toolbar -->
+            <div class="process-manager-toolbar mb-4">
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- Refresh Button -->
+                    <button class="btn-secondary flex items-center" onclick="window.processManagerRefresh()">
+                        <i class="fas fa-sync-alt mr-1"></i>刷新
+                    </button>
+
+                    <!-- Process Name Quick Filter -->
+                    <div class="relative">
+                        <select id="processNameFilter" class="bg-gray-800 border border-gray-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 appearance-none pr-8 min-w-[160px]">
+                            <option value="">全部进程</option>
+                            <option value="__browser__">🌐 浏览器进程</option>
+                            <option value="__system__">⚙️ 系统进程</option>
+                            <option value="__security__">🛡️ 安全软件</option>
+                        </select>
+                        <div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                            <i class="fas fa-filter text-gray-400 text-xs"></i>
+                        </div>
+                    </div>
+
+                    <!-- Search Input -->
+                    <div class="relative flex-1 min-w-[200px]">
+                        <input type="text" id="processSearch" placeholder="搜索进程名 / PID / 用户 / 路径..." class="w-full bg-gray-800 border border-gray-600 text-white rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs"></i>
+                    </div>
+
+                    <!-- Process Count -->
+                    <div class="flex items-center space-x-3 text-xs">
+                        <span class="text-gray-400 process-count">0 个进程</span>
+                        <span id="processFilteredCount" class="text-green-400 hidden"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Browser Main Process Legend (auto-shown when browser processes detected) -->
+            <div id="browserMainLegend" class="hidden mb-3 px-3 py-2 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-xs text-yellow-300 flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>识别中...
+            </div>
+
+            <!-- Process Table -->
+            <div class="process-manager-content" style="max-height: 65vh; overflow-y: auto;">
+                <table class="w-full">
+                    <thead class="sticky top-0 bg-gray-900 z-10">
+                        <tr class="border-b border-gray-700">
+                            <th class="table-header text-left cursor-pointer hover:text-green-400 transition-colors" onclick="window.processManagerSort('pid')" title="点击排序">
+                                PID <i class="fas fa-sort text-gray-600 ml-1 text-xs"></i>
+                            </th>
+                            <th class="table-header text-left cursor-pointer hover:text-green-400 transition-colors" onclick="window.processManagerSort('name')" title="点击排序">
+                                进程名 <i class="fas fa-sort text-gray-600 ml-1 text-xs"></i>
+                            </th>
+                            <th class="table-header text-left">用户</th>
+                            <th class="table-header text-left">PPID</th>
+                            <th class="table-header text-left">内存</th>
+                            <th class="table-header text-left">路径</th>
+                            <th class="table-header text-left" style="min-width: 140px;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="processListBody">
+                        <!-- Dynamically generated -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

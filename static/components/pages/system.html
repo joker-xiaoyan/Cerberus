@@ -1,0 +1,956 @@
+<!-- system 页面 - 系统管理 -->
+<div id="systemPage" class="page-content">
+    <div class="max-w-full mx-auto px-6 py-6">
+
+        <!-- ═══ 标题区域 ═══ -->
+        <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-600/30 to-gray-700/30 border border-gray-600/30 flex items-center justify-center shadow-lg">
+                    <i class="fas fa-cog text-xl text-gray-300"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-white tracking-tight">系统管理</h2>
+                    <p class="text-sm text-gray-400 mt-0.5">用户管理 · 系统日志 · 全局配置</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 px-4 py-2 rounded-full border border-gray-600/30 bg-gray-800/50">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-xs font-medium text-emerald-300">系统运行中</span>
+            </div>
+        </div>
+
+        <!-- ═══ 用户管理子页面 ═══ -->
+        <div id="user-managementSubpage" class="subpage-content">
+            <!-- 功能概览卡片 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+                <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-800/80 to-gray-900/80 border border-gray-700/50 p-5">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full -translate-y-8 translate-x-8"></div>
+                    <div class="relative z-10">
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/15 flex items-center justify-center mb-3">
+                            <i class="fas fa-users text-blue-400"></i>
+                        </div>
+                        <p class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">操作员</p>
+                        <p class="text-3xl font-extrabold text-white tabular-nums" id="sysUserCount">1</p>
+                        <p class="text-xs text-gray-500 mt-2">当前活跃操作员数量</p>
+                    </div>
+                </div>
+                <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-800/80 to-gray-900/80 border border-gray-700/50 p-5">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full -translate-y-8 translate-x-8"></div>
+                    <div class="relative z-10">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-500/15 flex items-center justify-center mb-3">
+                            <i class="fas fa-shield-alt text-emerald-400"></i>
+                        </div>
+                        <p class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">角色</p>
+                        <p class="text-3xl font-extrabold text-white tabular-nums">2</p>
+                        <p class="text-xs text-gray-500 mt-2">管理员 / 操作员</p>
+                    </div>
+                </div>
+                <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-800/80 to-gray-900/80 border border-gray-700/50 p-5">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-full -translate-y-8 translate-x-8"></div>
+                    <div class="relative z-10">
+                        <div class="w-10 h-10 rounded-lg bg-amber-500/15 flex items-center justify-center mb-3">
+                            <i class="fas fa-clock text-amber-400"></i>
+                        </div>
+                        <p class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">会话</p>
+                        <p class="text-3xl font-extrabold text-white tabular-nums" id="sysSessionCount">1</p>
+                        <p class="text-xs text-gray-500 mt-2">当前活跃会话</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 用户管理主卡片 -->
+            <div class="rounded-xl bg-gradient-to-br from-gray-800/60 to-gray-900/60 border border-gray-700/50 p-6">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 rounded-lg bg-blue-500/15 flex items-center justify-center">
+                            <i class="fas fa-user-cog text-blue-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-white">用户与权限管理</h3>
+                            <p class="text-[0.7rem] text-gray-500">管理操作员账户、角色与访问权限</p>
+                        </div>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-amber-500/15 text-amber-400 border border-amber-500/20">
+                        <i class="fas fa-code-branch mr-1"></i>开发中
+                    </span>
+                </div>
+
+                <!-- 功能预览 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex items-start space-x-3 p-4 rounded-lg bg-gray-800/50 border border-gray-700/30">
+                        <div class="w-8 h-8 rounded-md bg-purple-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i class="fas fa-user-plus text-purple-400 text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-200">操作员管理</p>
+                            <p class="text-xs text-gray-500 mt-1">创建、编辑、删除操作员账户，支持多操作员协同</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3 p-4 rounded-lg bg-gray-800/50 border border-gray-700/30">
+                        <div class="w-8 h-8 rounded-md bg-cyan-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i class="fas fa-key text-cyan-400 text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-200">RBAC 权限控制</p>
+                            <p class="text-xs text-gray-500 mt-1">基于角色的访问控制，细粒度权限分配</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3 p-4 rounded-lg bg-gray-800/50 border border-gray-700/30">
+                        <div class="w-8 h-8 rounded-md bg-green-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i class="fas fa-history text-green-400 text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-200">操作审计</p>
+                            <p class="text-xs text-gray-500 mt-1">记录所有操作员的操作行为，支持审计追溯</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3 p-4 rounded-lg bg-gray-800/50 border border-gray-700/30">
+                        <div class="w-8 h-8 rounded-md bg-rose-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i class="fas fa-fingerprint text-rose-400 text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-200">双因素认证</p>
+                            <p class="text-xs text-gray-500 mt-1">支持 TOTP 双因素认证，增强账户安全性</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-5 p-4 rounded-lg bg-blue-500/5 border border-blue-500/15">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-info-circle text-blue-400 text-sm"></i>
+                        <p class="text-xs text-blue-300/80">用户管理功能正在开发中，将在后续版本中发布。当前版本使用启动时配置的管理员凭据进行认证。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ 系统日志子页面 ═══ -->
+        <div id="system-logsSubpage" class="subpage-content" style="display: none;">
+            <div class="rounded-xl bg-gradient-to-br from-gray-800/60 to-gray-900/60 border border-gray-700/50 p-6">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 rounded-lg bg-yellow-500/15 flex items-center justify-center">
+                            <i class="fas fa-clipboard-list text-yellow-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-white">系统日志</h3>
+                            <p class="text-[0.7rem] text-gray-500">查看 TeamServer 运行日志与事件记录</p>
+                        </div>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-amber-500/15 text-amber-400 border border-amber-500/20">
+                        <i class="fas fa-code-branch mr-1"></i>开发中
+                    </span>
+                </div>
+
+                <!-- 日志类型预览 -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-5">
+                    <div class="p-4 rounded-lg bg-gray-800/50 border border-gray-700/30 text-center">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center mx-auto mb-2">
+                            <i class="fas fa-server text-emerald-400"></i>
+                        </div>
+                        <p class="text-sm font-medium text-gray-200">服务日志</p>
+                        <p class="text-xs text-gray-500 mt-1">TeamServer 核心运行日志</p>
+                    </div>
+                    <div class="p-4 rounded-lg bg-gray-800/50 border border-gray-700/30 text-center">
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mx-auto mb-2">
+                            <i class="fas fa-exchange-alt text-blue-400"></i>
+                        </div>
+                        <p class="text-sm font-medium text-gray-200">通信日志</p>
+                        <p class="text-xs text-gray-500 mt-1">Beacon 通信记录</p>
+                    </div>
+                    <div class="p-4 rounded-lg bg-gray-800/50 border border-gray-700/30 text-center">
+                        <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center mx-auto mb-2">
+                            <i class="fas fa-user-secret text-purple-400"></i>
+                        </div>
+                        <p class="text-sm font-medium text-gray-200">操作日志</p>
+                        <p class="text-xs text-gray-500 mt-1">操作员行为审计</p>
+                    </div>
+                    <div class="p-4 rounded-lg bg-gray-800/50 border border-gray-700/30 text-center">
+                        <div class="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center mx-auto mb-2">
+                            <i class="fas fa-exclamation-triangle text-red-400"></i>
+                        </div>
+                        <p class="text-sm font-medium text-gray-200">错误日志</p>
+                        <p class="text-xs text-gray-500 mt-1">异常与错误追踪</p>
+                    </div>
+                </div>
+
+                <!-- 日志查看器占位 -->
+                <div class="rounded-lg bg-gray-900/80 border border-gray-700/30 p-8">
+                    <div class="flex flex-col items-center justify-center text-center">
+                        <div class="w-16 h-16 rounded-2xl bg-yellow-500/10 flex items-center justify-center mb-4">
+                            <i class="fas fa-scroll text-yellow-400 text-2xl"></i>
+                        </div>
+                        <p class="text-lg font-semibold text-gray-300 mb-2">日志查看器即将上线</p>
+                        <p class="text-sm text-gray-500 max-w-md">系统日志查看功能正在开发中，将支持实时日志流、关键词搜索、日志级别过滤和导出功能。</p>
+                        <div class="flex items-center space-x-4 mt-5">
+                            <span class="px-3 py-1.5 rounded-lg bg-gray-800 border border-gray-700/50 text-xs text-gray-400">
+                                <i class="fas fa-search mr-1.5"></i>关键词搜索
+                            </span>
+                            <span class="px-3 py-1.5 rounded-lg bg-gray-800 border border-gray-700/50 text-xs text-gray-400">
+                                <i class="fas fa-filter mr-1.5"></i>级别过滤
+                            </span>
+                            <span class="px-3 py-1.5 rounded-lg bg-gray-800 border border-gray-700/50 text-xs text-gray-400">
+                                <i class="fas fa-download mr-1.5"></i>日志导出
+                            </span>
+                            <span class="px-3 py-1.5 rounded-lg bg-gray-800 border border-gray-700/50 text-xs text-gray-400">
+                                <i class="fas fa-stream mr-1.5"></i>实时流
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ 系统设置子页面 ═══ -->
+        <div id="settingsSubpage" class="subpage-content" style="display: none;">
+            <div class="rounded-xl bg-gradient-to-br from-gray-800/60 to-gray-900/60 border border-gray-700/50 p-6">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 rounded-lg bg-indigo-500/15 flex items-center justify-center">
+                            <i class="fas fa-sliders-h text-indigo-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-white">系统设置</h3>
+                            <p class="text-[0.7rem] text-gray-500">TeamServer 全局参数与行为配置</p>
+                        </div>
+                    </div>
+                    <button id="sysSettingsSaveBtn" onclick="saveSystemSettings()" class="px-4 py-1.5 rounded-lg text-xs font-medium bg-indigo-600 hover:bg-indigo-500 text-white transition-colors">
+                        <i class="fas fa-save mr-1"></i>保存设置
+                    </button>
+                </div>
+
+                <!-- ── 地理位置 API 配置 ── -->
+                <div class="space-y-4">
+                    <div class="p-5 rounded-lg bg-gray-800/50 border border-gray-700/30">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-8 h-8 rounded-md bg-cyan-500/10 flex items-center justify-center">
+                                <i class="fas fa-globe-asia text-cyan-400 text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-200">地理位置 API 配置</p>
+                                <p class="text-xs text-gray-500">配置 ipinfo.io API Token，用于 Beacon 地理位置分布查询</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-400 mb-1.5">IPInfo API Token</label>
+                                <div class="flex items-center space-x-2">
+                                    <div class="relative flex-1">
+                                        <input type="password" id="sysIpinfoToken" class="w-full px-3 py-2 rounded-lg bg-gray-900/80 border border-gray-600/50 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 pr-10" placeholder="输入 ipinfo.io API Token（留空则使用免费模式）">
+                                        <button onclick="toggleIpinfoTokenVisibility()" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors">
+                                            <i id="sysIpinfoTokenEye" class="fas fa-eye text-xs"></i>
+                                        </button>
+                                    </div>
+                                    <button onclick="testIpinfoToken()" class="px-3 py-2 rounded-lg text-xs font-medium bg-gray-700 hover:bg-gray-600 text-gray-300 transition-colors whitespace-nowrap">
+                                        <i class="fas fa-vial mr-1"></i>测试
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="sysIpinfoTestResult" class="hidden p-3 rounded-lg text-xs"></div>
+                            <div class="p-3 rounded-lg bg-cyan-500/5 border border-cyan-500/15">
+                                <div class="flex items-start space-x-2">
+                                    <i class="fas fa-info-circle text-cyan-400 text-xs mt-0.5"></i>
+                                    <div class="text-xs text-cyan-300/80 space-y-1">
+                                        <p>IPInfo.io 提供 IP 地理位置查询服务，用于 Dashboard 的 Beacon 地理位置分布图表。</p>
+                                        <p>• <strong>免费模式</strong>（不填 Token）：每日 1,000 次查询限额</p>
+                                        <p>• <strong>付费模式</strong>（填写 Token）：更高查询限额，可在 <a href="https://ipinfo.io/signup" target="_blank" class="text-cyan-400 underline hover:text-cyan-300">ipinfo.io</a> 免费注册获取 Token（每月 50,000 次）</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 其他设置分类预览（开发中） -->
+                    <div class="p-4 rounded-lg bg-gray-800/50 border border-gray-700/30 opacity-60">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-md bg-indigo-500/10 flex items-center justify-center">
+                                    <i class="fas fa-cog text-indigo-400 text-xs"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-200">通用设置</p>
+                                    <p class="text-xs text-gray-500">服务端口、绑定地址、TLS 证书配置</p>
+                                </div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[0.65rem] bg-amber-500/15 text-amber-400">开发中</span>
+                        </div>
+                    </div>
+                    <div class="p-4 rounded-lg bg-gray-800/50 border border-gray-700/30 opacity-60">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-md bg-red-500/10 flex items-center justify-center">
+                                    <i class="fas fa-lock text-red-400 text-xs"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-200">安全设置</p>
+                                    <p class="text-xs text-gray-500">加密算法、密钥轮换、IP 白名单</p>
+                                </div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[0.65rem] bg-amber-500/15 text-amber-400">开发中</span>
+                        </div>
+                    </div>
+                    <div class="p-4 rounded-lg bg-gray-800/50 border border-gray-700/30 opacity-60">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-md bg-emerald-500/10 flex items-center justify-center">
+                                    <i class="fas fa-broadcast-tower text-emerald-400 text-xs"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-200">Beacon 默认配置</p>
+                                    <p class="text-xs text-gray-500">默认 Sleep、Jitter、通信协议偏好</p>
+                                </div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[0.65rem] bg-amber-500/15 text-amber-400">开发中</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        // ──── System Settings: IPInfo Token ────
+        async function loadSystemSettings() {
+            try {
+                const resp = await fetch('/api/system-settings');
+                if (!resp.ok) return;
+                const data = await resp.json();
+                if (data.settings && data.settings.ipinfo_token) {
+                    const el = document.getElementById('sysIpinfoToken');
+                    if (el) {
+                        el.value = data.settings.ipinfo_token.value || '';
+                        if (el.value) el.placeholder = 'Token 已配置（修改请重新输入）';
+                    }
+                }
+            } catch (e) { /* ignore */ }
+        }
+
+        async function saveSystemSettings() {
+            const btn = document.getElementById('sysSettingsSaveBtn');
+            const origHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>保存中...';
+            try {
+                const token = document.getElementById('sysIpinfoToken')?.value?.trim() || '';
+                const resp = await fetch('/api/system-settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        settings: [
+                            { key: 'ipinfo_token', value: token, description: 'ipinfo.io API Token for geo-location queries' }
+                        ]
+                    })
+                });
+                if (resp.ok) {
+                    if (typeof showNotification === 'function') showNotification('系统设置已保存', 'success');
+                    else alert('系统设置已保存');
+                } else {
+                    throw new Error('Save failed');
+                }
+            } catch (e) {
+                if (typeof showNotification === 'function') showNotification('保存失败: ' + e.message, 'error');
+                else alert('保存失败');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = origHTML;
+            }
+        }
+
+        function toggleIpinfoTokenVisibility() {
+            const input = document.getElementById('sysIpinfoToken');
+            const icon = document.getElementById('sysIpinfoTokenEye');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        async function testIpinfoToken() {
+            const resultEl = document.getElementById('sysIpinfoTestResult');
+            resultEl.className = 'p-3 rounded-lg text-xs bg-gray-700/50 text-gray-300';
+            resultEl.classList.remove('hidden');
+            resultEl.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>正在测试...';
+
+            const token = document.getElementById('sysIpinfoToken')?.value?.trim() || '';
+            try {
+                const url = token
+                    ? `https://ipinfo.io/json?token=${encodeURIComponent(token)}`
+                    : 'https://ipinfo.io/json';
+                const resp = await fetch(url, { signal: AbortSignal.timeout(8000) });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    resultEl.className = 'p-3 rounded-lg text-xs bg-emerald-500/10 border border-emerald-500/30 text-emerald-300';
+                    resultEl.innerHTML = `<i class="fas fa-check-circle mr-1"></i>连接成功！当前 IP: ${data.ip || 'N/A'}，位置: ${data.city || 'N/A'}, ${data.country || 'N/A'}`;
+                } else if (resp.status === 403 || resp.status === 429) {
+                    resultEl.className = 'p-3 rounded-lg text-xs bg-red-500/10 border border-red-500/30 text-red-300';
+                    resultEl.innerHTML = '<i class="fas fa-times-circle mr-1"></i>Token 无效或已达到速率限制 (HTTP ' + resp.status + ')';
+                } else {
+                    throw new Error('HTTP ' + resp.status);
+                }
+            } catch (e) {
+                resultEl.className = 'p-3 rounded-lg text-xs bg-red-500/10 border border-red-500/30 text-red-300';
+                resultEl.innerHTML = '<i class="fas fa-times-circle mr-1"></i>测试失败: ' + (e.message || '网络错误');
+            }
+        }
+
+        // Auto-load settings when the subpage becomes visible
+        (function() {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(m) {
+                    if (m.target.id === 'settingsSubpage' && m.target.style.display !== 'none') {
+                        loadSystemSettings();
+                    }
+                });
+            });
+            const target = document.getElementById('settingsSubpage');
+            if (target) observer.observe(target, { attributes: true, attributeFilter: ['style'] });
+        })();
+        </script>
+
+        <!-- ═══ HTTP 模板配置子页面 ═══ -->
+        <div id="http-template-settingsSubpage" class="subpage-content" style="display: none;">
+            <div class="rounded-xl bg-gradient-to-br from-gray-800/60 to-gray-900/60 border border-gray-700/50 p-6">
+                <!-- 标题栏 -->
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 rounded-lg bg-indigo-500/15 flex items-center justify-center">
+                            <i class="fas fa-code text-indigo-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-white">HTTP 响应模板配置</h3>
+                            <p class="text-[0.7rem] text-gray-500">配置 TeamServer 返回给 Beacon 的 HTTP 响应伪装模板</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button id="httpTemplateReloadBtn" class="px-3 py-1.5 rounded-lg bg-gray-700/50 hover:bg-gray-700 border border-gray-600/30 text-xs text-gray-300 hover:text-white transition-all flex items-center space-x-1.5">
+                            <i class="fas fa-sync-alt text-[0.65rem]"></i>
+                            <span>重新加载</span>
+                        </button>
+                        <button id="httpTemplateSaveBtn" class="px-3 py-1.5 rounded-lg bg-indigo-600/80 hover:bg-indigo-600 border border-indigo-500/30 text-xs text-white transition-all flex items-center space-x-1.5">
+                            <i class="fas fa-save text-[0.65rem]"></i>
+                            <span>保存配置</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 说明提示 -->
+                <div class="mb-5 p-3.5 rounded-lg bg-amber-500/5 border border-amber-500/15">
+                    <div class="flex items-start space-x-2.5">
+                        <i class="fas fa-lightbulb text-amber-400 text-sm mt-0.5"></i>
+                        <div>
+                            <p class="text-xs text-amber-300/90 font-medium mb-1">模板工作原理</p>
+                            <p class="text-xs text-gray-400">TeamServer 会将加密的任务数据嵌入到 HTTP 响应体中返回给 Beacon。模板中的 <code class="px-1.5 py-0.5 rounded bg-gray-800 text-amber-300 text-[0.65rem] font-mono">{{DATA}}</code> 占位符会在运行时被替换为实际的加密数据。修改模板后请确保 Beacon 端的解析逻辑与之匹配。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 配置表单 -->
+                <div class="space-y-5">
+                    <!-- Content-Type -->
+                    <div>
+                        <label for="httpTemplateContentType" class="flex items-center space-x-2 mb-2">
+                            <i class="fas fa-tag text-gray-500 text-xs"></i>
+                            <span class="text-xs font-medium text-gray-300">Content-Type</span>
+                            <span class="text-[0.6rem] text-gray-600">— HTTP 响应头的内容类型</span>
+                        </label>
+                        <input type="text" id="httpTemplateContentType"
+                               class="w-full md:w-1/2 px-3.5 py-2.5 rounded-lg bg-gray-900/80 border border-gray-700/50 text-sm text-gray-200 font-mono placeholder-gray-600 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 focus:outline-none transition-all"
+                               placeholder="application/javascript">
+                    </div>
+
+                    <!-- Body Template -->
+                    <div>
+                        <label for="httpTemplateBodyTemplate" class="flex items-center space-x-2 mb-2">
+                            <i class="fas fa-file-code text-gray-500 text-xs"></i>
+                            <span class="text-xs font-medium text-gray-300">响应体模板</span>
+                            <span class="text-[0.6rem] text-gray-600">— 伪装为合法 JavaScript 代码</span>
+                        </label>
+                        <textarea id="httpTemplateBodyTemplate"
+                                  class="w-full px-3.5 py-3 rounded-lg bg-gray-900/80 border border-gray-700/50 text-sm text-gray-200 font-mono placeholder-gray-600 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 focus:outline-none transition-all resize-y leading-relaxed"
+                                  rows="10"
+                                  placeholder="var $jscomp=$jscomp||{};$jscomp.scope={}; const hiddenData = {{DATA}};"></textarea>
+                        <div class="flex items-center justify-between mt-2">
+                            <p class="text-[0.65rem] text-gray-600">
+                                <i class="fas fa-exclamation-circle mr-1 text-amber-500/60"></i>
+                                请确保模板中包含且仅包含一处 <code class="px-1 py-0.5 rounded bg-gray-800 text-amber-300/80 text-[0.6rem] font-mono">{{DATA}}</code> 占位符
+                            </p>
+                            <span class="text-[0.6rem] text-gray-600" id="httpTemplateCharCount"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ 通知设置子页面 ═══ -->
+        <div id="notification-settingsSubpage" class="subpage-content" style="display: none;">
+            <div class="rounded-xl bg-gradient-to-br from-gray-800/60 to-gray-900/60 border border-gray-700/50 p-6">
+                <!-- 标题栏 -->
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 rounded-lg bg-amber-500/15 flex items-center justify-center">
+                            <i class="fas fa-bell text-amber-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-white">通知设置</h3>
+                            <p class="text-[0.7rem] text-gray-500">配置 Webhook 通知渠道，接收 Beacon 上线/离线等关键事件推送</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button id="notifReloadBtn" class="px-3 py-1.5 rounded-lg bg-gray-700/50 hover:bg-gray-700 border border-gray-600/30 text-xs text-gray-300 hover:text-white transition-all flex items-center space-x-1.5">
+                            <i class="fas fa-sync-alt text-[0.65rem]"></i>
+                            <span>重新加载</span>
+                        </button>
+                        <button id="notifSaveBtn" class="px-3 py-1.5 rounded-lg bg-amber-600/80 hover:bg-amber-600 border border-amber-500/30 text-xs text-white transition-all flex items-center space-x-1.5">
+                            <i class="fas fa-save text-[0.65rem]"></i>
+                            <span>保存配置</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ── 事件触发配置 ── -->
+                <div class="mb-6">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <i class="fas fa-bolt text-amber-400 text-xs"></i>
+                        <span class="text-xs font-medium text-gray-300">事件触发</span>
+                        <span class="text-[0.6rem] text-gray-600">— 选择哪些事件会触发通知推送</span>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <!-- Beacon 上线 -->
+                        <label class="flex items-center space-x-3 p-3.5 rounded-lg bg-gray-800/50 border border-gray-700/30 cursor-pointer hover:border-emerald-500/30 transition-all group">
+                            <input type="checkbox" id="notifEvtBeaconOnline" class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-emerald-500 focus:ring-emerald-500/30 focus:ring-offset-0">
+                            <div>
+                                <div class="flex items-center space-x-1.5">
+                                    <i class="fas fa-signal text-emerald-400 text-xs"></i>
+                                    <span class="text-sm font-medium text-gray-200 group-hover:text-white transition-colors">Beacon 上线</span>
+                                </div>
+                                <p class="text-[0.65rem] text-gray-500 mt-0.5">新 Beacon 首次连接时通知</p>
+                            </div>
+                        </label>
+                        <!-- Beacon 离线 -->
+                        <label class="flex items-center space-x-3 p-3.5 rounded-lg bg-gray-800/50 border border-gray-700/30 cursor-pointer hover:border-red-500/30 transition-all group">
+                            <input type="checkbox" id="notifEvtBeaconOffline" class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-red-500 focus:ring-red-500/30 focus:ring-offset-0">
+                            <div>
+                                <div class="flex items-center space-x-1.5">
+                                    <i class="fas fa-skull-crossbones text-red-400 text-xs"></i>
+                                    <span class="text-sm font-medium text-gray-200 group-hover:text-white transition-colors">Beacon 离线</span>
+                                </div>
+                                <p class="text-[0.65rem] text-gray-500 mt-0.5">Beacon 超时离线时通知</p>
+                            </div>
+                        </label>
+                        <!-- 新任务 -->
+                        <label class="flex items-center space-x-3 p-3.5 rounded-lg bg-gray-800/50 border border-gray-700/30 cursor-pointer hover:border-blue-500/30 transition-all group">
+                            <input type="checkbox" id="notifEvtNewTask" class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-500 focus:ring-blue-500/30 focus:ring-offset-0">
+                            <div>
+                                <div class="flex items-center space-x-1.5">
+                                    <i class="fas fa-tasks text-blue-400 text-xs"></i>
+                                    <span class="text-sm font-medium text-gray-200 group-hover:text-white transition-colors">新任务</span>
+                                </div>
+                                <p class="text-[0.65rem] text-gray-500 mt-0.5">新任务创建时通知</p>
+                            </div>
+                        </label>
+                        <!-- 任务失败 -->
+                        <label class="flex items-center space-x-3 p-3.5 rounded-lg bg-gray-800/50 border border-gray-700/30 cursor-pointer hover:border-orange-500/30 transition-all group">
+                            <input type="checkbox" id="notifEvtTaskFailed" class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-orange-500 focus:ring-orange-500/30 focus:ring-offset-0">
+                            <div>
+                                <div class="flex items-center space-x-1.5">
+                                    <i class="fas fa-times-circle text-orange-400 text-xs"></i>
+                                    <span class="text-sm font-medium text-gray-200 group-hover:text-white transition-colors">任务失败</span>
+                                </div>
+                                <p class="text-[0.65rem] text-gray-500 mt-0.5">任务执行失败时通知</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- ── 浏览器端实时提醒 ── -->
+                <div class="mb-6">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <i class="fas fa-desktop text-cyan-400 text-xs"></i>
+                        <span class="text-xs font-medium text-gray-300">浏览器实时提醒</span>
+                        <span class="text-[0.6rem] text-gray-600">— Beacon 上线/离线时的本地提醒方式</span>
+                        <span class="px-1.5 py-0.5 rounded text-[0.55rem] font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block mr-1 animate-pulse"></span>SSE 实时推送
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <!-- 桌面通知 -->
+                        <label class="flex items-center space-x-3 p-3.5 rounded-lg bg-gray-800/50 border border-gray-700/30 cursor-pointer hover:border-cyan-500/30 transition-all group">
+                            <input type="checkbox" id="notifBrowserDesktop" checked class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-cyan-500 focus:ring-cyan-500/30 focus:ring-offset-0"
+                                   onchange="window._sseDesktopNotifEnabled = this.checked; localStorage.setItem('cerberus_desktop_notif', this.checked)">
+                            <div>
+                                <div class="flex items-center space-x-1.5">
+                                    <i class="fas fa-bell text-cyan-400 text-xs"></i>
+                                    <span class="text-sm font-medium text-gray-200 group-hover:text-white transition-colors">桌面通知</span>
+                                </div>
+                                <p class="text-[0.65rem] text-gray-500 mt-0.5">浏览器原生桌面弹窗（需授权）</p>
+                            </div>
+                        </label>
+                        <!-- 提示音 -->
+                        <label class="flex items-center space-x-3 p-3.5 rounded-lg bg-gray-800/50 border border-gray-700/30 cursor-pointer hover:border-cyan-500/30 transition-all group">
+                            <input type="checkbox" id="notifBrowserSound" checked class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-cyan-500 focus:ring-cyan-500/30 focus:ring-offset-0"
+                                   onchange="window._sseAlertSoundEnabled = this.checked; localStorage.setItem('cerberus_alert_sound', this.checked)">
+                            <div>
+                                <div class="flex items-center space-x-1.5">
+                                    <i class="fas fa-volume-up text-cyan-400 text-xs"></i>
+                                    <span class="text-sm font-medium text-gray-200 group-hover:text-white transition-colors">提示音</span>
+                                </div>
+                                <p class="text-[0.65rem] text-gray-500 mt-0.5">Beacon 上线时播放提示音</p>
+                            </div>
+                        </label>
+                        <!-- SSE 连接状态 -->
+                        <div class="flex items-center space-x-3 p-3.5 rounded-lg bg-gray-800/50 border border-gray-700/30">
+                            <div class="w-9 h-9 rounded-lg bg-gray-700/50 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-satellite text-gray-400 text-sm" id="sseStatusIcon"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-gray-500" id="sseStatusDot"></span>
+                                    <span class="text-sm font-medium text-gray-400" id="sseStatusText">连接中...</span>
+                                </div>
+                                <p class="text-[0.65rem] text-gray-500 mt-0.5">SSE 事件流连接状态</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── 通知渠道列表 ── -->
+                <div class="mb-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-satellite-dish text-amber-400 text-xs"></i>
+                            <span class="text-xs font-medium text-gray-300">通知渠道</span>
+                            <span class="text-[0.6rem] text-gray-600">— 配置 Webhook 接收端</span>
+                        </div>
+                        <button id="notifAddChannelBtn" class="px-3 py-1.5 rounded-lg bg-amber-600/20 hover:bg-amber-600/40 border border-amber-500/20 text-xs text-amber-400 hover:text-amber-300 transition-all flex items-center space-x-1.5">
+                            <i class="fas fa-plus text-[0.6rem]"></i>
+                            <span>添加渠道</span>
+                        </button>
+                    </div>
+
+                    <!-- 渠道列表容器 -->
+                    <div id="notifChannelList" class="space-y-3">
+                        <!-- Channels will be rendered here by JS -->
+                    </div>
+
+                    <!-- 空状态 -->
+                    <div id="notifChannelEmpty" class="hidden rounded-lg bg-gray-900/60 border border-gray-700/30 p-8">
+                        <div class="flex flex-col items-center justify-center text-center">
+                            <div class="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-3">
+                                <i class="fas fa-bell-slash text-amber-400/60 text-xl"></i>
+                            </div>
+                            <p class="text-sm font-medium text-gray-400 mb-1">暂无通知渠道</p>
+                            <p class="text-xs text-gray-500">点击「添加渠道」配置第一个 Webhook 通知接收端</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 说明提示 -->
+                <div class="p-3.5 rounded-lg bg-amber-500/5 border border-amber-500/15">
+                    <div class="flex items-start space-x-2.5">
+                        <i class="fas fa-lightbulb text-amber-400 text-sm mt-0.5"></i>
+                        <div>
+                            <p class="text-xs text-amber-300/90 font-medium mb-1">支持的通知平台</p>
+                            <div class="flex items-center space-x-3 mt-2">
+                                <span class="px-2.5 py-1 rounded-md bg-blue-500/10 border border-blue-500/15 text-xs text-blue-400">
+                                    <i class="fas fa-paper-plane mr-1"></i>飞书
+                                </span>
+                                <span class="px-2.5 py-1 rounded-md bg-sky-500/10 border border-sky-500/15 text-xs text-sky-400">
+                                    <i class="fas fa-robot mr-1"></i>钉钉
+                                </span>
+                                <span class="px-2.5 py-1 rounded-md bg-green-500/10 border border-green-500/15 text-xs text-green-400">
+                                    <i class="fas fa-comments mr-1"></i>企业微信
+                                </span>
+                                <span class="px-2.5 py-1 rounded-md bg-rose-500/10 border border-rose-500/15 text-xs text-rose-400">
+                                    <i class="fas fa-envelope mr-1"></i>QQ邮件
+                                </span>
+                                <span class="px-2.5 py-1 rounded-md bg-purple-500/10 border border-purple-500/15 text-xs text-purple-400">
+                                    <i class="fas fa-link mr-1"></i>自定义 Webhook
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2">Webhook 渠道使用对应的消息格式（飞书卡片、钉钉 Markdown、企业微信文本）。QQ邮件通过 SMTP 发送 HTML 格式邮件（需开启 POP3/SMTP 并获取授权码）。自定义 Webhook 发送标准 JSON 格式。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ C2 通信管理子页面 ═══ -->
+        <div id="c2-comm-settingsSubpage" class="subpage-content" style="display: none;">
+            <div class="space-y-6">
+
+                <!-- ── 端点轮转配置 ── -->
+                <div class="rounded-xl bg-gradient-to-br from-gray-800/60 to-gray-900/60 border border-gray-700/50 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-9 h-9 rounded-lg bg-cyan-500/15 flex items-center justify-center">
+                                <i class="fas fa-route text-cyan-400 text-sm"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-semibold text-white">C2 端点轮转</h3>
+                                <p class="text-[0.7rem] text-gray-500">配置备用 C2 端点，当主端点不可达时 Beacon 自动切换到备用端点</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="window._c2LoadEndpoints()" class="px-3 py-1.5 rounded-lg bg-gray-700/50 hover:bg-gray-700 border border-gray-600/30 text-xs text-gray-300 hover:text-white transition-all flex items-center space-x-1.5">
+                                <i class="fas fa-sync-alt text-[0.65rem]"></i>
+                                <span>刷新</span>
+                            </button>
+                            <button onclick="window._c2SaveEndpoints()" class="px-3 py-1.5 rounded-lg bg-cyan-600/80 hover:bg-cyan-600 border border-cyan-500/30 text-xs text-white transition-all flex items-center space-x-1.5">
+                                <i class="fas fa-save text-[0.65rem]"></i>
+                                <span>保存配置</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-5 p-3.5 rounded-lg bg-cyan-500/5 border border-cyan-500/15">
+                        <div class="flex items-start space-x-2.5">
+                            <i class="fas fa-lightbulb text-cyan-400 text-sm mt-0.5"></i>
+                            <div>
+                                <p class="text-xs text-cyan-300/90 font-medium mb-1">端点轮转工作原理</p>
+                                <p class="text-xs text-gray-400">当 Beacon 与当前 C2 端点连续通信失败达到阈值后，会自动切换到下一个备用端点继续通信。配置保存后，需要通过「推送到 Beacon」将端点列表下发到指定 Beacon。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+                        <div>
+                            <label class="flex items-center space-x-2 mb-2">
+                                <i class="fas fa-random text-gray-500 text-xs"></i>
+                                <span class="text-xs font-medium text-gray-300">轮转策略</span>
+                            </label>
+                            <select id="c2RotationStrategy" class="w-full px-3.5 py-2.5 rounded-lg bg-gray-900/80 border border-gray-700/50 text-sm text-gray-200 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 focus:outline-none transition-all">
+                                <option value="sequential">顺序轮转 (Sequential)</option>
+                                <option value="random">随机选择 (Random)</option>
+                                <option value="priority">优先级 (Priority)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="flex items-center space-x-2 mb-2">
+                                <i class="fas fa-exclamation-triangle text-gray-500 text-xs"></i>
+                                <span class="text-xs font-medium text-gray-300">最大连续失败次数</span>
+                            </label>
+                            <input type="number" id="c2MaxFailures" value="3" min="1" max="100"
+                                   class="w-full px-3.5 py-2.5 rounded-lg bg-gray-900/80 border border-gray-700/50 text-sm text-gray-200 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 focus:outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="flex items-center space-x-2 mb-2">
+                                <i class="fas fa-heartbeat text-gray-500 text-xs"></i>
+                                <span class="text-xs font-medium text-gray-300">健康检查</span>
+                            </label>
+                            <div class="flex items-center space-x-3 h-[42px]">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="c2HealthCheckEnabled" class="sr-only peer">
+                                    <div class="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan-600"></div>
+                                </label>
+                                <span class="text-xs text-gray-400">启用端点健康检查</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-server text-cyan-400 text-xs"></i>
+                                <span class="text-xs font-medium text-gray-300">备用端点列表</span>
+                                <span class="text-[0.6rem] text-gray-600" id="c2EndpointCount">0 个端点</span>
+                            </div>
+                            <button onclick="window._c2ShowAddEndpointDialog()" class="px-3 py-1.5 rounded-lg bg-cyan-600/20 hover:bg-cyan-600/40 border border-cyan-500/20 text-xs text-cyan-400 hover:text-cyan-300 transition-all flex items-center space-x-1.5">
+                                <i class="fas fa-plus text-[0.6rem]"></i>
+                                <span>添加端点</span>
+                            </button>
+                        </div>
+                        <div id="c2EndpointList" class="space-y-2"></div>
+                        <div id="c2EndpointEmpty" class="rounded-lg bg-gray-900/60 border border-gray-700/30 p-8">
+                            <div class="flex flex-col items-center justify-center text-center">
+                                <div class="w-14 h-14 rounded-2xl bg-cyan-500/10 flex items-center justify-center mb-3">
+                                    <i class="fas fa-server text-cyan-400/60 text-xl"></i>
+                                </div>
+                                <p class="text-sm font-medium text-gray-400 mb-1">暂无备用端点</p>
+                                <p class="text-xs text-gray-500">点击「添加端点」配置第一个备用 C2 端点</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-lg bg-gray-800/50 border border-gray-700/30">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-md bg-indigo-500/10 flex items-center justify-center">
+                                    <i class="fas fa-paper-plane text-indigo-400 text-xs"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-200">推送端点配置到 Beacon</p>
+                                    <p class="text-xs text-gray-500">将当前端点列表下发到指定 Beacon，使其具备自动轮转能力</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <select id="c2PushBeaconSelect" class="px-3 py-1.5 rounded-lg bg-gray-900/80 border border-gray-700/50 text-xs text-gray-300 focus:border-indigo-500/50 focus:outline-none min-w-[200px]">
+                                    <option value="">选择 Beacon...</option>
+                                </select>
+                                <button onclick="window._c2PushEndpointsToBeacon()" class="px-3 py-1.5 rounded-lg bg-indigo-600/80 hover:bg-indigo-600 border border-indigo-500/30 text-xs text-white transition-all flex items-center space-x-1.5">
+                                    <i class="fas fa-paper-plane text-[0.6rem]"></i>
+                                    <span>推送</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── C2 Profile 热更新 ── -->
+                <div class="rounded-xl bg-gradient-to-br from-gray-800/60 to-gray-900/60 border border-gray-700/50 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-9 h-9 rounded-lg bg-purple-500/15 flex items-center justify-center">
+                                <i class="fas fa-magic text-purple-400 text-sm"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-semibold text-white flex items-center space-x-2">
+                                    <span>C2 Profile 热更新</span>
+                                    <span id="c2HotProfileBadge" class="px-2 py-0.5 rounded-full text-[0.65rem] font-medium bg-purple-500/15 text-purple-400 border border-purple-500/20">loading...</span>
+                                </h3>
+                                <p class="text-[0.7rem] text-gray-500">运行时推送新的 C2 Profile 参数到 Beacon，无需重新编译</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="window._c2LoadActiveProfile()" class="px-3 py-1.5 rounded-lg bg-gray-700/50 hover:bg-gray-700 border border-gray-600/30 text-xs text-gray-300 hover:text-white transition-all flex items-center space-x-1.5">
+                                <i class="fas fa-sync-alt text-[0.65rem]"></i>
+                                <span>重新加载</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-5 p-3.5 rounded-lg bg-purple-500/5 border border-purple-500/15">
+                        <div class="flex items-start space-x-2.5">
+                            <i class="fas fa-lightbulb text-purple-400 text-sm mt-0.5"></i>
+                            <div>
+                                <p class="text-xs text-purple-300/90 font-medium mb-1">热更新工作原理</p>
+                                <p class="text-xs text-gray-400">下方表单已自动加载当前活跃 C2 Profile 的配置值。修改需要更新的参数后点击「推送更新」，TeamServer 会将变更作为任务下发到指定 Beacon。Beacon 在下一次通信周期中应用新配置。<strong class="text-amber-400">注意：修改 AES 密钥后，Beacon 与 TeamServer 必须使用相同的密钥才能正常通信。</strong></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-5">
+                        <div>
+                            <div class="flex items-center space-x-2 mb-3">
+                                <i class="fas fa-exchange-alt text-purple-400 text-xs"></i>
+                                <span class="text-xs font-medium text-gray-300">通信参数</span>
+                                <span class="text-[0.6rem] text-gray-600">— 已加载当前活跃 Profile 配置</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-xs text-gray-400 mb-1.5 block">Cookie 名称</label>
+                                    <input type="text" id="c2HotCookieName" placeholder="例: SESSION_ID" class="w-full px-3 py-2 rounded-lg bg-gray-900/80 border border-gray-700/50 text-sm text-gray-200 font-mono placeholder-gray-600 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 focus:outline-none transition-all">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-400 mb-1.5 block">路径模板</label>
+                                    <input type="text" id="c2HotPathTemplate" placeholder="例: /api/v2/data.{}.json" class="w-full px-3 py-2 rounded-lg bg-gray-900/80 border border-gray-700/50 text-sm text-gray-200 font-mono placeholder-gray-600 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 focus:outline-none transition-all">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="text-xs text-gray-400 mb-1.5 block">User-Agent</label>
+                                    <input type="text" id="c2HotUserAgent" placeholder="例: Mozilla/5.0 (Windows NT 10.0; Win64; x64) ..." class="w-full px-3 py-2 rounded-lg bg-gray-900/80 border border-gray-700/50 text-sm text-gray-200 font-mono placeholder-gray-600 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 focus:outline-none transition-all">
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-2 mb-3">
+                                <i class="fas fa-code text-purple-400 text-xs"></i>
+                                <span class="text-xs font-medium text-gray-300">响应解析参数</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="text-xs text-gray-400 mb-1.5 block">数据标记</label>
+                                    <input type="text" id="c2HotDataMarker" placeholder="例: hiddenData" class="w-full px-3 py-2 rounded-lg bg-gray-900/80 border border-gray-700/50 text-sm text-gray-200 font-mono placeholder-gray-600 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 focus:outline-none transition-all">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-400 mb-1.5 block">分隔符起始</label>
+                                    <input type="text" id="c2HotDelimStart" placeholder='例: = "' class="w-full px-3 py-2 rounded-lg bg-gray-900/80 border border-gray-700/50 text-sm text-gray-200 font-mono placeholder-gray-600 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 focus:outline-none transition-all">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-400 mb-1.5 block">分隔符结束</label>
+                                    <input type="text" id="c2HotDelimEnd" placeholder='例: ";' class="w-full px-3 py-2 rounded-lg bg-gray-900/80 border border-gray-700/50 text-sm text-gray-200 font-mono placeholder-gray-600 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 focus:outline-none transition-all">
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-2 mb-3">
+                                <i class="fas fa-clock text-purple-400 text-xs"></i>
+                                <span class="text-xs font-medium text-gray-300">行为参数</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-xs text-gray-400 mb-1.5 block">Sleep 间隔 (毫秒)</label>
+                                    <input type="number" id="c2HotSleepMs" placeholder="例: 10000" min="1000" max="86400000" class="w-full px-3 py-2 rounded-lg bg-gray-900/80 border border-gray-700/50 text-sm text-gray-200 font-mono placeholder-gray-600 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 focus:outline-none transition-all">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-400 mb-1.5 block">Jitter 百分比 (0-100)</label>
+                                    <input type="number" id="c2HotJitterPct" placeholder="例: 20" min="0" max="100" class="w-full px-3 py-2 rounded-lg bg-gray-900/80 border border-gray-700/50 text-sm text-gray-200 font-mono placeholder-gray-600 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 focus:outline-none transition-all">
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-2 mb-3">
+                                <i class="fas fa-key text-red-400 text-xs"></i>
+                                <span class="text-xs font-medium text-gray-300">加密参数</span>
+                                <span class="px-1.5 py-0.5 rounded text-[0.55rem] font-medium bg-red-500/15 text-red-400 border border-red-500/20"><i class="fas fa-exclamation-triangle mr-0.5"></i>高危</span>
+                            </div>
+                            <div class="p-3 rounded-lg bg-red-500/5 border border-red-500/15 mb-3">
+                                <p class="text-xs text-red-300/80"><i class="fas fa-exclamation-circle mr-1"></i>修改 AES 密钥/IV 后，Beacon 与 TeamServer 必须使用相同的密钥才能正常通信。错误的密钥将导致 Beacon 失联！</p>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-xs text-gray-400 mb-1.5 block">AES Key (16字节 Hex)</label>
+                                    <input type="text" id="c2HotAESKey" placeholder="例: 0123456789abcdef0123456789abcdef" maxlength="32" class="w-full px-3 py-2 rounded-lg bg-gray-900/80 border border-red-700/30 text-sm text-gray-200 font-mono placeholder-gray-600 focus:border-red-500/50 focus:ring-1 focus:ring-red-500/20 focus:outline-none transition-all">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-400 mb-1.5 block">AES IV (16字节 Hex)</label>
+                                    <input type="text" id="c2HotAESIV" placeholder="例: fedcba9876543210fedcba9876543210" maxlength="32" class="w-full px-3 py-2 rounded-lg bg-gray-900/80 border border-red-700/30 text-sm text-gray-200 font-mono placeholder-gray-600 focus:border-red-500/50 focus:ring-1 focus:ring-red-500/20 focus:outline-none transition-all">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 p-4 rounded-lg bg-gray-800/50 border border-gray-700/30">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-md bg-purple-500/10 flex items-center justify-center">
+                                    <i class="fas fa-paper-plane text-purple-400 text-xs"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-200">推送 Profile 更新到 Beacon</p>
+                                    <p class="text-xs text-gray-500">仅推送已填写的字段，空字段不会被修改</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <select id="c2HotPushBeaconSelect" class="px-3 py-1.5 rounded-lg bg-gray-900/80 border border-gray-700/50 text-xs text-gray-300 focus:border-purple-500/50 focus:outline-none min-w-[200px]">
+                                    <option value="">选择 Beacon...</option>
+                                </select>
+                                <button onclick="window._c2PushProfileUpdate()" class="px-3 py-1.5 rounded-lg bg-purple-600/80 hover:bg-purple-600 border border-purple-500/30 text-xs text-white transition-all flex items-center space-x-1.5">
+                                    <i class="fas fa-paper-plane text-[0.6rem]"></i>
+                                    <span>推送更新</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-history text-purple-400 text-xs"></i>
+                                <span class="text-xs font-medium text-gray-300">推送记录</span>
+                            </div>
+                            <button onclick="window._c2LoadHotUpdateLogs()" class="px-2 py-1 rounded text-[0.65rem] text-gray-500 hover:text-gray-300 transition-colors">
+                                <i class="fas fa-sync-alt mr-1"></i>刷新
+                            </button>
+                        </div>
+                        <div id="c2HotUpdateLogList" class="space-y-2 max-h-64 overflow-y-auto">
+                            <div class="text-center py-4"><p class="text-xs text-gray-500">暂无推送记录</p></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>

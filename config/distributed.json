@@ -1,0 +1,61 @@
+{
+    "mode": "standalone",
+    "node": {
+        "id": "",
+        "name": "",
+        "advertise_addr": "127.0.0.1",
+        "api_port": 8000,
+        "role": "primary"
+    },
+    "database": {
+        "driver": "sqlite",
+        "sqlite": {
+            "path": "./c2platform.db"
+        },
+        "postgres": {
+            "host": "127.0.0.1",
+            "port": 5432,
+            "user": "cerberus",
+            "password": "",
+            "dbname": "cerberus",
+            "sslmode": "disable",
+            "max_open_conns": 25,
+            "max_idle_conns": 10,
+            "conn_max_lifetime_min": 30
+        }
+    },
+    "redis": {
+        "enabled": false,
+        "addr": "127.0.0.1:6379",
+        "password": "",
+        "db": 0,
+        "pool_size": 20,
+        "prefix": "cerberus:"
+    },
+    "cluster": {
+        "heartbeat_interval_sec": 10,
+        "node_timeout_sec": 30,
+        "event_channel": "cerberus:events",
+        "node_channel": "cerberus:nodes"
+    },
+    "websocket": {
+        "enabled": false,
+        "path": "/ws",
+        "ping_interval_sec": 30,
+        "pong_timeout_sec": 10
+    },
+    "storage": {
+        "driver": "local",
+        "local": {
+            "base_path": "./"
+        },
+        "s3": {
+            "endpoint": "",
+            "bucket": "cerberus",
+            "access_key": "",
+            "secret_key": "",
+            "region": "us-east-1",
+            "use_ssl": false
+        }
+    }
+}

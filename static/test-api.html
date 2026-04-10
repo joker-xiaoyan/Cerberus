@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API测试 - C2平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            C2平台 API 测试工具
+        </h1>
+
+        <!-- 获取监听器列表 -->
+        <div class="bg-gray-800 rounded-lg p-6 mb-6 border border-gray-700">
+            <h2 class="text-xl font-semibold mb-4">1. 获取监听器列表</h2>
+            <button onclick="getListeners()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                GET /api/listeners
+            </button>
+            <pre id="listeners-result" class="mt-4 bg-gray-900 p-4 rounded text-sm overflow-auto max-h-60"></pre>
+        </div>
+
+        <!-- 启动监听器 -->
+        <div class="bg-gray-800 rounded-lg p-6 mb-6 border border-gray-700">
+            <h2 class="text-xl font-semibold mb-4">2. 启动监听器</h2>
+            <div class="flex gap-4 mb-4">
+                <input 
+                    type="text" 
+                    id="listener-id" 
+                    placeholder="输入监听器ID" 
+                    class="flex-1 bg-gray-700 border border-gray-600 rounded px-4 py-2"
+                />
+                <button onclick="startListener()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+                    POST /api/listeners/{id}/start
+                </button>
+            </div>
+            <pre id="start-result" class="bg-gray-900 p-4 rounded text-sm overflow-auto max-h-60"></pre>
+        </div>
+
+        <!-- 停止监听器 -->
+        <div class="bg-gray-800 rounded-lg p-6 mb-6 border border-gray-700">
+            <h2 class="text-xl font-semibold mb-4">3. 停止监听器</h2>
+            <div class="flex gap-4 mb-4">
+                <input 
+                    type="text" 
+                    id="stop-listener-id" 
+                    placeholder="输入监听器ID" 
+                    class="flex-1 bg-gray-700 border border-gray-600 rounded px-4 py-2"
+                />
+                <button onclick="stopListener()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
+                    POST /api/listeners/{id}/stop
+                </button>
+            </div>
+            <pre id="stop-result" class="bg-gray-900 p-4 rounded text-sm overflow-auto max-h-60"></pre>
+        </div>
+
+        <!-- 创建监听器 -->
+        <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <h2 class="text-xl font-semibold mb-4">4. 创建监听器</h2>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <input type="text" id="create-name" placeholder="名称" class="bg-gray-700 border border-gray-600 rounded px-4 py-2" />
+                <select id="create-protocol" class="bg-gray-700 border border-gray-600 rounded px-4 py-2">
+                    <option value="http">HTTP</option>
+                    <option value="https">HTTPS</option>
+                    <option value="tcp">TCP</option>
+                    <option value="dns">DNS</option>
+                </select>
+                <input type="text" id="create-host" placeholder="监听地址 (0.0.0.0)" value="0.0.0.0" class="bg-gray-700 border border-gray-600 rounded px-4 py-2" />
+                <input type="number" id="create-port" placeholder="端口 (8080)" value="8080" class="bg-gray-700 border border-gray-600 rounded px-4 py-2" />
+            </div>
+            <button onclick="createListener()" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded">
+                POST /api/listeners
+            </button>
+            <pre id="create-result" class="mt-4 bg-gray-900 p-4 rounded text-sm overflow-auto max-h-60"></pre>
+        </div>
+
+        <div class="mt-8 text-center">
+            <a href="/" class="text-blue-400 hover:text-blue-300">← 返回主页</a>
+        </div>
+    </div>
+
+    <script>
+        async function getListeners() {
+            const resultEl = document.getElementById('listeners-result');
+            resultEl.textContent = '加载中...';
+            
+            try {
+                const response = await fetch('/api/listeners');
+                const data = await response.json();
+                resultEl.textContent = JSON.stringify(data, null, 2);
+                
+                // 如果有监听器，自动填充ID
+                if (data && data.length > 0) {
+                    document.getElementById('listener-id').value = data[0].id;
+                    document.getElementById('stop-listener-id').value = data[0].id;
+                }
+            } catch (error) {
+                resultEl.textContent = '错误: ' + error.message;
+            }
+        }
+
+        async function startListener() {
+            const id = document.getElementById('listener-id').value;
+            const resultEl = document.getElementById('start-result');
+            
+            if (!id) {
+                resultEl.textContent = '请输入监听器ID';
+                return;
+            }
+            
+            resultEl.textContent = '启动中...';
+            
+            try {
+                const response = await fetch(`/api/listeners/${id}/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const data = await response.json();
+                resultEl.textContent = `状态码: ${response.status}\n\n` + JSON.stringify(data, null, 2);
+                
+                if (response.ok) {
+                    resultEl.className = 'bg-green-900 p-4 rounded text-sm overflow-auto max-h-60';
+                } else {
+                    resultEl.className = 'bg-red-900 p-4 rounded text-sm overflow-auto max-h-60';
+                }
+            } catch (error) {
+                resultEl.textContent = '错误: ' + error.message;
+                resultEl.className = 'bg-red-900 p-4 rounded text-sm overflow-auto max-h-60';
+            }
+        }
+
+        async function stopListener() {
+            const id = document.getElementById('stop-listener-id').value;
+            const resultEl = document.getElementById('stop-result');
+            
+            if (!id) {
+                resultEl.textContent = '请输入监听器ID';
+                return;
+            }
+            
+            resultEl.textContent = '停止中...';
+            
+            try {
+                const response = await fetch(`/api/listeners/${id}/stop`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const data = await response.json();
+                resultEl.textContent = `状态码: ${response.status}\n\n` + JSON.stringify(data, null, 2);
+                
+                if (response.ok) {
+                    resultEl.className = 'bg-green-900 p-4 rounded text-sm overflow-auto max-h-60';
+                } else {
+                    resultEl.className = 'bg-red-900 p-4 rounded text-sm overflow-auto max-h-60';
+                }
+            } catch (error) {
+                resultEl.textContent = '错误: ' + error.message;
+                resultEl.className = 'bg-red-900 p-4 rounded text-sm overflow-auto max-h-60';
+            }
+        }
+
+        async function createListener() {
+            const resultEl = document.getElementById('create-result');
+            
+            const name = document.getElementById('create-name').value;
+            const protocol = document.getElementById('create-protocol').value;
+            const host = document.getElementById('create-host').value;
+            const port = parseInt(document.getElementById('create-port').value);
+            
+            if (!name) {
+                resultEl.textContent = '请输入监听器名称';
+                return;
+            }
+            
+            resultEl.textContent = '创建中...';
+            
+            try {
+                const response = await fetch('/api/listeners', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name,
+                        protocol: protocol,
+                        host: host,
+                        port: port
+                    })
+                });
+                
+                const data = await response.json();
+                resultEl.textContent = `状态码: ${response.status}\n\n` + JSON.stringify(data, null, 2);
+                
+                if (response.ok) {
+                    resultEl.className = 'bg-green-900 p-4 rounded text-sm overflow-auto max-h-60';
+                    // 自动刷新监听器列表
+                    setTimeout(getListeners, 500);
+                } else {
+                    resultEl.className = 'bg-red-900 p-4 rounded text-sm overflow-auto max-h-60';
+                }
+            } catch (error) {
+                resultEl.textContent = '错误: ' + error.message;
+                resultEl.className = 'bg-red-900 p-4 rounded text-sm overflow-auto max-h-60';
+            }
+        }
+
+        // 页面加载时自动获取监听器列表
+        window.addEventListener('DOMContentLoaded', getListeners);
+    </script>
+</body>
+</html>

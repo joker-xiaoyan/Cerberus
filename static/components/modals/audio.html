@@ -1,0 +1,102 @@
+<!-- 录音管理模态框 -->
+<div id="audioModal" class="modal-overlay hidden" onclick="if(event.target===this)window.closeAudioModal()">
+    <div class="modal-content" style="max-width: 900px; width: 90%; max-height: 85vh;">
+        <div class="modal-header">
+            <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                <i class="fas fa-microphone text-orange-400"></i>
+                录音管理
+                <span id="audioBeaconName" class="text-sm text-gray-400 ml-2"></span>
+            </h3>
+            <button onclick="window.closeAudioModal()" class="text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <div class="modal-body p-4 overflow-y-auto" style="max-height: calc(85vh - 120px);">
+            <!-- 控制面板 -->
+            <div class="flex items-center justify-between mb-4 bg-gray-800 rounded-lg p-3">
+                <div class="flex items-center gap-3">
+                    <span class="text-sm text-gray-400">状态:</span>
+                    <!-- 运行状态指示器 -->
+                    <div id="audioRunningIndicator" class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-gray-700 text-gray-400 transition-all duration-300">
+                        <span id="audioRunningDot" class="w-2.5 h-2.5 rounded-full bg-gray-500 inline-block transition-all duration-300"></span>
+                        <span id="audioStatusBadge">未知</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="window.audioAction('status')" class="px-3 py-1.5 bg-gray-600 hover:bg-gray-500 text-white text-sm rounded transition-colors" title="查询状态">
+                        <i class="fas fa-info-circle mr-1"></i>状态
+                    </button>
+                    <button onclick="window.audioAction('devices')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded transition-colors" title="枚举设备">
+                        <i class="fas fa-list mr-1"></i>设备
+                    </button>
+                    <button onclick="window.audioAction('start')" class="px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white text-sm rounded transition-colors" title="开始录音">
+                        <i class="fas fa-play mr-1"></i>开始
+                    </button>
+                    <button onclick="window.audioAction('stop')" class="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white text-sm rounded transition-colors" title="停止录音">
+                        <i class="fas fa-stop mr-1"></i>停止
+                    </button>
+                    <button onclick="window.audioAction('dump')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded transition-colors" title="获取录音">
+                        <i class="fas fa-download mr-1"></i>获取
+                    </button>
+                    <button onclick="window.loadAudioHistory()" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-sm rounded transition-colors" title="查看历史">
+                        <i class="fas fa-history mr-1"></i>历史
+                    </button>
+                </div>
+            </div>
+
+            <!-- 设备选择器区域（枚举设备后动态填充） -->
+            <div id="audioDeviceSelector" class="mb-4 hidden"></div>
+
+            <!-- 状态输出区域 -->
+            <div class="bg-gray-900 rounded-lg border border-gray-700 overflow-hidden mb-4">
+                <div class="flex items-center justify-between bg-gray-800 px-3 py-2 border-b border-gray-700">
+                    <span class="text-sm text-gray-400">
+                        <i class="fas fa-terminal mr-1"></i>录音状态
+                    </span>
+                    <button onclick="window.clearAudioDisplay()" class="text-gray-400 hover:text-white text-sm transition-colors" title="清空显示">
+                        <i class="fas fa-eraser"></i>
+                    </button>
+                </div>
+                <div id="audioOutput" class="p-4 font-mono text-sm text-orange-300 whitespace-pre-wrap overflow-y-auto" style="min-height: 150px; max-height: 300px;">
+                    <span class="text-gray-500 italic">等待录音数据...</span>
+                </div>
+            </div>
+
+            <!-- 音频播放器区域 -->
+            <div id="audioPlayerSection" class="hidden mb-4">
+                <div class="bg-gray-900 rounded-lg border border-gray-700 overflow-hidden">
+                    <div class="flex items-center justify-between bg-gray-800 px-3 py-2 border-b border-gray-700">
+                        <span class="text-sm text-gray-400">
+                            <i class="fas fa-volume-up mr-1"></i>音频播放器
+                        </span>
+                        <button onclick="window.downloadAudioWav()" class="text-gray-400 hover:text-white text-sm transition-colors" title="下载WAV">
+                            <i class="fas fa-file-download mr-1"></i>下载
+                        </button>
+                    </div>
+                    <div class="p-4">
+                        <audio id="audioPlayer" controls class="w-full" style="height: 40px;"></audio>
+                        <p id="audioPlayerInfo" class="text-xs text-gray-500 mt-2"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 历史记录区域（默认隐藏） -->
+            <div id="audioHistorySection" class="hidden">
+                <div class="bg-gray-900 rounded-lg border border-gray-700 overflow-hidden">
+                    <div class="flex items-center justify-between bg-gray-800 px-3 py-2 border-b border-gray-700">
+                        <span class="text-sm text-gray-400">
+                            <i class="fas fa-history mr-1"></i>历史录音
+                        </span>
+                        <button onclick="window.clearAudioHistory()" class="text-red-400 hover:text-red-300 text-sm transition-colors" title="清除所有历史">
+                            <i class="fas fa-trash mr-1"></i>清除历史
+                        </button>
+                    </div>
+                    <div id="audioHistoryList" class="p-2 max-h-64 overflow-y-auto">
+                        <span class="text-gray-500 italic text-sm p-2">加载中...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

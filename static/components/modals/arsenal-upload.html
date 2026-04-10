@@ -1,0 +1,108 @@
+<!-- 武器库上传模态框 -->
+<div id="arsenalUploadModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50">
+    <div class="bg-gray-800 rounded-xl border border-gray-700 w-full max-w-2xl mx-4 shadow-2xl">
+        <div class="flex items-center justify-between p-6 border-b border-gray-700">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-upload text-red-400"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">上传武器化DLL</h3>
+            </div>
+            <button onclick="window.closeArsenalUploadModal()" class="text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <form id="arsenalUploadForm" class="p-6 space-y-4">
+            <!-- 文件上传 -->
+            <div class="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center cursor-pointer hover:border-red-500 transition-colors"
+                 onclick="document.getElementById('arsenalFileInput').click()">
+                <i class="fas fa-cloud-upload-alt text-4xl text-gray-500 mb-3"></i>
+                <p class="text-gray-400" id="arsenalFileLabel">点击选择DLL/PE文件</p>
+                <input type="file" id="arsenalFileInput" class="hidden" accept=".dll,.exe,.bin" onchange="window.handleArsenalFileSelect(event)">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-gray-300 text-sm mb-1 block">武器名称 *</label>
+                    <input type="text" id="arsenalName" placeholder="例: Mimikatz DLL"
+                           class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+                </div>
+                <div>
+                    <label class="text-gray-300 text-sm mb-1 block">分类</label>
+                    <select id="arsenalCategory" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <option value="通用工具">通用工具</option>
+                        <option value="信息收集">信息收集</option>
+                        <option value="权限提升">权限提升</option>
+                        <option value="横向移动">横向移动</option>
+                        <option value="持久化">持久化</option>
+                        <option value="凭据窃取">凭据窃取</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-gray-300 text-sm mb-1 block">目标平台</label>
+                    <select id="arsenalPlatform" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <option value="windows">Windows</option>
+                        <option value="linux">Linux</option>
+                        <option value="cross_platform">跨平台</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-gray-300 text-sm mb-1 block">架构</label>
+                    <select id="arsenalArch" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <option value="x64">x64</option>
+                        <option value="x86">x86</option>
+                        <option value="any">任意</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="text-gray-300 text-sm mb-1 block">描述</label>
+                <textarea id="arsenalDescription" rows="2" placeholder="武器用途描述..."
+                          class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+            </div>
+
+            <div>
+                <label class="text-gray-300 text-sm mb-1 block">标签 (逗号分隔)</label>
+                <input type="text" id="arsenalTags" placeholder="例: credential,dump,windows"
+                       class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+            </div>
+
+            <!-- 导出函数区域 -->
+            <div id="arsenalExportFuncsSection" class="hidden">
+                <label class="text-gray-300 text-sm mb-1 block">
+                    <i class="fas fa-code text-yellow-400 mr-1"></i>导出函数
+                    <span id="arsenalExportFuncsCount" class="text-yellow-400 text-xs ml-1"></span>
+                    <span id="arsenalExportFuncsLoading" class="text-blue-400 text-xs ml-2 hidden">
+                        <i class="fas fa-spinner fa-spin mr-1"></i>正在解析PE导出表...
+                    </span>
+                </label>
+                <div id="arsenalExportFuncsList" class="bg-gray-900 border border-gray-600 rounded-lg p-3 max-h-40 overflow-y-auto">
+                    <span class="text-gray-500 text-sm">选择DLL文件后自动解析导出函数...</span>
+                </div>
+                <div class="mt-2 flex items-center space-x-2">
+                    <input type="text" id="arsenalExportFuncManual" placeholder="手动添加导出函数名..."
+                           onkeydown="if(event.key==='Enter'){event.preventDefault();window.addManualExportFunc()}"
+                           class="flex-1 bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    <button type="button" onclick="window.addManualExportFunc()" class="px-3 py-1.5 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg text-sm transition-colors">
+                        <i class="fas fa-plus mr-1"></i>添加
+                    </button>
+                </div>
+                <input type="hidden" id="arsenalExportFuncs" value="">
+            </div>
+        </form>
+
+        <div class="flex items-center justify-end space-x-3 p-6 border-t border-gray-700">
+            <button onclick="window.closeArsenalUploadModal()" class="px-6 py-2.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors">
+                取消
+            </button>
+            <button onclick="window.uploadArsenalPayload()" class="px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors">
+                <i class="fas fa-upload mr-2"></i>上传武器
+            </button>
+        </div>
+    </div>
+</div>

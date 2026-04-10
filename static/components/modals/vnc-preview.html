@@ -1,0 +1,56 @@
+<!-- vnc-preview 模态框 - 从 1index.html 自动提取 -->
+<div id="vncPreviewModal" class="fixed inset-0 bg-black/90 hidden items-center justify-center z-50">
+    <div class="w-full h-full flex flex-col">
+        <!-- 顶部工具栏 -->
+        <div class="bg-gray-900/80 backdrop-blur-sm border-b border-gray-700 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-expand text-cyan-400"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-white">VNC预览</h3>
+                    <p id="vncPreviewModalSessionInfo" class="text-sm text-gray-400"></p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <!-- 缩放控制 -->
+                <button onclick="window.zoomVNCPreview(0.5)" class="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm transition-colors">
+                    <i class="fas fa-search-minus mr-1"></i>50%
+                </button>
+                <button onclick="window.zoomVNCPreview(1)" class="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm transition-colors">
+                    <i class="fas fa-expand mr-1"></i>100%
+                </button>
+                <button onclick="window.zoomVNCPreview(1.5)" class="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm transition-colors">
+                    <i class="fas fa-search-plus mr-1"></i>150%
+                </button>
+                <button onclick="window.zoomVNCPreview(2)" class="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm transition-colors">
+                    <i class="fas fa-search-plus mr-1"></i>200%
+                </button>
+                <button onclick="window.fitVNCPreview()" class="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm transition-colors">
+                    <i class="fas fa-expand-arrows-alt mr-1"></i>适应
+                </button>
+                <div class="border-l border-gray-600 h-8 mx-2"></div>
+                <button onclick="window.refreshVNCPreviewModal()" class="px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm transition-colors">
+                    <i class="fas fa-sync-alt mr-1"></i>刷新
+                </button>
+                <button onclick="window.closeVNCPreviewModal()" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition-colors">
+                    <i class="fas fa-times mr-1"></i>关闭 (ESC)
+                </button>
+            </div>
+        </div>
+        <!-- 图片显示区域 -->
+        <div class="flex-1 overflow-auto flex items-center justify-center p-6" id="vncPreviewContainer">
+            <img id="vncPreviewModalImage" src="" alt="VNC预览" class="max-w-full max-h-full object-contain cursor-move transition-transform duration-200" />
+        </div>
+        <!-- 底部状态栏 -->
+        <div class="bg-gray-900/80 backdrop-blur-sm border-t border-gray-700 px-6 py-3 flex items-center justify-between text-sm text-gray-400">
+            <div class="flex items-center space-x-4">
+                <span><i class="fas fa-mouse-pointer mr-1"></i>拖拽移动</span>
+                <span><i class="fas fa-mouse mr-1"></i>滚轮缩放</span>
+            </div>
+            <div id="vncPreviewZoomInfo">缩放: 100%</div>
+        </div>
+    </div>
+</div>
+
+<!-- 服务器文件模态框 -->

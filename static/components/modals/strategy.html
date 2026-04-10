@@ -1,0 +1,147 @@
+<!-- strategy 模态框 - 从 1index.html 自动提取 -->
+<div id="strategyModal" class="modal">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h3 class="text-xl font-bold flex items-center">
+                <i class="fas fa-cogs mr-2 text-green-400"></i>
+                <span id="strategyModalTitle">创建自动化策略</span>
+            </h3>
+            <button class="modal-close" onclick="closeStrategyModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="strategyForm" class="space-y-6">
+                <input type="hidden" id="strategyId">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">策略名称*</label>
+                        <input type="text" id="strategyName" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:border-green-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">目标平台*</label>
+                        <select id="strategyPlatform" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:border-green-500" required>
+                            <option value="">选择平台</option>
+                            <option value="windows">Windows</option>
+                            <option value="linux">Linux</option>
+                            <option value="macos">macOS</option>
+                            <option value="cross_platform">跨平台</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">策略描述</label>
+                    <textarea id="strategyDescription" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:border-green-500" rows="3" placeholder="描述此策略的功能和用途"></textarea>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">策略分类*</label>
+                        <select id="strategyCategory" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:border-green-500" required>
+                            <option value="">选择分类</option>
+                            <option value="信息收集">信息收集</option>
+                            <option value="权限提升">权限提升</option>
+                            <option value="横向移动">横向移动</option>
+                            <option value="持久化">持久化</option>
+                            <option value="数据窃取">数据窃取</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">优先级</label>
+                        <select id="strategyPriority" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:border-green-500">
+                            <option value="1">1 - 最高</option>
+                            <option value="2">2 - 高</option>
+                            <option value="3">3 - 中</option>
+                            <option value="4">4 - 低</option>
+                            <option value="5">5 - 最低</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-sm font-medium text-gray-300">执行命令</label>
+                        <button type="button" id="toggleCommandsMode" class="text-xs text-green-400 hover:text-green-300">
+                            <i class="fas fa-magic mr-1"></i>切换到 JSON 高级编辑
+                        </button>
+                    </div>
+                    
+                    <!-- 可视化命令编辑器 -->
+                    <div id="commandBuilder" class="border border-gray-600 rounded-lg p-4 bg-gray-900/50">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="text-sm text-gray-400">
+                                <i class="fas fa-terminal mr-1"></i>命令步骤
+                            </div>
+                            <button type="button" id="addCommandStepBtn" class="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1.5 rounded">
+                                <i class="fas fa-plus mr-1"></i>添加步骤
+                            </button>
+                        </div>
+                        <div id="commandStepsContainer" class="space-y-2">
+                            <!-- 命令步骤将在这里动态渲染 -->
+                        </div>
+                    </div>
+                    
+                    <!-- 高级 JSON 编辑器 -->
+                    <textarea id="strategyCommands" class="hidden w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:border-green-500 font-mono" rows="6" placeholder='[{"type":"command","command":"whoami","parameters":{"timeout":10},"delay":2}]'></textarea>
+                    <p class="text-xs text-gray-500 mt-1">定义策略执行的命令列表，支持命令类型、参数和执行延迟设置</p>
+                </div>
+                
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-sm font-medium text-gray-300">触发条件</label>
+                        <button type="button" id="toggleConditionsMode" class="text-xs text-green-400 hover:text-green-300">
+                            <i class="fas fa-magic mr-1"></i>切换到 JSON 高级编辑
+                        </button>
+                    </div>
+                    
+                    <!-- 可视化条件编辑器 -->
+                    <div id="conditionsBuilder" class="border border-gray-600 rounded-lg p-4 bg-gray-900/50">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="text-sm text-gray-400">
+                                <i class="fas fa-filter mr-1"></i>条件规则
+                            </div>
+                            <button type="button" id="addConditionRowBtn" class="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1.5 rounded">
+                                <i class="fas fa-plus mr-1"></i>添加条件
+                            </button>
+                        </div>
+                        <div id="conditionRowsContainer" class="space-y-2">
+                            <!-- 条件行将在这里动态渲染 -->
+                        </div>
+                    </div>
+                    
+                    <!-- 高级 JSON 编辑器 -->
+                    <textarea id="strategyConditions" class="hidden w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:border-green-500 font-mono" rows="4" placeholder='[{"field":"status","operator":"==","value":"online"}]'></textarea>
+                    <p class="text-xs text-gray-500 mt-1">定义触发策略执行的条件，例如Beacon在线状态、操作系统类型等</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="strategyEnabled" class="w-4 h-4 text-green-600 bg-gray-800 border-gray-600 rounded focus:ring-green-500 mr-2" checked>
+                        <label for="strategyEnabled" class="text-sm text-gray-300">启用此策略</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="strategyAutoExecute" class="w-4 h-4 text-green-600 bg-gray-800 border-gray-600 rounded focus:ring-green-500 mr-2">
+                        <label for="strategyAutoExecute" class="text-sm text-gray-300">Beacon上线时自动执行</label>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="autoExecuteDelaySection" style="display: none;">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">自动执行延迟时间 (秒)</label>
+                        <input type="number" id="strategyAutoExecuteDelay" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:border-green-500" min="0" value="60" placeholder="60">
+                        <p class="text-xs text-gray-500 mt-1">Beacon上线后多少秒开始自动执行策略，默认为60秒</p>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" class="btn-secondary" onclick="window.closeStrategyModal()">取消</button>
+                    <button type="submit" class="btn-primary bg-green-600 hover:bg-green-700">
+                        <i class="fas fa-save mr-2"></i>保存策略
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,84 @@
+<!-- add-command 模态框 - 从 1index.html 自动提取 -->
+<div id="addCommandModal" class="modal">
+    <div class="modal-content modal-large">
+        <div class="modal-header text-center">
+            <h3 class="text-xl font-bold flex items-center justify-center mx-auto">
+                <i class="fas fa-plus-circle mr-2 text-green-400"></i>
+                新增命令
+            </h3>
+            <button class="modal-close" onclick="window.closeAddCommandModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="addCommandForm" class="space-y-6 max-w-4xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">命令名称*</label>
+                        <input type="text" id="commandName" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-200" placeholder="例如: whoami" required>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">分类*</label>
+                        <select id="commandCategory" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-200" required>
+                            <option value="">请选择分类</option>
+                            <option value="basic_operations">基础操作</option>
+                            <option value="process_management">进程管理</option>
+                            <option value="file_transfer">文件传输</option>
+                            <option value="stealth_operations">窃密操作</option>
+                            <option value="post_exploitation">后渗透</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">描述*</label>
+                    <textarea id="commandDescription" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-200" rows="2" placeholder="命令的功能描述" required></textarea>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">语法</label>
+                        <input type="text" id="commandSyntax" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-200" placeholder="例如: whoami /groups">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">安全等级</label>
+                        <select id="commandSecurityLevel" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-200">
+                            <option value="1">1 - 基础信息收集</option>
+                            <option value="2">2 - 文件操作</option>
+                            <option value="3">3 - 进程管理</option>
+                            <option value="4">4 - 权限相关</option>
+                            <option value="5">5 - 高风险操作</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Beacon类型*</label>
+                    <select id="commandBeaconType" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-200" required>
+                        <option value="">请选择类型</option>
+                        <option value="windows">Windows</option>
+                        <option value="linux">Linux</option>
+                        <option value="macos">macOS</option>
+                        <option value="cross_platform">跨平台</option>
+                    </select>
+                </div>
+                
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">使用案例 (每行一个案例)</label>
+                    <textarea id="commandExamples" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-200" rows="4" placeholder="例如:
+whoami
+whoami /groups
+whoami /all"></textarea>
+                    <p class="text-xs text-gray-500 mt-1">每个案例占一行，将作为示例保存</p>
+                </div>
+                
+                <div class="flex justify-center space-x-4 pt-6">
+                    <button type="button" class="btn-secondary px-6 py-2" onclick="window.closeAddCommandModal()">取消</button>
+                    <button type="submit" class="btn-primary bg-green-600 hover:bg-green-700 px-6 py-2">
+                        <i class="fas fa-check mr-2"></i>创建命令
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

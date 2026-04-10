@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cerberus - AI助手</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=1.1">
+</head>
+<body class="bg-gray-900 text-gray-100">
+    <!-- 顶部导航栏 -->
+    <nav class="bg-gray-800 border-b border-gray-700 fixed w-full top-0 z-50">
+        <div class="max-w-full mx-auto px-6">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-8">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-shield-alt text-white text-xl"></i>
+                        </div>
+                        <span class="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Cerberus</span>
+                    </div>
+                    <div class="hidden md:flex space-x-1">
+                        <!-- 顶部导航栏按钮 -->
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <button class="p-2 rounded-lg hover:bg-gray-700 transition-colors relative">
+                            <i class="fas fa-bell text-gray-300"></i>
+                            <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <img id="userAvatar" class="w-9 h-9 rounded-full border-2 border-purple-500" src="/static/userimg/橘猫.png" alt="User">
+                        <span id="userName" class="text-sm font-medium text-gray-300">加载中...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 左侧导航栏 -->
+    <aside id="sidebar" class="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-gray-800 border-r border-gray-700 z-40 transition-all duration-300">
+        <div class="h-full flex flex-col">
+            <!-- 导航菜单 -->
+            <nav class="flex-1 overflow-y-auto py-4 px-3">
+                <!-- Dashboard 菜单项 -->
+                <div class="mb-2">
+                    <a href="index.html" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-gray-700 text-white transition-colors">
+                        <i class="fas fa-chart-line mr-3"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+
+                <!-- AI助手 菜单项 -->
+                <div class="mb-2">
+                    <button class="nav-menu-item active" data-page="ai">
+                        <i class="fas fa-robot mr-3 text-purple-400"></i>
+                        <span class="flex-1 text-left">AI助手</span>
+                        <i class="fas fa-chevron-down text-xs transition-transform duration-200"></i>
+                    </button>
+                    <div class="nav-submenu active">
+                        <a href="#" class="nav-submenu-item active" data-subpage="ai-chat">
+                            <i class="fas fa-comments mr-3"></i>
+                            对话
+                        </a>
+                        <a href="#" class="nav-submenu-item" data-subpage="ai-commands">
+                            <i class="fas fa-terminal mr-3"></i>
+                            命令列表
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Beacon 菜单项 -->
+                <div class="mb-2">
+                    <a href="index.html#beacon" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-gray-700 text-white transition-colors">
+                        <i class="fas fa-broadcast-tower mr-3"></i>
+                        <span>Beacon</span>
+                    </a>
+                </div>
+
+                <!-- 监听器菜单项 -->
+                <div class="mb-2">
+                    <a href="index.html#listeners" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-gray-700 text-white transition-colors">
+                        <i class="fas fa-satellite-dish mr-3"></i>
+                        <span>监听器</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="pt-16 min-h-screen ml-64 transition-all duration-300">
+        <div class="max-w-full mx-auto px-6 py-6">
+            <!-- 标题行 -->
+            <div class="mb-6 flex items-center justify-between">
+                <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">AI助手</h1>
+                <div class="flex items-center space-x-4">
+                    <!-- Beacon选择器 -->
+                    <div class="relative">
+                        <select id="beaconSelect" class="bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none">
+                            <option value="">所有Beacon</option>
+                        </select>
+                        <div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                            <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI对话页面 -->
+            <div id="ai-chat" class="ai-page active">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- 聊天区域 -->
+                    <div class="lg:col-span-2 bg-gray-800 rounded-xl p-6 flex flex-col" style="height: 70vh;">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-xl font-bold text-white flex items-center">
+                                <span class="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-robot text-white text-sm"></i>
+                                </span>
+                                AI对话
+                            </h2>
+                            <button id="clearChatBtn" class="text-gray-400 hover:text-white transition-colors">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+
+                        <!-- 消息区域 -->
+                        <div id="chatMessages" class="flex-1 overflow-y-auto mb-4 space-y-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-robot text-white text-sm"></i>
+                                </div>
+                                <div class="bg-gray-700 rounded-lg p-3 max-w-[80%]">
+                                    <p class="text-white">您好！我是C2平台的AI助手，我可以帮助您进行以下操作：</p>
+                                    <ul class="text-gray-300 mt-2 ml-4 space-y-1">
+                                        <li>• 分析命令的安全性</li>
+                                        <li>• 提供操作建议</li>
+                                        <li>• 检测异常行为</li>
+                                        <li>• 生成执行计划</li>
+                                        <li>• 回答技术问题</li>
+                                    </ul>
+                                    <p class="text-gray-300 mt-2">您可以问我任何与C2平台相关的问题，例如：</p>
+                                    <div class="bg-gray-800 rounded p-2 mt-2 text-gray-300 text-sm font-mono">
+                                        "分析这个命令的安全性: whoami"
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 输入区域 -->
+                        <div class="flex items-center">
+                            <div class="flex-1 relative mr-3">
+                                <textarea id="chatInput" 
+                                    class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                                    placeholder="输入消息..." 
+                                    rows="1"></textarea>
+                            </div>
+                            <button id="chatSendBtn" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg p-3 hover:from-purple-600 hover:to-pink-600 transition-all">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 右侧面板 -->
+                    <div class="space-y-6">
+                        <!-- AI功能卡片 -->
+                        <div class="bg-gray-800 rounded-xl p-6">
+                            <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                                <i class="fas fa-magic text-purple-400 mr-2"></i>
+                                AI功能
+                            </h3>
+                            <div class="space-y-3">
+                                <button class="w-full text-left bg-gray-700 hover:bg-gray-600 rounded-lg p-3 transition-colors flex items-center">
+                                    <i class="fas fa-shield-alt text-green-400 mr-3"></i>
+                                    <div>
+                                        <div class="text-white font-medium">命令分析</div>
+                                        <div class="text-gray-400 text-sm">评估命令安全风险</div>
+                                    </div>
+                                </button>
+                                <button class="w-full text-left bg-gray-700 hover:bg-gray-600 rounded-lg p-3 transition-colors flex items-center">
+                                    <i class="fas fa-lightbulb text-yellow-400 mr-3"></i>
+                                    <div>
+                                        <div class="text-white font-medium">智能建议</div>
+                                        <div class="text-gray-400 text-sm">获取操作建议</div>
+                                    </div>
+                                </button>
+                                <button class="w-full text-left bg-gray-700 hover:bg-gray-600 rounded-lg p-3 transition-colors flex items-center">
+                                    <i class="fas fa-exclamation-triangle text-red-400 mr-3"></i>
+                                    <div>
+                                        <div class="text-white font-medium">威胁检测</div>
+                                        <div class="text-gray-400 text-sm">扫描系统威胁</div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 快速操作 -->
+                        <div class="bg-gray-800 rounded-xl p-6">
+                            <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                                <i class="fas fa-bolt text-purple-400 mr-2"></i>
+                                快速操作
+                            </h3>
+                            <div class="space-y-2">
+                                <button class="w-full text-left bg-gray-700 hover:bg-gray-600 rounded-lg p-2 text-sm transition-colors" onclick="sendQuickMessage('帮助')">
+                                    获取帮助
+                                </button>
+                                <button class="w-full text-left bg-gray-700 hover:bg-gray-600 rounded-lg p-2 text-sm transition-colors" onclick="sendQuickMessage('检测异常情况')">
+                                    检测异常
+                                </button>
+                                <button class="w-full text-left bg-gray-700 hover:bg-gray-600 rounded-lg p-2 text-sm transition-colors" onclick="sendQuickMessage('生成一个信息收集计划')">
+                                    生成计划
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- AI命令列表页面 -->
+    <div id="ai-commands" class="ai-page">
+        <div class="bg-gray-800 rounded-xl p-6 mb-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-white flex items-center">
+                    <i class="fas fa-terminal text-purple-400 mr-2"></i>
+                    命令列表
+                </h2>
+                <button id="addCommandBtn" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg px-4 py-2 hover:from-purple-600 hover:to-pink-600 transition-all">
+                    <i class="fas fa-plus mr-2"></i>添加新命令
+                </button>
+            </div>
+            
+            <!-- 筛选器 -->
+            <div class="flex space-x-4 mb-6">
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-400 mb-1">分类筛选</label>
+                    <select id="commandCategoryFilter" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2">
+                        <option value="">所有分类</option>
+                        <option value="basic_operations">基础操作</option>
+                        <option value="process_management">进程管理</option>
+                        <option value="file_transfer">文件传输</option>
+                        <option value="stealth_operations">窃密操作</option>
+                        <option value="post_exploitation">后渗透操作</option>
+                    </select>
+                </div>
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Beacon类型</label>
+                    <select id="beaconTypeFilter" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2">
+                        <option value="">所有类型</option>
+                        <option value="windows">Windows</option>
+                        <option value="linux">Linux</option>
+                        <option value="macos">macOS</option>
+                        <option value="cross_platform">跨平台</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 命令列表容器 -->
+            <div id="commandsListContainer" class="space-y-4">
+                <div class="text-center py-8 text-gray-400">
+                    <i class="fas fa-spinner fa-spin text-3xl mb-3"></i>
+                    <p>加载中...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加/编辑命令模态框 -->
+    <div id="commandModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-900 opacity-75"></div>
+            </div>
+            <span class="hidden inline-block h-screen align-middle" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-white" id="commandModalTitle">
+                                添加新命令
+                            </h3>
+                            <form id="commandForm" class="mt-4 space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-400 mb-1">命令名称</label>
+                                    <input type="text" id="commandName" required 
+                                        class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-400 mb-1">描述</label>
+                                    <textarea id="commandDescription" rows="2" required
+                                        class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-400 mb-1">语法</label>
+                                    <input type="text" id="commandSyntax" 
+                                        class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-400 mb-1">分类</label>
+                                    <select id="commandCategory" required
+                                        class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                        <option value="">选择分类</option>
+                                        <option value="basic_operations">基础操作</option>
+                                        <option value="process_management">进程管理</option>
+                                        <option value="file_transfer">文件传输</option>
+                                        <option value="stealth_operations">窃密操作</option>
+                                        <option value="post_exploitation">后渗透操作</option>
+                                    </select>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-400 mb-1">安全级别</label>
+                                        <select id="commandSecurityLevel" required
+                                            class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                            <option value="1">1 - 低风险</option>
+                                            <option value="2">2 - 中低风险</option>
+                                            <option value="3">3 - 中等风险</option>
+                                            <option value="4">4 - 中高风险</option>
+                                            <option value="5">5 - 高风险</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-400 mb-1">Beacon类型</label>
+                                        <select id="commandBeaconType" required
+                                            class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                            <option value="cross_platform">跨平台</option>
+                                            <option value="windows">Windows</option>
+                                            <option value="linux">Linux</option>
+                                            <option value="macos">macOS</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="saveCommandBtn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                        保存
+                    </button>
+                    <button type="button" id="cancelCommandBtn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-gray-300 hover:bg-gray-700 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 操作确认弹窗 -->
+    <div id="confirmModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-900 opacity-75"></div>
+            </div>
+            <span class="hidden inline-block h-screen align-middle" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-white" id="confirmTitle">
+                                确认操作
+                            </h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-300" id="confirmMessage">
+                                    确定要执行此操作吗？
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="confirmBtn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                        确认
+                    </button>
+                    <button type="button" id="cancelBtn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-gray-300 hover:bg-gray-700 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="ui.js"></script>
+    <script src="ai.js"></script>
+    
+    <script>
+        // 快速消息发送函数
+        function sendQuickMessage(message) {
+            const chatInput = document.getElementById('aiChatInput');
+            if (chatInput) {
+                chatInput.value = message;
+                // 触发送按钮事件
+                const sendBtn = document.getElementById('aiChatSendBtn');
+                if (sendBtn) {
+                    const event = new Event('click');
+                    sendBtn.dispatchEvent(event);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

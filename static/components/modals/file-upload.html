@@ -1,0 +1,88 @@
+<!-- file-upload 模态框 - 从 1index.html 自动提取 -->
+<div id="fileUploadModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50">
+    <div class="bg-gray-800 rounded-xl border border-gray-700 w-full max-w-2xl mx-4 shadow-2xl">
+        <div class="flex items-center justify-between p-6 border-b border-gray-700">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-upload text-yellow-400"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">文件上传</h3>
+            </div>
+            <button onclick="window.closeFileUploadModal()" class="text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- 左侧：文件选择 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-2">选择本地文件</label>
+                    <div class="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-purple-500/50 transition-colors cursor-pointer"
+                         onclick="document.getElementById('localFileInput').click()"
+                         ondragover="event.preventDefault(); this.classList.add('border-purple-500')"
+                         ondragleave="this.classList.remove('border-purple-500')"
+                         ondrop="window.handleFileDrop(event)">
+                        <input type="file" id="localFileInput" class="hidden" onchange="window.handleFileSelect(event)">
+                        <div id="fileUploadPlaceholder">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-500 mb-3"></i>
+                            <p class="text-gray-400 mb-2">点击选择文件或拖拽文件到此处</p>
+                            <p class="text-gray-500 text-sm">支持任意类型文件</p>
+                        </div>
+                        <div id="fileUploadPreview" class="hidden">
+                            <div class="flex items-center space-x-4 mb-3">
+                                <div class="w-16 h-16 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-file text-yellow-400 text-2xl"></i>
+                                </div>
+                                <div class="flex-1 text-left">
+                                    <p id="selectedFileName" class="font-semibold text-white truncate">-</p>
+                                    <p id="selectedFileSize" class="text-sm text-gray-400">-</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3 text-sm">
+                                <div class="bg-gray-700/50 rounded p-3">
+                                    <p class="text-gray-400 text-xs mb-1">文件类型</p>
+                                    <p id="selectedFileType" class="text-white font-mono">-</p>
+                                </div>
+                                <div class="bg-gray-700/50 rounded p-3">
+                                    <p class="text-gray-400 text-xs mb-1">文件大小</p>
+                                    <p id="selectedFileFormatSize" class="text-white font-mono">-</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 右侧：目标路径 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-2">目标主机路径</label>
+                    <input type="text" id="targetPathInput" placeholder="C:\Users\Public\Documents\example.txt"
+                           class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 mb-4 font-mono">
+                    <div class="flex space-x-2 mb-4">
+                        <button onclick="window.suggestPath('desktop')" class="flex-1 bg-gray-700 hover:bg-gray-600 text-gray-300 py-2 px-3 rounded-lg text-sm transition-colors">
+                            <i class="fas fa-desktop mr-2"></i>桌面
+                        </button>
+                        <button onclick="window.suggestPath('documents')" class="flex-1 bg-gray-700 hover:bg-gray-600 text-gray-300 py-2 px-3 rounded-lg text-sm transition-colors">
+                            <i class="fas fa-folder mr-2"></i>文档
+                        </button>
+                        <button onclick="window.suggestPath('downloads')" class="flex-1 bg-gray-700 hover:bg-gray-600 text-gray-300 py-2 px-3 rounded-lg text-sm transition-colors">
+                            <i class="fas fa-download mr-2"></i>下载
+                        </button>
+                    </div>
+                    <div class="bg-gray-700/30 rounded-lg p-4 mb-4">
+                        <p class="text-gray-400 text-xs mb-2"><i class="fas fa-info-circle mr-2"></i>提示</p>
+                        <p class="text-gray-400 text-sm">文件将上传到指定路径。如果路径不存在，将自动创建目录。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center justify-end space-x-3 p-6 border-t border-gray-700">
+            <button onclick="window.closeFileUploadModal()" class="px-6 py-2.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors">
+                取消
+            </button>
+            <button onclick="window.confirmFileUpload()" class="px-6 py-2.5 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-colors flex items-center">
+                <i class="fas fa-upload mr-2"></i>开始上传
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 文件下载模态框 -->

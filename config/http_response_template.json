@@ -1,0 +1,4 @@
+{
+  "content_type": "application/javascript",
+  "body_template": "$jscomp=$jscomp||{};$jscomp.scope={}; const hiddenData = {{DATA}};"
+}

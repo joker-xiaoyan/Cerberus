@@ -1,0 +1,187 @@
+<!-- listeners 页面 - 监听器管理 -->
+<div id="listenersPage" class="page-content">
+    <div class="max-w-full mx-auto px-6 py-6">
+
+        <!-- 顶部标题栏 -->
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-satellite-dish text-purple-400 text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold">监听器管理</h2>
+                    <p class="text-sm text-gray-400">管理和监控所有通信监听器</p>
+                </div>
+            </div>
+            <button class="btn-primary" onclick="window.openCreateListenerModal()">
+                <i class="fas fa-plus mr-2"></i>新建监听器
+            </button>
+        </div>
+
+        <!-- 统计卡片区 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <!-- 总数 -->
+            <div class="bg-gray-800/60 border border-gray-700 rounded-xl p-4 flex items-center space-x-4">
+                <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-server text-blue-400 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-400 uppercase tracking-wide">总监听器</p>
+                    <p class="text-2xl font-bold text-white" id="listenerStatTotal">0</p>
+                </div>
+            </div>
+            <!-- 运行中 -->
+            <div class="bg-gray-800/60 border border-gray-700 rounded-xl p-4 flex items-center space-x-4">
+                <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-play-circle text-green-400 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-400 uppercase tracking-wide">运行中</p>
+                    <p class="text-2xl font-bold text-green-400" id="listenerStatRunning">0</p>
+                </div>
+            </div>
+            <!-- 已停止 -->
+            <div class="bg-gray-800/60 border border-gray-700 rounded-xl p-4 flex items-center space-x-4">
+                <div class="w-12 h-12 bg-gray-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-stop-circle text-gray-400 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-400 uppercase tracking-wide">已停止</p>
+                    <p class="text-2xl font-bold text-gray-400" id="listenerStatStopped">0</p>
+                </div>
+            </div>
+            <!-- 协议分布 -->
+            <div class="bg-gray-800/60 border border-gray-700 rounded-xl p-4 flex items-center space-x-4">
+                <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-network-wired text-purple-400 text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-400 uppercase tracking-wide">协议类型</p>
+                    <p class="text-sm font-semibold text-purple-300" id="listenerStatProtocols">-</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 搜索 & 筛选栏 -->
+        <div class="bg-gray-800/40 border border-gray-700 rounded-xl p-4 mb-6">
+            <div class="flex flex-wrap items-center gap-4">
+                <!-- 搜索框 -->
+                <div class="flex-1 min-w-[200px]">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                        <input type="text" id="listenerSearchInput" placeholder="搜索监听器名称、地址、端口..."
+                               class="w-full bg-gray-900 border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-sm text-gray-100 focus:outline-none focus:border-purple-500 transition-colors">
+                    </div>
+                </div>
+                <!-- 状态筛选 -->
+                <select id="listenerStatusFilter" class="bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-purple-500">
+                    <option value="">全部状态</option>
+                    <option value="running">运行中</option>
+                    <option value="stopped">已停止</option>
+                </select>
+                <!-- 协议筛选 -->
+                <select id="listenerProtocolFilter" class="bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-purple-500">
+                    <option value="">全部协议</option>
+                    <option value="http">HTTP</option>
+                    <option value="https">HTTPS</option>
+                    <option value="tcp">TCP</option>
+                    <option value="udp">UDP</option>
+                    <option value="dns">DNS</option>
+                </select>
+                <!-- 视图切换 -->
+                <div class="flex items-center bg-gray-900 border border-gray-600 rounded-lg overflow-hidden">
+                    <button id="listenerViewCard" class="px-3 py-2 text-sm text-purple-400 bg-purple-500/10 transition-colors" onclick="window.switchListenerView('card')" title="卡片视图">
+                        <i class="fas fa-th-large"></i>
+                    </button>
+                    <button id="listenerViewTable" class="px-3 py-2 text-sm text-gray-400 hover:text-gray-200 transition-colors" onclick="window.switchListenerView('table')" title="表格视图">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+                <!-- 结果计数 -->
+                <span class="text-xs text-gray-500" id="listenerResultCount"></span>
+            </div>
+        </div>
+
+        <!-- 卡片视图 -->
+        <div id="listenersCardView">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="listenersGrid">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+
+        <!-- 表格视图（默认隐藏） -->
+        <div id="listenersTableView" class="hidden">
+            <div class="bg-gray-800/60 border border-gray-700 rounded-xl overflow-hidden">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-900/50">
+                            <th class="table-cell text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">状态</th>
+                            <th class="table-cell text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">名称</th>
+                            <th class="table-cell text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">协议</th>
+                            <th class="table-cell text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">监听地址</th>
+                            <th class="table-cell text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">活跃连接</th>
+                            <th class="table-cell text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">启动时间</th>
+                            <th class="table-cell text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">创建时间</th>
+                            <th class="table-cell text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listenersTableBody">
+                        <!-- 动态生成 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- 编辑监听器模态框 -->
+<div id="editListenerModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="text-xl font-bold flex items-center">
+                <i class="fas fa-edit mr-2 text-blue-400"></i>
+                编辑监听器
+            </h3>
+            <button class="modal-close" onclick="window.closeEditListenerModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="editListenerForm" class="space-y-4">
+                <input type="hidden" id="editListenerId">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">监听器名称</label>
+                    <input type="text" id="editListenerName" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:border-purple-500" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">协议类型</label>
+                    <select id="editListenerProtocol" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:border-purple-500">
+                        <option value="http">HTTP</option>
+                        <option value="https">HTTPS</option>
+                        <option value="tcp">TCP</option>
+                        <option value="udp">UDP</option>
+                        <option value="dns">DNS</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">监听地址</label>
+                    <input type="text" id="editListenerHost" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:border-purple-500" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">监听端口</label>
+                    <input type="number" id="editListenerPort" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:border-purple-500" min="1" max="65535" required>
+                </div>
+                <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+                    <p class="text-xs text-yellow-300"><i class="fas fa-exclamation-triangle mr-1"></i>修改运行中的监听器会自动重启</p>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" class="btn-secondary" onclick="window.closeEditListenerModal()">取消</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save mr-2"></i>保存修改
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
