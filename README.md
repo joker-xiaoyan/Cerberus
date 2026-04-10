@@ -218,15 +218,6 @@ C2 profiles control how beacon traffic is shaped to blend in with legitimate net
 
 ---
 
-## Security & OPSEC Notes
-
-- All beacon-to-server communication is encrypted with **AES-256-GCM** after **X25519 ECDH** key exchange
-- Initial check-in uses **PSK (AES-128-CBC)** for the handshake phase only
-- Beacon data is always transmitted in **compact binary format** embedded within Cookie or request body — never in plaintext headers
-- The server produces **no console output** in production mode to avoid log leakage
-
----
-
 ## License
 
 This project is released for **educational and authorized security research purposes only**.
