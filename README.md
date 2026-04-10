@@ -66,14 +66,10 @@
 ### 🎯 Post-Exploitation Capabilities
 - **File Manager** — Full remote file system browsing, upload, download, rename, delete
 - **Process Manager** — Process listing, injection, and kill
-- **Screenshot & Keylogger** — Real-time screen capture and keystroke logging
-- **Audio & Camera Capture** — Microphone recording and webcam snapshot
-- **HVNC** — Hidden Virtual Network Computing for covert desktop interaction
-- **VNC** — Standard VNC remote desktop
+- **Screenshot** — Real-time remote screen capture
 - **DLL Management** — Remote DLL load, execute, and unload
 - **BOF (Beacon Object Files)** — Inline execution of BOF modules
 - **Inline PE Execution** — Execute PE files in memory without touching disk
-- **Rootkit Manager** — Rootkit module management interface
 
 ### 🏗️ Infrastructure & Operations
 - **Distributed Cluster** — Multi-node TeamServer clustering for high-availability red team operations
