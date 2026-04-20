@@ -151,6 +151,9 @@ Log in with the username and password you specified at startup.
 ```
 .
 ├── c2-platform(.exe)       # TeamServer binary
+├── certs/                          # HTTPS certificate directory
+│   ├── server.crt                  # TLS certificate (PEM)
+│   └── server.key                  # TLS private key (PEM)
 ├── config/
 │   ├── c2_active_profile.json      # Active C2 profile
 │   ├── c2_profiles/                # Built-in traffic profiles
@@ -164,8 +167,65 @@ Log in with the username and password you specified at startup.
 ├── static/                         # Web UI assets
 ├── arsenal_storage/                # Arsenal file storage
 ├── delivery_storage/               # Delivery payload storage
-└── downloads/                      # Downloaded files from beacons
+├── downloads/                      # Downloaded files from beacons
+├── generate_certs.sh               # Certificate generator (Linux/macOS)
+└── generate_certs.ps1              # Certificate generator (Windows)
 ```
+
+---
+
+## HTTPS Certificate Configuration
+
+HTTPS listeners require a TLS certificate. Cerberus supports **three modes** — from zero-config to fully custom:
+
+### Mode 1: Auto-Generated (Zero Config)
+
+Simply create an HTTPS listener — if no certificate files are found, the server **automatically generates** a self-signed ECDSA P-256 certificate (valid for 10 years) and saves it to the `certs/` directory for future use.
+
+> This is the easiest way to get started. No manual steps required.
+
+### Mode 2: Pre-Generate with Script
+
+Generate a certificate before starting the server:
+
+#### Linux / macOS
+```bash
+chmod +x generate_certs.sh
+./generate_certs.sh
+```
+
+#### Windows
+```powershell
+.\generate_certs.ps1
+```
+
+This creates `certs/server.crt` and `certs/server.key` using OpenSSL (or PowerShell as fallback).
+
+### Mode 3: Custom Certificate
+
+Bring your own certificate (e.g., from Let's Encrypt or an internal CA):
+
+```bash
+# PEM format (recommended)
+cp /path/to/your/fullchain.pem  certs/server.crt
+cp /path/to/your/privkey.pem    certs/server.key
+
+# Or PFX format (legacy)
+cp /path/to/your/cert.pfx  mycert.pfx
+```
+
+### Certificate Search Order
+
+The server searches for certificates in this priority order:
+
+| Priority | Path | Format |
+|----------|------|--------|
+| 1 | `certs/server.pfx` | PKCS#12 (PFX) |
+| 2 | `mycert.pfx` | PKCS#12 (PFX, legacy) |
+| 3 | `certs/server.crt` + `certs/server.key` | PEM |
+| 4 | *(none found)* | Auto-generate self-signed |
+
+> **Note:** Certificate paths are relative to the binary location. Both the executable directory and the current working directory are searched.
 
 ---
 
