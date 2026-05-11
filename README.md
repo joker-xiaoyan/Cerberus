@@ -36,13 +36,24 @@
 - **PPID Spoofing + Thread Start Address Spoofing** — Process injection with parent process forgery and thread entry point masking
 - **Traffic Obfuscation** — Encrypted binary beacon data embedded in legitimate Cookie/Body fields; no plaintext sensitive data in HTTP headers
 
-### 🌐 Cross-Platform Support
+### Cross-Platform Support
+
 | Platform | Architecture | Beacon Type |
 |----------|-------------|-------------|
 | Windows  | x64         | Full-featured DLL beacon |
 | Windows  | x64         | Staged DLL (stager) |
 | Linux    | x64         | Full-featured ELF beacon |
 | Linux    | x64         | Basic ELF beacon |
+
+### Windows Compatibility
+
+| Windows Version | Status |
+|-----------------|--------|
+| Windows 7 / Server 2008 R2 (x64) | Supported (TLS 1.2 auto-enabled, PE Subsystem 6.01) |
+| Windows 8 / 8.1 / Server 2012 / 2012 R2 (x64) | Supported |
+| Windows 10 / 11 / Server 2016+ (x64) | Supported |
+
+> Beacon and stager EXEs are linked with `/SUBSYSTEM:WINDOWS,6.01` and `WinHttpSetOption(SECURE_PROTOCOLS)` is invoked at runtime, so HTTP/HTTPS payloads work out of the box on legacy Windows versions where TLS 1.2 is disabled by default.
 
 ### 📡 Flexible C2 Communication
 - **Multiple Listener Types** — HTTP, HTTPS, TCP, UDP, DNS
